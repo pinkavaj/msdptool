@@ -1,0 +1,30 @@
+#ifndef __SDP2XXX_H___
+#define __SDP2XXX_H___
+
+"SESS__\r"
+"ENDS__\r"
+"CCOM__??\r"
+"GCOM__\r"
+"GMAX__\r"
+"GOVP__\r"
+"GETD__\r"
+"GETS__\r"
+"GETM__\r"
+"GETM__?\r"
+"GETP__\r"
+"GETP__?\r"
+"GPAL__\r"
+"VOLT__?\r"
+"CURR__?\r"
+"SOVP__?\r"
+"SOUT__1\r"
+"SOUT__0\r"
+"POWW__?\r"
+"POWW__?\r"
+"PROM__?\r"
+"PROP__?\r"
+"RUNM__?\r"
+"RUNP__?\r"
+"STOP__\r"
+
+#endif
