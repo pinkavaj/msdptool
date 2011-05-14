@@ -28,6 +28,11 @@ typedef enum {
 } sdp_ifce_t;
 
 typedef enum {
+        sdp_mode_cc,
+        sdp_mode_cv,
+} sdp_mode_t;
+
+typedef enum {
         sdp_resp_incomplete = 0,
         sdp_resp_data,
         sdp_resp_nodata,
@@ -37,6 +42,12 @@ typedef struct {
         int curr;
         int volt;
 } sdp_va_t;
+
+typedef struct {
+        int curr;
+        int volt;
+        sdp_mode_t mode;
+} sdp_preset_t;
 
 typedef struct {
         int curr;
@@ -77,7 +88,7 @@ int sdp_resp_volt_limit(char *buf, int len, int *volt_limit);
 // FIXME: missing information about mode: constant voltage/current
 int sdp_resp_va_data(char *buf, int len, sdp_va_t *va_data);
 int sdp_resp_va_setpoint(char *buf, int len, sdp_va_t *va_setpoints);
-int sdp_resp_preset(char *buf, int len, sdp_va_t *va_preset);
+int sdp_resp_preset(char *buf, int len, sdp_preset_t *preset);
 int sdp_resp_program(char *buf, int len, sdp_program_t *program);
 int sdp_resp_ldc_info(char *buf, int len, sdp_ldc_info_t *lcd_info);
 

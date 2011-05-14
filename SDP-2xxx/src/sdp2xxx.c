@@ -205,12 +205,12 @@ int sdp_resp_va_setpoint(char *buf, int len, sdp_va_t *va_setpoints)
  * buf:         buffer with irecieved response
  * len:         lenght of data in buffer
  * va_preset:   When sdp_get_preset called with preset number expects pointer
- *      to sdp_va_t to store value from requested preset. 
+ *      to sdp_preset_t to store value from requested preset. 
  *      When sdp_get_preset called with SDP_PRESET_ALL expects pointer to
- *      sdp_va_t array of size 9 to store all presets values.
+ *      sdp_preset_t array of size 9 to store all presets values.
  * returns:     0 on success, -1 on error
  */
-int sdp_resp_preset(char *buf, int len, sdp_va_t *va_preset)
+int sdp_resp_preset(char *buf, int len, sdp_preset_t *preset)
 {
         return -1;
 }
