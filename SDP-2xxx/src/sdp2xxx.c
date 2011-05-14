@@ -130,18 +130,58 @@ sdp_resp_t sdp_resp(const char *buf, int len)
  * returns:     0 on success, -1 on error
  */
 int sdp_resp_dev_addr(char *buf, int len, int *addr)
-{
-        // FIXME
-        if (len != (sizeof(str_ok) - 1 + 3))
+{       
+        const char resp[] = "RS__\rOK\r";
+
+        if (len != (sizeof(resp) - 1))
                 return -1;
 
-        if (buf[0] != '0' || buf[1] != '0')
+        if (buf[0] != 'R' || buf[1] != 'S' ||
+                        buf[2] < '0' || buf[2] > '9' ||
+                        buf[3] < '0' || buf[3] > '9')
                 return -1;
 
-        *addr = buf[2] - '0';
+        *addr = (buf[2] - '0') * 10;
+        *addr += buf[3] - '0';
 
         return 0;
 }
+
+int sdp_resp_va_maximums(char *buf, int len, sdp_va_t *va_maximums)
+{
+        return -1;
+}
+
+int sdp_resp_volt_limit(char *buf, int len, int *volt_limit)
+{
+        return -1;
+}
+
+int sdp_resp_va_data(char *buf, int len, sdp_va_t *va_data)
+{
+        return -1;
+}
+
+int sdp_resp_va_setpoint(char *buf, int len, sdp_va_t *va_setpoints)
+{
+        return -1;
+}
+
+int sdp_resp_preset(char *buf, int len, sdp_va_t *va_preset)
+{
+        return -1;
+}
+
+int sdp_resp_program(char *buf, int len, sdp_program_t *program)
+{
+        return -1;
+}
+
+int sdp_resp_ldc_info(char *buf, int len, sdp_resp_ldc_info_t *lcd_info)
+{
+        return -1;
+}
+
 
 /**
  * Enable or disable remote control of SDP power supply.
