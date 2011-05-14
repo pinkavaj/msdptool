@@ -71,20 +71,20 @@ static int sdp_print_cmd(char *buf, int addr, const char *cmd)
  * len  - lenght of data in buffer
  * returns response status (nodata, data, incomplete)
  */
-sdp_response_t sdp_response(const char *buf, int len)
+sdp_resp_t sdp_resp(const char *buf, int len)
 {
         static const char str_ok[] = "OK\r";
 
         if (len < 3)
-                return sdp_response_incomplete;
+                return sdp_resp_incomplete;
         if (!strncmp(buf + len - 3, str_ok, 3)) {
                 /* response contains only OK skring */
                 if (len == 3)
-                        return sdp_response_nodata;
+                        return sdp_resp_nodata;
                 /* response contains some data and OK string */
                 if (buf[len - 4] == '\r')
-                        return sdp_response_data;
+                        return sdp_resp_data;
         }
-        return sdp_response_incomplete;
+        return sdp_resp_incomplete;
 }
 
