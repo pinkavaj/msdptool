@@ -55,7 +55,7 @@ typedef struct {
         int fault;
         int output;
         int remote;
-} sdp_resp_ldc_info_t;
+} sdp_ldc_info_t;
 
 sdp_resp_t sdp_resp(const char *buf, int len);
 
@@ -79,7 +79,7 @@ int sdp_resp_va_data(char *buf, int len, sdp_va_t *va_data);
 int sdp_resp_va_setpoint(char *buf, int len, sdp_va_t *va_setpoints);
 int sdp_resp_preset(char *buf, int len, sdp_va_t *va_preset);
 int sdp_resp_program(char *buf, int len, sdp_program_t *program);
-int sdp_resp_ldc_info(char *buf, int len, sdp_resp_ldc_info_t *lcd_info);
+int sdp_resp_ldc_info(char *buf, int len, sdp_ldc_info_t *lcd_info);
 
 /* This functions respond only "OK" (sdp_resp_nodata) */
 int sdp_remote(char *buf, int addr, int enable);
