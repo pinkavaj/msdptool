@@ -150,6 +150,8 @@ int sdp_resp_dev_addr(char *buf, int len, int *addr)
 /**
  * Parse response on sdp_get_va_maximums.
  *
+ * buf:         buffer with irecieved response
+ * len:         lenght of data in buffer
  * va_maximums: pointer to sdp_va_t where result should be stored
  * returns:     0 on success, -1 on error
  */
@@ -161,6 +163,8 @@ int sdp_resp_va_maximums(char *buf, int len, sdp_va_t *va_maximums)
 /**
  * Parse response on sdp_get_volt_limit.
  *
+ * buf:         buffer with irecieved response
+ * len:         lenght of data in buffer
  * volt_limit:  pointer to int where upper voltage limit should be stored
  * returns:     0 on success, -1 on error
  */
@@ -172,6 +176,8 @@ int sdp_resp_volt_limit(char *buf, int len, int *volt_limit)
 /**
  * Parse response on sdp_get_va_data.
  *
+ * buf:         buffer with irecieved response
+ * len:         lenght of data in buffer
  * va_data:     pointer to sdp_va_t to store current U and I value
  * returns:     0 on success, -1 on error
  */
@@ -183,6 +189,8 @@ int sdp_resp_va_data(char *buf, int len, sdp_va_t *va_data)
 /**
  * Parse response on sdp_get_va_setpoint.
  *
+ * buf:         buffer with irecieved response
+ * len:         lenght of data in buffer
  * va_setpoints: pointer to sdp_va_t used to store current setpoint
  * returns:     0 on success, -1 on error
  */
@@ -194,6 +202,8 @@ int sdp_resp_va_setpoint(char *buf, int len, sdp_va_t *va_setpoints)
 /**
  * Parse response on sdp_get_preset.
  *
+ * buf:         buffer with irecieved response
+ * len:         lenght of data in buffer
  * va_preset:   When sdp_get_preset called with preset number expects pointer
  *      to sdp_va_t to store value from requested preset. 
  *      When sdp_get_preset called with SDP_PRESET_ALL expects pointer to
@@ -208,6 +218,8 @@ int sdp_resp_preset(char *buf, int len, sdp_va_t *va_preset)
 /**
  * Parse response on sdp_get_program.
  *
+ * buf:         buffer with irecieved response
+ * len:         lenght of data in buffer
  * program:     When sdp_get_program called with program number expects
  *      pointer to sdp_program_t to store requested program item.
  *      When sdp_get_program called with SDP_PROGRAM_ALL expects pointer to
@@ -222,6 +234,8 @@ int sdp_resp_program(char *buf, int len, sdp_program_t *program)
 /**
  * Parse response on sdp_get_ldc_info.
  *
+ * buf:         buffer with irecieved response
+ * len:         lenght of data in buffer
  * lcd_info:    pointer to sdp_ldc_info_t to store recieved LCD info
  * returns:     0 on success, -1 on error
  */
