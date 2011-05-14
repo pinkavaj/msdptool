@@ -119,12 +119,12 @@ sdp_resp_t sdp_resp(const char *buf, int len)
 }
 
 /**
- * Parse response for sdp_get_dev_addr. When device is connected on
- *      rs485 bus, this function might be used to detect whatever is device
- *      with specified address online, This function has no meaning on rs232,
- *      but might be used to to get last rs485 device address.
+ * Parse response from sdp_get_dev_addr. When device is connected on
+ *      rs485 bus, this function might be used to check for presence of device
+ *      with specified address. This function has no meaning on rs232,
+ *      but might be used to get last rs485 device address (unsupported).
  *
- * buf:         buffer with data from response
+ * buf:         buffer with recieved response
  * len:         lenght of data in buffer
  * addr:        pointer to integer to store recieved addres
  * returns:     0 on success, -1 on error
