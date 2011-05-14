@@ -5,7 +5,8 @@
 extern "C" {
 #endif
 
-/* minimal lenght of buffer where SDP command is writen */
+/* Minimal lenght of buffer where SDP command is writen, it is garanted
+ * that all commands will fit into this buffer including trailing \0 */
 #define SDP_BUF_SIZE_MIN (20)
 
 #define SDP_DEV_ADDR_MIN    (1)
