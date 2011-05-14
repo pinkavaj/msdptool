@@ -1,0 +1,6 @@
+ * finish library (implement cmd specific functions)
+ * create some tools to test and use this library
+   * commandline tool for basic operations, testing nad script automation
+   * GUI tool (Qt4?, some multiplatform lib for serlia line ?)
+   * other? Some requests?
+
