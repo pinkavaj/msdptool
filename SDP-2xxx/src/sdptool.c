@@ -3,6 +3,7 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <unistd.h>
 #include "sdp2xxx.h"
 
 void print_help(void)
@@ -97,44 +98,71 @@ int main(int argc, char **argv)
                 // TODO set parameters of serial port to 9600 8n1
         }
 
+        char sdp_cmd[SDP_BUF_SIZE_MIN];
+        char *cmd = argv[arg_idx];
+        // Drop already processed arguments
+        argv += arg_idx;
+        argc -= arg_idx;
+        arg_idx = 0;
+
         // TODO parse command and write it into output
-        if (strcmp(argv[arg_idx], "ccom")) {
+        if (!strcmp(cmd, "ccom")) {
+                sdp_ifce_t ifce;
+
+                if (argc != 1) {
+                        print_help();
+                        return -1;
+                }
+
+                if (!strcmp(argv[0], "rs232"))
+                        ifce = sdp_ifce_rs232;
+                else if (!strcmp(argv[0], "rs485"))
+                        ifce = sdp_ifce_rs485;
+                else {
+                        return -1;
+                }
+
+                if (sdp_select_ifce(sdp_cmd, addr, ifce) == -1)
+                        return -1;
+                write(fd_dev_out, sdp_cmd, strlen(sdp_cmd));
+                // TODO
         }
-        else if (strcmp(argv[arg_idx], "gcom")) {
+        else if (!strcmp(cmd, "gcom")) {
+//                if (sdp_(sdp_cmd, addr) == -1)
         }
-        else if (strcmp(argv[arg_idx], "gmax")) {
+        else if (!strcmp(cmd, "gmax")) {
         }
-        else if (strcmp(argv[arg_idx], "govp")) {
+        else if (!strcmp(cmd, "govp")) {
         }
-        else if (strcmp(argv[arg_idx], "getd")) {
+        else if (!strcmp(cmd, "getd")) {
         }
-        else if (strcmp(argv[arg_idx], "gets")) {
+        else if (!strcmp(cmd, "gets")) {
         }
-        else if (strcmp(argv[arg_idx], "getm")) {
+        else if (!strcmp(cmd, "getm")) {
         }
-        else if (strcmp(argv[arg_idx], "getp")) {
+        else if (!strcmp(cmd, "getp")) {
         }
-        else if (strcmp(argv[arg_idx], "gpal")) {
+        else if (!strcmp(cmd, "gpal")) {
         }
-        else if (strcmp(argv[arg_idx], "volt")) {
+        else if (!strcmp(cmd, "volt")) {
         }
-        else if (strcmp(argv[arg_idx], "curr")) {
+        else if (!strcmp(cmd, "curr")) {
         }
-        else if (strcmp(argv[arg_idx], "sovp")) {
+        else if (!strcmp(cmd, "sovp")) {
         }
-        else if (strcmp(argv[arg_idx], "sout")) {
+        else if (!strcmp(cmd, "sout")) {
         }
-        else if (strcmp(argv[arg_idx], "poww")) {
+        else if (!strcmp(cmd, "poww")) {
         }
-        else if (strcmp(argv[arg_idx], "prom")) {
+        else if (!strcmp(cmd, "prom")) {
         }
-        else if (strcmp(argv[arg_idx], "prop")) {
+        else if (!strcmp(cmd, "prop")) {
         }
-        else if (strcmp(argv[arg_idx], "runm")) {
+        else if (!strcmp(cmd, "runm")) {
         }
-        else if (strcmp(argv[arg_idx], "runp")) {
+        else if (!strcmp(cmd, "runp")) {
         }
-        else if (strcmp(argv[arg_idx], "stop")) {
+        else if (!strcmp(cmd, "stop")) {
         }
         else {
                 print_help();
