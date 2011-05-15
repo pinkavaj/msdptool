@@ -28,8 +28,8 @@ typedef enum {
 } sdp_ifce_t;
 
 typedef enum {
-        sdp_mode_cc,
-        sdp_mode_cv,
+        sdp_mode_cv = 0,
+        sdp_mode_cc = 1,
 } sdp_mode_t;
 
 typedef enum {
@@ -47,7 +47,7 @@ typedef struct {
         int curr;
         int volt;
         sdp_mode_t mode;
-} sdp_preset_t;
+} sdp_va_data_t;
 
 typedef struct {
         int curr;
@@ -85,10 +85,9 @@ int sdp_get_ldc_info(char *buf, int addr);
 int sdp_resp_dev_addr(char *buf, int len, int *addr);
 int sdp_resp_va_maximums(char *buf, int len, sdp_va_t *va_maximums);
 int sdp_resp_volt_limit(char *buf, int len, int *volt_limit);
-// FIXME: missing information about mode: constant voltage/current
-int sdp_resp_va_data(char *buf, int len, sdp_va_t *va_data);
+int sdp_resp_va_data(char *buf, int len, sdp_va_data_t *va_data);
 int sdp_resp_va_setpoint(char *buf, int len, sdp_va_t *va_setpoints);
-int sdp_resp_preset(char *buf, int len, sdp_preset_t *preset);
+int sdp_resp_preset(char *buf, int len, sdp_va_t *va_preset);
 int sdp_resp_program(char *buf, int len, sdp_program_t *program);
 int sdp_resp_ldc_info(char *buf, int len, sdp_ldc_info_t *lcd_info);
 

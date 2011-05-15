@@ -1,4 +1,5 @@
 #include "sdp2xxx.h"
+#include <ctype.h>
 #include <string.h>
 #include <strings.h>
 
@@ -45,35 +46,50 @@ static const char sdp_cmd_stop[] = "STOP__\r";
 static const char str_ok[] = "OK\r";
 
 /**
- * Print 2 digits unsigned number into buffer.
+ * Print 3, 2 or 1 digits unsigned number into buffer.
  *
- * buf:         output buffer, mus be at least 2B long
- * num:         number to write, must be in range 0-99
+ * buf:         output buffer, mus be at least lenB long
+ * len:         count of printed digits
+ * num:         value to print
  * returns:     pointer to buf
  */
-static char *sdp_print_num2(char *buf, int num)
+static char *sdp_print_num(char *buf, int len, int num)
 {
-        buf[1] = (num % 10) + '0';
-        num /= 10;
-        buf[0] = (num % 10) + '0';
+        switch (len) {
+                case 3:
+                        *buf++ = (num / 100) + '0';
+                        num %= 100;
+                case 2:
+                        *buf++ = (num / 10) + '0';
+                        num %= 10;
+                case 1:
+                        *buf++ = num + '0';
+                default:
+                        break;
+        }
 
-        return buf;
+        return buf - len;
 }
 
 /**
- * Print 3 digits unsigned number into buffer.
+ * Convert numeric string into number
  *
- * buf:         output buffer, mus be at least 3B long
- * num:         number to write, must be in range 0-999
- * returns:     pointer to buf
+ * buf:         buffer with character data
+ * len:         number of digits
+ * val:         pointer to integet to store result
+ * returns:     -1 on error, 0 otherwise
  */
-static char *sdp_print_num3(char *buf, int num)
+static int sdp_scan_num(const char *buf, int len, int *val)
 {
-        buf[2] = (num % 10) + '0';
-        num /= 10;
-        sdp_print_num2(buf + 1, num);
-
-        return buf;
+        *val = 0;
+        while (len--) {
+                if (!isdigit(buf[0]))
+                        return -1;
+                *val *= 10;
+                *val += buf[0] - '0';
+                buf++;
+        }
+        return 0;
 }
 
 /**
@@ -91,7 +107,7 @@ static int sdp_print_cmd(char *buf, const char *cmd, int addr)
                 return -1;
        
         strcpy(buf, cmd);
-        sdp_print_num2(buf + 4, addr);
+        sdp_print_num(buf + 4, 2, addr);
 
         return 0;
 }
@@ -136,13 +152,11 @@ int sdp_resp_dev_addr(char *buf, int len, int *addr)
         if (len != (sizeof(resp) - 1))
                 return -1;
 
-        if (buf[0] != 'R' || buf[1] != 'S' ||
-                        buf[2] < '0' || buf[2] > '9' ||
-                        buf[3] < '0' || buf[3] > '9')
+        if (buf[0] != 'R' || buf[1] != 'S')
                 return -1;
-
-        *addr = (buf[2] - '0') * 10;
-        *addr += buf[3] - '0';
+        
+        if (sdp_scan_num(buf + 2, 2, addr) == -1)
+                return -1;
 
         return 0;
 }
@@ -157,7 +171,17 @@ int sdp_resp_dev_addr(char *buf, int len, int *addr)
  */
 int sdp_resp_va_maximums(char *buf, int len, sdp_va_t *va_maximums)
 {
-        return -1;
+        const char resp[] = "uuuiii\rOK\r";
+
+        if (len != (sizeof(resp) - 1))
+                return -1;
+
+        if (sdp_scan_num(buf, 3, &va_maximums->volt) == -1)
+                return -1;
+        if (sdp_scan_num(buf + 3, 3, &va_maximums->curr) == -1)
+                return -1;
+        
+        return 0;
 }
 
 /**
@@ -170,7 +194,15 @@ int sdp_resp_va_maximums(char *buf, int len, sdp_va_t *va_maximums)
  */
 int sdp_resp_volt_limit(char *buf, int len, int *volt_limit)
 {
-        return -1;
+        const char resp[] = "uuu\rOK\r";
+
+        if (len != (sizeof(resp) - 1))
+                return -1;
+
+        if (sdp_scan_num(buf, 3, volt_limit) == -1)
+                return -1;
+
+        return 0;
 }
 
 /**
@@ -178,12 +210,26 @@ int sdp_resp_volt_limit(char *buf, int len, int *volt_limit)
  *
  * buf:         buffer with irecieved response
  * len:         lenght of data in buffer
- * va_data:     pointer to sdp_va_t to store current U and I value
+ * va_data:     pointer to sdp_va_data_t to store current U, I and mode
  * returns:     0 on success, -1 on error
  */
-int sdp_resp_va_data(char *buf, int len, sdp_va_t *va_data)
+int sdp_resp_va_data(char *buf, int len, sdp_va_data_t *va_data)
 {
-        return -1;
+        const char resp[] = "uuuuiiiic\rOK\r";
+        int mode;
+
+        if (len != (sizeof(resp) - 1))
+                return -1;
+
+        if (sdp_scan_num(buf, 4, &va_data->volt) == -1)
+                return -1;
+        if (sdp_scan_num(buf + 4, 4, &va_data->curr) == -1)
+                return -1;
+        if (sdp_scan_num(buf + 8, 1, &mode) == -1)
+                return -1;
+        va_data->mode = mode;
+
+        return 0;
 }
 
 /**
@@ -196,7 +242,17 @@ int sdp_resp_va_data(char *buf, int len, sdp_va_t *va_data)
  */
 int sdp_resp_va_setpoint(char *buf, int len, sdp_va_t *va_setpoints)
 {
-        return -1;
+        const char resp[] = "uuuiii\rOK\r";
+
+        if (len != (sizeof(resp) - 1))
+                return -1;
+
+        if (sdp_scan_num(buf, 3, &va_setpoints->volt) == -1)
+                return -1;
+        if (sdp_scan_num(buf + 3, 3, &va_setpoints->curr) == -1)
+                return -1;
+
+        return 0;
 }
 
 /**
@@ -205,14 +261,37 @@ int sdp_resp_va_setpoint(char *buf, int len, sdp_va_t *va_setpoints)
  * buf:         buffer with irecieved response
  * len:         lenght of data in buffer
  * va_preset:   When sdp_get_preset called with preset number expects pointer
- *      to sdp_preset_t to store value from requested preset. 
+ *      to sdp_va_t to store value from requested preset. 
  *      When sdp_get_preset called with SDP_PRESET_ALL expects pointer to
- *      sdp_preset_t array of size 9 to store all presets values.
+ *      sdp_va_t array of size 9 to store all presets values.
  * returns:     0 on success, -1 on error
  */
-int sdp_resp_preset(char *buf, int len, sdp_preset_t *preset)
+int sdp_resp_preset(char *buf, int len, sdp_va_t *va_preset)
 {
-        return -1;
+        const char resp[] = "uuuiii\r";
+        const int resp_s1 = sizeof(resp) - 1 + sizeof(str_ok) - 1;
+        const int resp_s9 = (sizeof(resp) - 1) * 9 + sizeof(str_ok) - 1;
+        int count = 1;
+
+        if (len == resp_s9) {
+                count = 9;
+        } else if (len != resp_s1)
+                return -1;
+
+        while (count--) {
+                if (sdp_scan_num(buf, 3, &va_preset->volt) == -1)
+                        return -1;
+                buf += 3;
+
+                if (sdp_scan_num(buf, 3, &va_preset->curr) == -1)
+                        return -1;
+                buf += 3;
+
+                va_preset++;
+                buf++;
+        }
+
+        return 0;
 }
 
 /**
@@ -228,7 +307,39 @@ int sdp_resp_preset(char *buf, int len, sdp_preset_t *preset)
  */
 int sdp_resp_program(char *buf, int len, sdp_program_t *program)
 {
-        return -1;
+        const char resp[] = "uuuiiimmss\r";
+        const int resp_s1 = sizeof(resp) - 1 + sizeof(str_ok) - 1;
+        const int resp_s20 = (sizeof(resp) - 1) * 20 + sizeof(str_ok) - 1;
+        int count = 1;
+
+        if (len == resp_s20) {
+                count = 20;
+        } else if (len != resp_s1)
+                return -1;
+
+        while (count--) {
+                int min, sec;
+
+                if (sdp_scan_num(buf, 3, &program->volt) == -1)
+                        return -1;
+                buf += 3;
+                if (sdp_scan_num(buf, 3, &program->curr) == -1)
+                        return -1;
+                buf += 3;
+
+                if (sdp_scan_num(buf, 2, &min) == -1)
+                        return -1;
+                buf += 2;
+                if (sdp_scan_num(buf, 2, &sec) == -1)
+                        return -1;
+                buf += 2;
+                program->time = min * 60 + sec;
+
+                program++;
+                buf++;
+        }
+
+        return 0;
 }
 
 /**
@@ -241,6 +352,14 @@ int sdp_resp_program(char *buf, int len, sdp_program_t *program)
  */
 int sdp_resp_ldc_info(char *buf, int len, sdp_ldc_info_t *lcd_info)
 {
+        const char resp[] = "\rOK\r"; //TODO
+
+        if (len != (sizeof(resp) - 1))
+                return -1;
+
+        //if (sdp_scan_num(buf, 2, &lcd_info->) == -1)
+        //        return -1;
+        // TODO
         return -1;
 }
 
@@ -298,7 +417,7 @@ int sdp_run_program(char *buf, int addr, int count)
         if (sdp_print_cmd(buf, sdp_cmd_runp, addr) == -1)
                 return -1;
 
-        sdp_print_num3(buf + 6, count);
+        sdp_print_num(buf + 6, 3, count);
  
         return 0;
 }
@@ -337,7 +456,7 @@ int sdp_set_volt(char *buf, int addr, int volt)
         if (sdp_print_cmd(buf, sdp_cmd_volt, addr) == -1)
                 return -1;
 
-        sdp_print_num3(buf + 6, volt);
+        sdp_print_num(buf + 6, 3, volt);
         
         return 0;
 }
@@ -358,7 +477,7 @@ int sdp_set_curr(char *buf, int addr, int curr)
         if (sdp_print_cmd(buf, sdp_cmd_curr, addr) == -1)
                 return -1;
 
-        sdp_print_num3(buf + 6, curr);
+        sdp_print_num(buf + 6, 3, curr);
 
         return 0;
 }
@@ -379,7 +498,7 @@ int sdp_set_volt_limit(char *buf, int addr, int volt)
         if (sdp_print_cmd(buf, sdp_cmd_sovp, addr) == -1)
                 return -1;
 
-        sdp_print_num3(buf + 6, volt);
+        sdp_print_num(buf + 6, 3, volt);
 
         return 0;
 }
@@ -451,8 +570,8 @@ int sdp_set_preset(char *buf, int addr, int preset, int volt, int curr)
                 return -1;
 
         buf[6] = preset + '0';
-        sdp_print_num3(buf + 7, volt);
-        sdp_print_num3(buf + 7 + 3, curr);
+        sdp_print_num(buf + 7, 3, volt);
+        sdp_print_num(buf + 10, 3, curr);
 
         return 0;
 }
@@ -474,17 +593,17 @@ int sdp_set_program(char *buf, int addr, int program, int volt, int curr,
         if (program < SDP_PROGRAM_MIN || program > SDP_PROGRAM_MAX ||
                         volt < 0 || volt > 999 || 
                         curr < 0 || curr > 999 ||
-                        time < 0 || time > (59*60+59))
+                        time < 0 || time > (99*60+59))
                 return -1;
 
         if (sdp_print_cmd(buf, sdp_cmd_prop, addr) == -1)
                 return -1;
 
-        sdp_print_num2(buf + 6, program);
-        sdp_print_num3(buf + 6 + 2, volt);
-        sdp_print_num3(buf + 6 + 2 + 3, curr);
-        sdp_print_num2(buf + 6 + 2 + 3 + 3 + 2, time % 60);
-        sdp_print_num2(buf + 6 + 2 + 3 + 3, time / 60);
+        sdp_print_num(buf + 6, 2, program);
+        sdp_print_num(buf + 8, 3, volt);
+        sdp_print_num(buf + 11, 3, curr);
+        sdp_print_num(buf + 14, 2, time / 60);
+        sdp_print_num(buf + 16, 2, time % 60);
         
         return 0;
 }
