@@ -23,8 +23,13 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include "sdp2xxx.h"
+#ifdef __linux__
+#else
 #ifdef _WIN32
 #include <windows.h>
+#else
+#error "Unsupported OS"
+#endif
 #endif
 
 void print_help(void)
@@ -81,24 +86,43 @@ static sdp_resp_t sdp_read(int fd, char *buf, ssize_t count)
         // TODO
         return -1;
 }
+
+static ssize_t sdp_write(int fd, char *, ssize_t count)
+{
+        // TODO
+        return write(fd, buf, size);
+}
 #endif
 
 #ifdef _WIN32
-static sdp_resp_t sdp_read(int fd, char *buf, ssize_t count)
+static sdp_resp_t sdp_read(HANDLE h, char *buf, ssize_t count)
 {
-        int readb;
+        DWORD readb;
 
-        if (!ReadFile(fd, buf, n, &readb, NULL)) {
+        if (!ReadFile(h, buf, 1, &readb, NULL)) {
                 // error
         }
         // TODO
         return -1;
 }
+
+static ssize_t sdp_write(HANDLE h, char *buf, ssize_t count)
+{
+        DWORD writeb;
+        // TODO
+        if (!WriteFile(h, buf, count, &writeb, NULL))
+            return -1;
+        return count;
+}
 #endif
 
 int main(int argc, char **argv)
 {
+#ifdef __linux__
         int fd_dev_in, fd_dev_out, fd_std_out;
+#elif _WIN32
+        HANDLE fd_dev_in, fd_dev_out, fd_std_out;
+#endif
         int arg_idx = 1;
         int addr = 1;
 
@@ -132,9 +156,15 @@ int main(int argc, char **argv)
         }
 
         if (!strcmp(argv[arg_idx], "-")) {
-                fd_dev_in = 1;
-                fd_dev_out = 2;
-                fd_std_out = 3;
+#ifdef __linux__
+                fd_dev_in = STDIN_FILENO;
+                fd_dev_out = STDOUT_FILENO;
+                fd_std_out = STDERR_FILENO;
+#elif _WIN32
+                fd_dev_in = GetStdHandle(STD_INPUT_HANDLE);
+                fd_dev_out = GetStdHandle(STD_OUTPUT_HANDLE);
+                fd_std_out = GetStdHandle(STD_ERROR_HANDLE);
+#endif
         } 
         else {
 #ifdef __linux__
@@ -143,12 +173,13 @@ int main(int argc, char **argv)
                         perror("Failed to open port");
                         return -1;
                 }
+                fd_std_out = STDOUT_FILENO;
                 // TODO set parameters of serial port to 9600 8n1
 #elif _WIN32
                 fd_dev_in = CreateFile(argv[arg_idx],
                                 GENERIC_READ | GENERIC_WRITE, 0, 0,
                                 OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
-                if (fd_dev_in == INVALID_FILE_HANDLE) {
+                if (fd_dev_in == INVALID_HANDLE_VALUE) {
                         char buf[1024];
 
                         FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM |
@@ -156,16 +187,14 @@ int main(int argc, char **argv)
                                         NULL, GetLastError(),
                                         MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
                                         buf, sizeof(buf), NULL);
-                        fprintf(2, buf);
+                        fprintf(stderr, buf);
 
                         // TODO
                         return -1;
                 }
+                fd_std_out = GetStdHandle(STD_OUTPUT_HANDLE);;
                 // TODO set parameters of serial port to 9600 8n1
-#else
-#error "Unsupported OS"
 #endif
-                fd_std_out = 2;
         }
 
         char buf[SDP_BUF_SIZE_MIN];
@@ -199,7 +228,7 @@ int main(int argc, char **argv)
                         print_help();
                         return -1;
                 }
-                if (write(fd_dev_out, buf, size) != size) {
+                if (sdp_write(fd_dev_out, buf, size) != size) {
                         print_help();
                         return -1;
                 }
