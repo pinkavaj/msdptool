@@ -1,0 +1,6 @@
+Read LICENSE.BSD for license agreement. This license is default and is used
+for everything if not specified explicitly otherwise.
+
+Read LICENSE.LGPL3 for lincese agreement for icons (images). Icons originate
+fron Oxygen KDE4 theme.
+
