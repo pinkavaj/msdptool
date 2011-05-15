@@ -1,2 +1,4 @@
+sdptool
 *.o
+*.so
 *.so.*
