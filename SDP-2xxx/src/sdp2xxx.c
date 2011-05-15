@@ -99,7 +99,8 @@ static int sdp_scan_num(const char *buf, int len, int *val)
  * cmd:         template of command wich should be printed
  * addr:        rs485 address of device in range 1 - 31,
  *      for device connected on rs232 use anny number in range 1 - 31
- * returns:     -1 on error, 0 otherwise
+ * returns:     number of writen characters not including trailing '\0',
+ *      -1 on error
  */
 static int sdp_print_cmd(char *buf, const char *cmd, int addr)
 {
@@ -109,7 +110,7 @@ static int sdp_print_cmd(char *buf, const char *cmd, int addr)
         strcpy(buf, cmd);
         sdp_print_num(buf + 4, 2, addr);
 
-        return 0;
+        return strlen(cmd);
 }
 
 /**
@@ -370,7 +371,8 @@ int sdp_resp_ldc_info(char *buf, int len, sdp_ldc_info_t *lcd_info)
  * buf:         output buffer (see SDP_BUF_SIZE_MIN)
  * addr:        rs485 device address: 1 - 31 (use anny valid for rs232)
  * enable:      when 0 disable remote control, enable otherwise
- * returns:     0 on success, -1 on error
+ * returns:     number of writen characters not including trailing '\0',
+ *      -1 on error
  */
 int sdp_remote(char *buf, int addr, int enable)
 {
@@ -386,19 +388,21 @@ int sdp_remote(char *buf, int addr, int enable)
  * buf:         output buffer (see SDP_BUF_SIZE_MIN)
  * addr:        rs485 device address: 1 - 31 (use anny valid for rs232)
  * preset:      index of preset values: 1-9
- * returns:     0 on success, -1 on error
+ * returns:     number of writen characters not including trailing '\0',
+ *      -1 on error
  */
 int sdp_run_preset(char *buf, int addr, int preset)
 {
+        int ret;
+
         if (preset < SDP_PRESET_MIN || preset > SDP_PRESET_MAX)
                 return -1;
 
-        if (sdp_print_cmd(buf, sdp_cmd_runm, addr) == -1)
-                return -1;
+        ret = sdp_print_cmd(buf, sdp_cmd_runm, addr);
+        if (ret != -1)
+                buf[6] = ((char)preset % 10) + '0';
 
-        buf[6] = ((char)preset % 10) + '0';
-
-        return 0;
+        return ret;
 }
 
 /**
@@ -407,19 +411,21 @@ int sdp_run_preset(char *buf, int addr, int preset)
  * buf:         output buffer (see SDP_BUF_SIZE_MIN)
  * addr:        rs485 device address: 1 - 31 (use anny valid for rs232)
  * count:       number of program repeats: 0-999 or SDP_RUN_PROG_INF
- * returns:     0 on success, -1 on error
+ * returns:     number of writen characters not including trailing '\0',
+ *      -1 on error
  */
 int sdp_run_program(char *buf, int addr, int count)
 {
+        int ret;
+
         if ((count < 1 || count > 999) && count != SDP_RUN_PROG_INF)
                 return -1;
 
-        if (sdp_print_cmd(buf, sdp_cmd_runp, addr) == -1)
-                return -1;
-
-        sdp_print_num(buf + 6, 3, count);
+        ret = sdp_print_cmd(buf, sdp_cmd_runp, addr);
+        if (ret != -1)
+                sdp_print_num(buf + 6, 3, count);
  
-        return 0;
+        return ret;
 }
 
 /**
@@ -428,7 +434,8 @@ int sdp_run_program(char *buf, int addr, int count)
  * buf:         output buffer (see SDP_BUF_SIZE_MIN)
  * addr:        rs485 device address: 1 - 31 (use anny valid for rs232)
  * ifce:        selected interface type
- * returns:     0 on success, -1 on error
+ * returns:     number of writen characters not including trailing '\0',
+ *      -1 on error
  */
 int sdp_select_ifce(char *buf, int addr, sdp_ifce_t ifce)
 {
@@ -446,19 +453,21 @@ int sdp_select_ifce(char *buf, int addr, sdp_ifce_t ifce)
  * buf:         output buffer (see SDP_BUF_SIZE_MIN)
  * addr:        rs485 device address: 1 - 31 (use anny valid for rs232)
  * volt:        voltage level value (TODO: units)
- * returns:     0 on success, -1 on error
+ * returns:     number of writen characters not including trailing '\0',
+ *      -1 on error
  */
 int sdp_set_volt(char *buf, int addr, int volt)
 {
+        int ret;
+
         if (volt < 0 || volt > 999)
                 return -1;
 
-        if (sdp_print_cmd(buf, sdp_cmd_volt, addr) == -1)
-                return -1;
-
-        sdp_print_num(buf + 6, 3, volt);
+        ret = sdp_print_cmd(buf, sdp_cmd_volt, addr);
+        if (ret != -1)
+                sdp_print_num(buf + 6, 3, volt);
         
-        return 0;
+        return ret;
 }
 
 /**
@@ -467,19 +476,21 @@ int sdp_set_volt(char *buf, int addr, int volt)
  * buf:         output buffer (see SDP_BUF_SIZE_MIN)
  * addr:        rs485 device address: 1 - 31 (use anny valid for rs232)
  * curr:        current level value
- * returns:     0 on success, -1 on error
+ * returns:     number of writen characters not including trailing '\0',
+ *      -1 on error
  */
 int sdp_set_curr(char *buf, int addr, int curr)
 {
+        int ret;
+
         if (curr < 0 || curr > 999)
                 return -1;
 
-        if (sdp_print_cmd(buf, sdp_cmd_curr, addr) == -1)
-                return -1;
+        ret = sdp_print_cmd(buf, sdp_cmd_curr, addr);
+        if (ret != -1)
+                sdp_print_num(buf + 6, 3, curr);
 
-        sdp_print_num(buf + 6, 3, curr);
-
-        return 0;
+        return ret;
 }
 
 /**
@@ -488,19 +499,21 @@ int sdp_set_curr(char *buf, int addr, int curr)
  * buf:         output buffer (see SDP_BUF_SIZE_MIN)
  * addr:        rs485 device address: 1 - 31 (use anny valid for rs232)
  * volt:        voltage limit (TODO: units)
- * returns:     0 on success, -1 on error
+ * returns:     number of writen characters not including trailing '\0',
+ *      -1 on error
  */
 int sdp_set_volt_limit(char *buf, int addr, int volt)
 {
+        int ret;
+
         if (volt < 0 || volt > 999)
                 return -1;
 
-        if (sdp_print_cmd(buf, sdp_cmd_sovp, addr) == -1)
-                return -1;
+        ret = sdp_print_cmd(buf, sdp_cmd_sovp, addr);
+        if (ret != -1)
+                sdp_print_num(buf + 6, 3, volt);
 
-        sdp_print_num(buf + 6, 3, volt);
-
-        return 0;
+        return ret;
 }
 
 /**
@@ -510,7 +523,8 @@ int sdp_set_volt_limit(char *buf, int addr, int volt)
  * addr:        rs485 device address: 1 - 31 (use anny valid for rs232)
  * addr:        address of device (used only for devices connected with rs485)
  * enable:      when 0 set output to off, set to on otherwise
- * returns:     0 on success, -1 on error
+ * returns:     number of writen characters not including trailing '\0',
+ *      -1 on error
  */
 int sdp_set_output(char *buf, int addr, int enable)
 {
@@ -527,7 +541,8 @@ int sdp_set_output(char *buf, int addr, int enable)
  * addr:        rs485 device address: 1 - 31 (use anny valid for rs232)
  * preset:      preset number: 1-9
  * enable:      when 0 disable, oneble oterwise
- * returns:     0 on success, -1 on error
+ * returns:     number of writen characters not including trailing '\0',
+ *      -1 on error
  */
 int sdp_set_poweron_output(char *buf, int addr, int preset, int enable)
 {
@@ -541,12 +556,10 @@ int sdp_set_poweron_output(char *buf, int addr, int preset, int enable)
         else
                 ret = sdp_print_cmd(buf, sdp_cmd_poww_dis, addr);
 
-        if (ret == -1)
-                return -1;
+        if (ret != -1)
+                buf[6] = preset + '0';
         
-        buf[6] = preset + '0';
-        
-        return 0;
+        return ret;
 }
 
 /**
@@ -557,23 +570,26 @@ int sdp_set_poweron_output(char *buf, int addr, int preset, int enable)
  * preset:      index of preset: 1-9
  * volt:        preset voltage value: 0-999
  * curr:        preset current value: 0-999
- * returns:     0 on success, -1 on error
+ * returns:     number of writen characters not including trailing '\0',
+ *      -1 on error
  */
 int sdp_set_preset(char *buf, int addr, int preset, int volt, int curr)
 {
+        int ret;
+
         if (preset < SDP_PRESET_MIN || preset > SDP_PRESET_MAX ||
                         volt < 0 || volt > 999 || 
                         curr < 0 || curr > 999)
                 return -1;
 
-        if (sdp_print_cmd(buf, sdp_cmd_prom, addr) == -1)
-                return -1;
+        ret = sdp_print_cmd(buf, sdp_cmd_prom, addr);
+        if (ret != -1) {
+                buf[6] = preset + '0';
+                sdp_print_num(buf + 7, 3, volt);
+                sdp_print_num(buf + 10, 3, curr);
+        }
 
-        buf[6] = preset + '0';
-        sdp_print_num(buf + 7, 3, volt);
-        sdp_print_num(buf + 10, 3, curr);
-
-        return 0;
+        return ret;
 }
 
 /**
@@ -585,27 +601,30 @@ int sdp_set_preset(char *buf, int addr, int preset, int volt, int curr)
  * volt:        new volage for specified program item: 0-999
  * curr:        new curret for specified program item: 0-999
  * time:        new lenght of program item duration in seconds: 0-5999
- * returns:     0 on success, -1 on error
+ * returns:     number of writen characters not including trailing '\0',
+ *      -1 on error
  */
 int sdp_set_program(char *buf, int addr, int program, int volt, int curr,
                 int time)
 {
+        int ret;
+
         if (program < SDP_PROGRAM_MIN || program > SDP_PROGRAM_MAX ||
                         volt < 0 || volt > 999 || 
                         curr < 0 || curr > 999 ||
                         time < 0 || time > (99*60+59))
                 return -1;
 
-        if (sdp_print_cmd(buf, sdp_cmd_prop, addr) == -1)
-                return -1;
-
-        sdp_print_num(buf + 6, 2, program);
-        sdp_print_num(buf + 8, 3, volt);
-        sdp_print_num(buf + 11, 3, curr);
-        sdp_print_num(buf + 14, 2, time / 60);
-        sdp_print_num(buf + 16, 2, time % 60);
+        ret = sdp_print_cmd(buf, sdp_cmd_prop, addr);
+        if (ret != -1) {
+                sdp_print_num(buf + 6, 2, program);
+                sdp_print_num(buf + 8, 3, volt);
+                sdp_print_num(buf + 11, 3, curr);
+                sdp_print_num(buf + 14, 2, time / 60);
+                sdp_print_num(buf + 16, 2, time % 60);
+        }
         
-        return 0;
+        return ret;
 }
 
 /**
@@ -613,7 +632,8 @@ int sdp_set_program(char *buf, int addr, int program, int volt, int curr,
  *
  * buf:         output buffer (see SDP_BUF_SIZE_MIN)
  * addr:        rs485 device address: 1 - 31 (use anny valid for rs232)
- * returns:     0 on success, -1 on error
+ * returns:     number of writen characters not including trailing '\0',
+ *      -1 on error
  */
 int sdp_stop(char *buf, int addr)
 {
