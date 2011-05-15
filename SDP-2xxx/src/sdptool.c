@@ -23,6 +23,9 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include "sdp2xxx.h"
+#ifdef _WIN32
+#include <windows.h>
+#endif
 
 void print_help(void)
 {
@@ -66,6 +69,33 @@ void print_help_short(void)
                         
 }
 
+#ifdef __linux__
+static sdp_resp_t sdp_read(int fd, char *buf, ssize_t count)
+{
+        ssize_t size;
+
+        size = read(fd, buf, 1);
+        if (size == -1)
+                return -1;
+                //error
+        // TODO
+        return -1;
+}
+#endif
+
+#ifdef _WIN32
+static sdp_resp_t sdp_read(int fd, char *buf, ssize_t count)
+{
+        int readb;
+
+        if (!ReadFile(fd, buf, n, &readb, NULL)) {
+                // error
+        }
+        // TODO
+        return -1;
+}
+#endif
+
 int main(int argc, char **argv)
 {
         int fd_dev_in, fd_dev_out, fd_std_out;
@@ -107,16 +137,38 @@ int main(int argc, char **argv)
                 fd_std_out = 3;
         } 
         else {
+#ifdef __linux__
                 fd_dev_in = fd_dev_out = open(argv[arg_idx], O_RDWR);
                 if (fd_dev_in == -1) {
                         perror("Failed to open port");
                         return -1;
                 }
-                fd_std_out = 2;
                 // TODO set parameters of serial port to 9600 8n1
+#elif _WIN32
+                fd_dev_in = CreateFile(argv[arg_idx],
+                                GENERIC_READ | GENERIC_WRITE, 0, 0,
+                                OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+                if (fd_dev_in == INVALID_FILE_HANDLE) {
+                        char buf[1024];
+
+                        FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM |
+                                        FORMAT_MESSAGE_IGNORE_INSERTS,
+                                        NULL, GetLastError(),
+                                        MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+                                        buf, sizeof(buf), NULL);
+                        fprintf(2, buf);
+
+                        // TODO
+                        return -1;
+                }
+                // TODO set parameters of serial port to 9600 8n1
+#else
+#error "Unsupported OS"
+#endif
+                fd_std_out = 2;
         }
 
-        char sdp_cmd[SDP_BUF_SIZE_MIN];
+        char buf[SDP_BUF_SIZE_MIN];
         char *cmd = argv[arg_idx];
         // Drop already processed arguments
         argv += arg_idx;
@@ -126,6 +178,7 @@ int main(int argc, char **argv)
         // TODO parse command and write it into output
         if (!strcmp(cmd, "ccom")) {
                 sdp_ifce_t ifce;
+                ssize_t size;
 
                 if (argc != 1) {
                         print_help();
@@ -137,12 +190,22 @@ int main(int argc, char **argv)
                 else if (!strcmp(argv[0], "rs485"))
                         ifce = sdp_ifce_rs485;
                 else {
+                        print_help();
                         return -1;
                 }
 
-                if (sdp_select_ifce(sdp_cmd, addr, ifce) == -1)
+                size = sdp_select_ifce(buf, addr, ifce);
+                if (size == -1) {
+                        print_help();
                         return -1;
-                write(fd_dev_out, sdp_cmd, strlen(sdp_cmd));
+                }
+                if (write(fd_dev_out, buf, size) != size) {
+                        print_help();
+                        return -1;
+                }
+
+                if (sdp_read(fd_dev_in, buf, sizeof(buf) != sdp_resp_nodata))
+                        return -1;
                 // TODO
         }
         else if (!strcmp(cmd, "gcom")) {
