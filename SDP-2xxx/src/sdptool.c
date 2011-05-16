@@ -134,7 +134,7 @@ static ssize_t sdp_write(int fd, char *buf, ssize_t count)
 #endif
 
 #ifdef _WIN32
-int open_serial(const char* fname)
+HANDLE open_serial(const char* fname)
 {
         HANDLE h;
 
