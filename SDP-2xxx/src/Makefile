@@ -7,7 +7,7 @@ CFLAGS=-Wall
 LDFLAGS=
 
 SRC_PROG=sdptool.c
-SRC_LIB=sdp2xxx.c
+SRC_LIB=sdp2xxx.c sdp2xxx_low.c
 
 OBJS_PROG=$(SRC_PROG:%.c=%.o)
 OBJS_LIB=$(SRC_LIB:%.c=%.o)
