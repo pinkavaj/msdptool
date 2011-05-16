@@ -34,10 +34,6 @@
 extern "C" {
 #endif
 
-/* Minimal lenght of buffer where SDP command is writen, it is garanted
- * that all commands will fit into this buffer including trailing \0 */
-#define SDP_BUF_SIZE_MIN (20)
-
 typedef enum {
         sdp_resp_incomplete = 0,
         sdp_resp_data,

@@ -36,7 +36,8 @@ extern "C" {
 
 typedef struct {
         unsigned char addr;
-        SDP_F f;
+        SDP_F f_in;
+        SDP_F f_out;
 } sdp_t;
 
 /* High leve operation functions */

@@ -32,6 +32,10 @@
 extern "C" {
 #endif
 
+/* Minimal lenght of buffer where SDP command is writen, it is garanted
+ * that all commands will fit into this buffer including trailing \0 */
+#define SDP_BUF_SIZE_MIN (20)
+
 #define SDP_DEV_ADDR_MIN    (1)
 #define SDP_DEV_ADDR_MAX    (31)
 
@@ -47,9 +51,11 @@ extern "C" {
 
 #ifdef __linux__
 #define SDP_F int
+#define SDP_F_ERR -1
 #endif
 #ifdef _WIN32
 #define SDP_F HANDLE
+#define SDP_F_ERR INVALID_HANDLE_VALUE
 #endif
 
 typedef enum {

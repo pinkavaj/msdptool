@@ -16,11 +16,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  * */
 
+#include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include <sys/stat.h>
-#include <fcntl.h>
 #include <unistd.h>
 #include "sdp2xxx.h"
 #ifdef __linux__
@@ -102,89 +100,13 @@ void print_help_short(void)
                         
 }
 
-#ifdef __linux__
-int open_serial(const char* fname)
-{
-        int fd;
-
-        fd = open(fname, O_RDWR);
-        if (fd == -1)
-                perror_("Failed to open port");
-        // TODO set parameters of serial port to 9600 8n1
-        return fd;
-}
-
-// TODO
-static int sdp_read(int fd, char *buf, ssize_t count)
-{
-        ssize_t size;
-
-        size = read(fd, buf, 1);
-        if (size == -1)
-                return -1;
-                //error
-        // TODO
-        return -1;
-}
-
-static ssize_t sdp_write(int fd, char *buf, ssize_t count)
-{
-        // TODO
-        return write(fd, buf, count);
-}
-#endif
-
-#ifdef _WIN32
-HANDLE open_serial(const char* fname)
-{
-        HANDLE h;
-
-        h = CreateFile(fname, GENERIC_READ | GENERIC_WRITE, 0, 0,
-                        OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
-        if (h == INVALID_HANDLE_VALUE) {
-                char buf[1024];
-
-                FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM |
-                                FORMAT_MESSAGE_IGNORE_INSERTS,
-                                NULL, GetLastError(),
-                                MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-                                buf, sizeof(buf), NULL);
-                fprintf(stderr, buf);
-
-                return h;
-        }
-        // TODO set parameters of serial port to 9600 8n1
-
-        return h;
-}
-
-static sdp_resp_t sdp_read(HANDLE h, char *buf, ssize_t count)
-{
-        DWORD readb;
-
-        if (!ReadFile(h, buf, 1, &readb, NULL)) {
-                // error
-        }
-        // TODO
-        return -1;
-}
-
-static ssize_t sdp_write(HANDLE h, char *buf, ssize_t count)
-{
-        DWORD writeb;
-        // TODO
-        if (!WriteFile(h, buf, count, &writeb, NULL))
-            return -1;
-        return count;
-}
-#endif
-
 int main(int argc, char **argv)
 {
+        sdp_t sdp;
 #ifdef __linux__
-        int fd_dev_in, fd_dev_out, fd_std_out;
+        int fd_std_out;
 #elif _WIN32
-        HANDLE fd_dev_in, fd_dev_out, fd_std_out;
+        HANDLE fd_std_out;
 #endif
         int arg_idx = 1;
         int addr = 1;
@@ -217,13 +139,15 @@ int main(int argc, char **argv)
 
 #ifdef __linux__
         if (!strcmp(argv[arg_idx], "-")) {
-                fd_dev_in = STDIN_FILENO;
-                fd_dev_out = STDOUT_FILENO;
+                sdp.f_in = STDIN_FILENO;
+                sdp.f_out = STDOUT_FILENO;
                 fd_std_out = STDERR_FILENO;
         }
         else {
-                fd_dev_in = fd_dev_out = open_serial(argv[arg_idx]);
-                if (fd_dev_in == -1)
+                int ret;
+
+                ret = sdp_open(&sdp, argv[arg_idx], addr);
+                if (ret == -1)
                         return -1;
                 fd_std_out = STDOUT_FILENO;
         }
@@ -241,7 +165,6 @@ int main(int argc, char **argv)
         }
 #endif
 
-        char buf[512];
         char *cmd = argv[arg_idx];
         // Drop already processed arguments
         argv += arg_idx;
@@ -251,7 +174,7 @@ int main(int argc, char **argv)
         // TODO parse command and write it into output
         if (!strcmp(cmd, "ccom")) {
                 sdp_ifce_t ifce;
-                ssize_t size;
+                int ret;
 
                 if (argc != 1)
                         return printe("Invalid number of parameters");
@@ -264,14 +187,9 @@ int main(int argc, char **argv)
                         return printe("Invalid argument");
 
                 // TODO
-                /*size = sdp_select_ifce(buf, addr, ifce);
-                if (size == -1)
+                ret = sdp_select_ifce(&sdp, ifce);
+                if (ret == -1)
                         return printe("bug: sdp_select_ifce");
-                if (sdp_write(fd_dev_out, buf, size) != size)
-                        return perror_("Comunication with device failed");
-
-                if (sdp_read(fd_dev_in, buf, sizeof(buf) != sdp_resp_nodata))
-                        return perror_("Comunication with device failed");*/
                 // TODO
         }
         else if (!strcmp(cmd, "gcom")) {
@@ -309,20 +227,14 @@ int main(int argc, char **argv)
         else if (!strcmp(cmd, "runp")) {
         }
         else if (!strcmp(cmd, "stop")) {
-                ssize_t size;
+                int ret;
 
                 if (argc != 0)
                         return printe("Invalid number of parameters");
 
-                size = sdp_stop(buf, addr);
-                if (size == -1)
+                ret = sdp_stop(&sdp);
+                if (ret == -1)
                         return printe("bug: sdp_stop");
-                if (sdp_write(fd_dev_out, buf, size) != size)
-                        return perror_("Comunication with device failed");
-
-                // TODO
-                /*if (sdp_read(fd_dev_in, buf, sizeof(buf) != sdp_resp_nodata))
-                        return perror_("Comunication with device failed");*/
         }
         else {
                 print_help();
