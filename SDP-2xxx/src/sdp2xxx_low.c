@@ -154,7 +154,7 @@ sdp_resp_t sdp_resp(const char *buf, int len)
 }
 
 /**
- * Parse response on sdp_get_dev_addr. When device is connected on
+ * Parse response on sdp_sget_dev_addr. When device is connected on
  *      rs485 bus, this function might be used to check for presence of device
  *      with specified address. This function has no meaning on rs232,
  *      but might be used to get last rs485 device address (unsupported).
@@ -164,7 +164,7 @@ sdp_resp_t sdp_resp(const char *buf, int len)
  * addr:        pointer to integer to store recieved addres
  * returns:     0 on success, -1 on error
  */
-int sdp_resp_dev_addr(char *buf, int len, int *addr)
+int sdp_sresp_dev_addr(char *buf, int len, int *addr)
 {       
         const char resp[] = "RS__\rOK\r";
 
@@ -181,14 +181,14 @@ int sdp_resp_dev_addr(char *buf, int len, int *addr)
 }
 
 /**
- * Parse response on sdp_get_va_maximums.
+ * Parse response on sdp_sget_va_maximums.
  *
  * buf:         buffer with irecieved response
  * len:         lenght of data in buffer
  * va_maximums: pointer to sdp_va_t where result should be stored
  * returns:     0 on success, -1 on error
  */
-int sdp_resp_va_maximums(char *buf, int len, sdp_va_t *va_maximums)
+int sdp_sresp_va_maximums(char *buf, int len, sdp_va_t *va_maximums)
 {
         const char resp[] = "uuuiii\rOK\r";
 
@@ -204,14 +204,14 @@ int sdp_resp_va_maximums(char *buf, int len, sdp_va_t *va_maximums)
 }
 
 /**
- * Parse response on sdp_get_volt_limit.
+ * Parse response on sdp_sget_volt_limit.
  *
  * buf:         buffer with irecieved response
  * len:         lenght of data in buffer
  * volt_limit:  pointer to int where upper voltage limit should be stored
  * returns:     0 on success, -1 on error
  */
-int sdp_resp_volt_limit(char *buf, int len, int *volt_limit)
+int sdp_sresp_volt_limit(char *buf, int len, int *volt_limit)
 {
         const char resp[] = "uuu\rOK\r";
 
@@ -225,14 +225,14 @@ int sdp_resp_volt_limit(char *buf, int len, int *volt_limit)
 }
 
 /**
- * Parse response on sdp_get_va_data.
+ * Parse response on sdp_sget_va_data.
  *
  * buf:         buffer with irecieved response
  * len:         lenght of data in buffer
  * va_data:     pointer to sdp_va_data_t to store current U, I and mode
  * returns:     0 on success, -1 on error
  */
-int sdp_resp_va_data(char *buf, int len, sdp_va_data_t *va_data)
+int sdp_sresp_va_data(char *buf, int len, sdp_va_data_t *va_data)
 {
         const char resp[] = "uuuuiiiic\rOK\r";
         int mode;
@@ -252,14 +252,14 @@ int sdp_resp_va_data(char *buf, int len, sdp_va_data_t *va_data)
 }
 
 /**
- * Parse response on sdp_get_va_setpoint.
+ * Parse response on sdp_sget_va_setpoint.
  *
  * buf:         buffer with irecieved response
  * len:         lenght of data in buffer
  * va_setpoints: pointer to sdp_va_t used to store current setpoint
  * returns:     0 on success, -1 on error
  */
-int sdp_resp_va_setpoint(char *buf, int len, sdp_va_t *va_setpoints)
+int sdp_sresp_va_setpoint(char *buf, int len, sdp_va_t *va_setpoints)
 {
         const char resp[] = "uuuiii\rOK\r";
 
@@ -275,17 +275,17 @@ int sdp_resp_va_setpoint(char *buf, int len, sdp_va_t *va_setpoints)
 }
 
 /**
- * Parse response on sdp_get_preset.
+ * Parse response on sdp_sget_preset.
  *
  * buf:         buffer with irecieved response
  * len:         lenght of data in buffer
- * va_preset:   When sdp_get_preset called with preset number expects pointer
+ * va_preset:   When sdp_sget_preset called with preset number expects pointer
  *      to sdp_va_t to store value from requested preset. 
- *      When sdp_get_preset called with SDP_PRESET_ALL expects pointer to
+ *      When sdp_sget_preset called with SDP_PRESET_ALL expects pointer to
  *      sdp_va_t array of size 9 to store all presets values.
  * returns:     0 on success, -1 on error
  */
-int sdp_resp_preset(char *buf, int len, sdp_va_t *va_preset)
+int sdp_sresp_preset(char *buf, int len, sdp_va_t *va_preset)
 {
         const char resp[] = "uuuiii\r";
         const int resp_s1 = sizeof(resp) - 1 + sizeof(str_ok) - 1;
@@ -314,17 +314,17 @@ int sdp_resp_preset(char *buf, int len, sdp_va_t *va_preset)
 }
 
 /**
- * Parse response on sdp_get_program.
+ * Parse response on sdp_sget_program.
  *
  * buf:         buffer with irecieved response
  * len:         lenght of data in buffer
- * program:     When sdp_get_program called with program number expects
+ * program:     When sdp_sget_program called with program number expects
  *      pointer to sdp_program_t to store requested program item.
- *      When sdp_get_program called with SDP_PROGRAM_ALL expects pointer to
+ *      When sdp_sget_program called with SDP_PROGRAM_ALL expects pointer to
  *      array of sdp_program_t of size 20 to store all program items.
  * returns:     0 on success, -1 on error
  */
-int sdp_resp_program(char *buf, int len, sdp_program_t *program)
+int sdp_sresp_program(char *buf, int len, sdp_program_t *program)
 {
         const char resp[] = "uuuiiimmss\r";
         const int resp_s1 = sizeof(resp) - 1 + sizeof(str_ok) - 1;
@@ -362,14 +362,14 @@ int sdp_resp_program(char *buf, int len, sdp_program_t *program)
 }
 
 /**
- * Parse response on sdp_get_ldc_info.
+ * Parse response on sdp_sget_ldc_info.
  *
  * buf:         buffer with irecieved response
  * len:         lenght of data in buffer
  * lcd_info:    pointer to sdp_ldc_info_t to store recieved LCD info
  * returns:     0 on success, -1 on error
  */
-int sdp_resp_ldc_info(char *buf, int len, sdp_ldc_info_t *lcd_info)
+int sdp_sresp_ldc_info(char *buf, int len, sdp_ldc_info_t *lcd_info)
 {
         const char resp[] = "\rOK\r"; //TODO
 
@@ -392,7 +392,7 @@ int sdp_resp_ldc_info(char *buf, int len, sdp_ldc_info_t *lcd_info)
  * returns:     number of writen characters not including trailing '\0',
  *      -1 on error
  */
-int sdp_remote(char *buf, int addr, int enable)
+int sdp_sremote(char *buf, int addr, int enable)
 {
         if (enable)
                 return sdp_print_cmd(buf, sdp_cmd_sess, addr);
@@ -409,7 +409,7 @@ int sdp_remote(char *buf, int addr, int enable)
  * returns:     number of writen characters not including trailing '\0',
  *      -1 on error
  */
-int sdp_run_preset(char *buf, int addr, int presn)
+int sdp_srun_preset(char *buf, int addr, int presn)
 {
         int ret;
 
@@ -432,7 +432,7 @@ int sdp_run_preset(char *buf, int addr, int presn)
  * returns:     number of writen characters not including trailing '\0',
  *      -1 on error
  */
-int sdp_run_program(char *buf, int addr, int count)
+int sdp_srun_program(char *buf, int addr, int count)
 {
         int ret;
 
@@ -455,7 +455,7 @@ int sdp_run_program(char *buf, int addr, int count)
  * returns:     number of writen characters not including trailing '\0',
  *      -1 on error
  */
-int sdp_select_ifce(char *buf, int addr, sdp_ifce_t ifce)
+int sdp_sselect_ifce(char *buf, int addr, sdp_ifce_t ifce)
 {
         if (ifce == sdp_ifce_rs232)
                 return sdp_print_cmd(buf, sdp_cmd_ccom_rs232, addr);
@@ -474,7 +474,7 @@ int sdp_select_ifce(char *buf, int addr, sdp_ifce_t ifce)
  * returns:     number of writen characters not including trailing '\0',
  *      -1 on error
  */
-int sdp_set_volt(char *buf, int addr, int volt)
+int sdp_sset_volt(char *buf, int addr, int volt)
 {
         int ret;
 
@@ -497,7 +497,7 @@ int sdp_set_volt(char *buf, int addr, int volt)
  * returns:     number of writen characters not including trailing '\0',
  *      -1 on error
  */
-int sdp_set_curr(char *buf, int addr, int curr)
+int sdp_sset_curr(char *buf, int addr, int curr)
 {
         int ret;
 
@@ -520,7 +520,7 @@ int sdp_set_curr(char *buf, int addr, int curr)
  * returns:     number of writen characters not including trailing '\0',
  *      -1 on error
  */
-int sdp_set_volt_limit(char *buf, int addr, int volt)
+int sdp_sset_volt_limit(char *buf, int addr, int volt)
 {
         int ret;
 
@@ -544,7 +544,7 @@ int sdp_set_volt_limit(char *buf, int addr, int volt)
  * returns:     number of writen characters not including trailing '\0',
  *      -1 on error
  */
-int sdp_set_output(char *buf, int addr, int enable)
+int sdp_sset_output(char *buf, int addr, int enable)
 {
         if (enable)
                 return sdp_print_cmd(buf, sdp_cmd_sout_en, addr);
@@ -562,7 +562,7 @@ int sdp_set_output(char *buf, int addr, int enable)
  * returns:     number of writen characters not including trailing '\0',
  *      -1 on error
  */
-int sdp_set_poweron_output(char *buf, int addr, int presn, int enable)
+int sdp_sset_poweron_output(char *buf, int addr, int presn, int enable)
 {
         int ret;
 
@@ -591,7 +591,7 @@ int sdp_set_poweron_output(char *buf, int addr, int presn, int enable)
  * returns:     number of writen characters not including trailing '\0',
  *      -1 on error
  */
-int sdp_set_preset(char *buf, int addr, int presn, int volt, int curr)
+int sdp_sset_preset(char *buf, int addr, int presn, int volt, int curr)
 {
         int ret;
 
@@ -622,7 +622,7 @@ int sdp_set_preset(char *buf, int addr, int presn, int volt, int curr)
  * returns:     number of writen characters not including trailing '\0',
  *      -1 on error
  */
-int sdp_set_program(char *buf, int addr, int progn, int volt, int curr,
+int sdp_sset_program(char *buf, int addr, int progn, int volt, int curr,
                 int time)
 {
         int ret;
@@ -653,7 +653,7 @@ int sdp_set_program(char *buf, int addr, int progn, int volt, int curr,
  * returns:     number of writen characters not including trailing '\0',
  *      -1 on error
  */
-int sdp_stop(char *buf, int addr)
+int sdp_sstop(char *buf, int addr)
 {
         return sdp_print_cmd(buf, sdp_cmd_stop, addr);
 }
