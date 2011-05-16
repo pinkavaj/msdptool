@@ -33,6 +33,31 @@
 #endif
 
 /**
+ * Print message to standard error
+ *
+ * fmt:         format message, see man printf for details
+ * returns:     -1 always
+ **/
+int printe(const char *fmt)
+{
+        fprintf(stderr, "%s\n", fmt);
+        return -1;
+}
+
+/**
+ * Same as perror, but returns -1
+ *
+ * str:         Message to print with error
+ * returns:     -1 always
+ */
+int perror_(const char *str)
+{
+        perror(str);
+
+        return -1;
+}
+
+/**
  * Print program help to standard output
  */
 void print_help(void)
@@ -83,10 +108,8 @@ int open_serial(const char* fname)
         int fd;
 
         fd = open(fname, O_RDWR);
-        if (fd == -1) {
-                perror("Failed to open port");
-                return -1;
-        }
+        if (fd == -1)
+                perror_("Failed to open port");
         // TODO set parameters of serial port to 9600 8n1
         return fd;
 }
@@ -172,25 +195,22 @@ int main(int argc, char **argv)
         }
 
         if (argc == 2) {
-                print_help();
-                if (!strcmp(argv[1], "-h") || !strcmp(argv[1], "--help"))
+                if (!strcmp(argv[1], "-h") || !strcmp(argv[1], "--help")) {
+                        print_help();
                         return 0;
-                return -1;
+                }
+                return printe("Invalid or missing argument.");
         }
 
         if (!strcmp(argv[1], "-a")) {
                 char *endptr;
 
-                if (argc < 5) {
-                        print_help();
-                        return -1;
-                }
+                if (argc < 5)
+                        return printe("Invalid or missing argument.");
                 addr = strtol(argv[2], &endptr, 0);
                 if (addr < SDP_DEV_ADDR_MIN || addr > SDP_DEV_ADDR_MAX ||
-                                *endptr) {
-                        print_help();
-                        return -1;
-                }
+                                *endptr)
+                        return printe("Device address out of range.");
                 arg_idx = 3;
         }
 
@@ -232,32 +252,24 @@ int main(int argc, char **argv)
                 sdp_ifce_t ifce;
                 ssize_t size;
 
-                if (argc != 1) {
-                        print_help();
-                        return -1;
-                }
+                if (argc != 1)
+                        return printe("Argument missing");
 
                 if (!strcmp(argv[0], "rs232"))
                         ifce = sdp_ifce_rs232;
                 else if (!strcmp(argv[0], "rs485"))
                         ifce = sdp_ifce_rs485;
-                else {
-                        print_help();
-                        return -1;
-                }
+                else
+                        return printe("Invalid argument");
 
                 size = sdp_select_ifce(buf, addr, ifce);
-                if (size == -1) {
-                        print_help();
-                        return -1;
-                }
-                if (sdp_write(fd_dev_out, buf, size) != size) {
-                        print_help();
-                        return -1;
-                }
+                if (size == -1)
+                        return printe("bug: sdp_select_ifce");
+                if (sdp_write(fd_dev_out, buf, size) != size)
+                        return perror_("Comunication with device failed");
 
                 if (sdp_read(fd_dev_in, buf, sizeof(buf) != sdp_resp_nodata))
-                        return -1;
+                        return perror_("Comunication with device failed");
                 // TODO
         }
         else if (!strcmp(cmd, "gcom")) {
