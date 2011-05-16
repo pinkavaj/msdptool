@@ -32,6 +32,9 @@
 #endif
 #endif
 
+/**
+ * Print program help to standard output
+ */
 void print_help(void)
 {
         printf("sdptool [-h] [-a <addr>] <io port> <CMD>\n"
@@ -75,6 +78,19 @@ void print_help_short(void)
 }
 
 #ifdef __linux__
+int open_serial(const char* fname)
+{
+        int fd;
+
+        fd = open(fname, O_RDWR);
+        if (fd == -1) {
+                perror("Failed to open port");
+                return -1;
+        }
+        // TODO set parameters of serial port to 9600 8n1
+        return fd;
+}
+
 static sdp_resp_t sdp_read(int fd, char *buf, ssize_t count)
 {
         ssize_t size;
@@ -87,14 +103,37 @@ static sdp_resp_t sdp_read(int fd, char *buf, ssize_t count)
         return -1;
 }
 
-static ssize_t sdp_write(int fd, char *, ssize_t count)
+static ssize_t sdp_write(int fd, char *buf, ssize_t count)
 {
         // TODO
-        return write(fd, buf, size);
+        return write(fd, buf, count);
 }
 #endif
 
 #ifdef _WIN32
+int open_serial(const char* fname)
+{
+        HANDLE h;
+
+        h = CreateFile(fname, GENERIC_READ | GENERIC_WRITE, 0, 0,
+                        OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+        if (h == INVALID_HANDLE_VALUE) {
+                char buf[1024];
+
+                FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM |
+                                FORMAT_MESSAGE_IGNORE_INSERTS,
+                                NULL, GetLastError(),
+                                MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+                                buf, sizeof(buf), NULL);
+                fprintf(stderr, buf);
+
+                return h;
+        }
+        // TODO set parameters of serial port to 9600 8n1
+
+        return h;
+}
+
 static sdp_resp_t sdp_read(HANDLE h, char *buf, ssize_t count)
 {
         DWORD readb;
@@ -155,47 +194,31 @@ int main(int argc, char **argv)
                 arg_idx = 3;
         }
 
-        if (!strcmp(argv[arg_idx], "-")) {
 #ifdef __linux__
+        if (!strcmp(argv[arg_idx], "-")) {
                 fd_dev_in = STDIN_FILENO;
                 fd_dev_out = STDOUT_FILENO;
                 fd_std_out = STDERR_FILENO;
+        }
+        else {
+                fd_dev_in = fd_dev_out = open_serial(argv[arg_idx]);
+                if (fd_dev_in == -1)
+                        return -1;
+                fd_std_out = STDOUT_FILENO;
+        }
 #elif _WIN32
+        if (!strcmp(argv[arg_idx], "-")) {
                 fd_dev_in = GetStdHandle(STD_INPUT_HANDLE);
                 fd_dev_out = GetStdHandle(STD_OUTPUT_HANDLE);
                 fd_std_out = GetStdHandle(STD_ERROR_HANDLE);
-#endif
         } 
         else {
-#ifdef __linux__
-                fd_dev_in = fd_dev_out = open(argv[arg_idx], O_RDWR);
-                if (fd_dev_in == -1) {
-                        perror("Failed to open port");
+                fd_dev_in = fd_dev_out = open_serial(argv[arg_idx]);
+                if (fd_dev_in == INVALID_HANDLE_VALUE)
                         return -1;
-                }
-                fd_std_out = STDOUT_FILENO;
-                // TODO set parameters of serial port to 9600 8n1
-#elif _WIN32
-                fd_dev_in = CreateFile(argv[arg_idx],
-                                GENERIC_READ | GENERIC_WRITE, 0, 0,
-                                OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
-                if (fd_dev_in == INVALID_HANDLE_VALUE) {
-                        char buf[1024];
-
-                        FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM |
-                                        FORMAT_MESSAGE_IGNORE_INSERTS,
-                                        NULL, GetLastError(),
-                                        MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-                                        buf, sizeof(buf), NULL);
-                        fprintf(stderr, buf);
-
-                        // TODO
-                        return -1;
-                }
                 fd_std_out = GetStdHandle(STD_OUTPUT_HANDLE);;
-                // TODO set parameters of serial port to 9600 8n1
-#endif
         }
+#endif
 
         char buf[SDP_BUF_SIZE_MIN];
         char *cmd = argv[arg_idx];
