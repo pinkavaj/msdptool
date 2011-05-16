@@ -49,6 +49,13 @@ extern "C" {
 
 #define SDP_RUN_PROG_INF (0)
 
+#ifdef __linux__
+#define SDP_F int
+#endif
+#ifdef _WIN32
+#define SDP_F HANDLE
+#endif
+
 typedef enum {
         sdp_ifce_rs232,
         sdp_ifce_rs485,
@@ -97,18 +104,12 @@ typedef struct {
 
 typedef struct {
         unsigned char addr;
-#ifdef __linux__
-        int f;
-#endif
-#ifdef _WIN32
-        HANDLE f;
-#endif
+        SDP_F f;
 } sdp_t;
 
 /* High leve operation functions */
 sdp_t *sdp_open(sdp_t *sdp, const char *fname, int addr);
-//sdp_t *sdp_reopen(sdp_t *sdp, int f, int addr);
-//sdp_t *sdp_reopen(sdp_t *sdp, HANDLE f, int addr);
+sdp_t *sdp_openf(sdp_t *sdp, SDP_F f, int addr);
 sdp_t *sdp_close(sdp_t *sdp);
 
 int sdp_fget_dev_addr(const sdp_t *sdp);
@@ -119,7 +120,6 @@ int sdp_fget_va_setpoint(const sdp_t *sdp, sdp_va_t *va_setpoints);
 int sdp_fget_preset(const sdp_t *sdp, int presn, sdp_va_t *va_preset);
 int sdp_fget_program(const sdp_t *sdp, int progn, sdp_program_t *program);
 int sdp_fget_ldc_info(const sdp_t *sdp, sdp_ldc_info_t *lcd_info);
-
 int sdp_fremote(const sdp_t *sdp, int enable);
 int sdp_frun_preset(const sdp_t *sdp, int preset);
 int sdp_frun_program(const sdp_t *sdp, int count);
@@ -134,12 +134,11 @@ int sdp_fset_program(const sdp_t *sdp, int progn, const sdp_program_t *program);
 int sdp_fstop(const sdp_t *sdp);
 
 /* Low level operation functions */
-
 sdp_resp_t sdp_resp(const char *buf, int len);
 
 /* This functions return some data (sdp_resp_data), use corecponding
  * sdp_resp_* function to get this data from response message */
-int sdp_get_dev_addr(char *buf, int addr);
+int sdp_get_dev_addr(char *buf, int *addr);
 int sdp_get_va_maximums(char *buf, int addr);
 int sdp_get_volt_limit(char *buf, int addr);
 int sdp_get_va_data(char *buf, int addr);
