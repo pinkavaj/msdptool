@@ -240,7 +240,7 @@ int main(int argc, char **argv)
         }
 #endif
 
-        char buf[SDP_BUF_SIZE_MIN];
+        char buf[512];
         char *cmd = argv[arg_idx];
         // Drop already processed arguments
         argv += arg_idx;
@@ -253,7 +253,7 @@ int main(int argc, char **argv)
                 ssize_t size;
 
                 if (argc != 1)
-                        return printe("Argument missing");
+                        return printe("Invalid number of parameters");
 
                 if (!strcmp(argv[0], "rs232"))
                         ifce = sdp_ifce_rs232;
@@ -273,7 +273,6 @@ int main(int argc, char **argv)
                 // TODO
         }
         else if (!strcmp(cmd, "gcom")) {
-//                if (sdp_(sdp_cmd, addr) == -1)
         }
         else if (!strcmp(cmd, "gmax")) {
         }
@@ -308,6 +307,19 @@ int main(int argc, char **argv)
         else if (!strcmp(cmd, "runp")) {
         }
         else if (!strcmp(cmd, "stop")) {
+                ssize_t size;
+
+                if (argc != 0)
+                        return printe("Invalid number of parameters");
+
+                size = sdp_stop(buf, addr);
+                if (size == -1)
+                        return printe("bug: sdp_stop");
+                if (sdp_write(fd_dev_out, buf, size) != size)
+                        return perror_("Comunication with device failed");
+
+                if (sdp_read(fd_dev_in, buf, sizeof(buf) != sdp_resp_nodata))
+                        return perror_("Comunication with device failed");
         }
         else {
                 print_help();

@@ -405,20 +405,20 @@ int sdp_remote(char *buf, int addr, int enable)
  *
  * buf:         output buffer (see SDP_BUF_SIZE_MIN)
  * addr:        rs485 device address: 1 - 31 (use anny valid for rs232)
- * preset:      index of preset values: 1-9
+ * presn:       preset number to recall: 1-9
  * returns:     number of writen characters not including trailing '\0',
  *      -1 on error
  */
-int sdp_run_preset(char *buf, int addr, int preset)
+int sdp_run_preset(char *buf, int addr, int presn)
 {
         int ret;
 
-        if (preset < SDP_PRESET_MIN || preset > SDP_PRESET_MAX)
+        if (presn < SDP_PRESET_MIN || presn > SDP_PRESET_MAX)
                 return -1;
 
         ret = sdp_print_cmd(buf, sdp_cmd_runm, addr);
         if (ret != -1)
-                buf[6] = ((char)preset % 10) + '0';
+                buf[6] = ((char)presn % 10) + '0';
 
         return ret;
 }
@@ -557,16 +557,16 @@ int sdp_set_output(char *buf, int addr, int enable)
  *
  * buf:         output buffer (see SDP_BUF_SIZE_MIN)
  * addr:        rs485 device address: 1 - 31 (use anny valid for rs232)
- * preset:      preset number: 1-9
+ * presn:       preset number: 1-9
  * enable:      when 0 disable, oneble oterwise
  * returns:     number of writen characters not including trailing '\0',
  *      -1 on error
  */
-int sdp_set_poweron_output(char *buf, int addr, int preset, int enable)
+int sdp_set_poweron_output(char *buf, int addr, int presn, int enable)
 {
         int ret;
 
-        if (preset < SDP_PRESET_MIN || preset > SDP_PRESET_MAX)
+        if (presn < SDP_PRESET_MIN || presn > SDP_PRESET_MAX)
                 return -1;
 
         if (enable)
@@ -575,7 +575,7 @@ int sdp_set_poweron_output(char *buf, int addr, int preset, int enable)
                 ret = sdp_print_cmd(buf, sdp_cmd_poww_dis, addr);
 
         if (ret != -1)
-                buf[6] = preset + '0';
+                buf[6] = presn + '0';
         
         return ret;
 }
@@ -585,24 +585,24 @@ int sdp_set_poweron_output(char *buf, int addr, int preset, int enable)
  *
  * buf:         output buffer (see SDP_BUF_SIZE_MIN)
  * addr:        rs485 device address: 1 - 31 (use anny valid for rs232)
- * preset:      index of preset: 1-9
+ * presn:       number of preset to set: 1-9
  * volt:        preset voltage value: 0-999
  * curr:        preset current value: 0-999
  * returns:     number of writen characters not including trailing '\0',
  *      -1 on error
  */
-int sdp_set_preset(char *buf, int addr, int preset, int volt, int curr)
+int sdp_set_preset(char *buf, int addr, int presn, int volt, int curr)
 {
         int ret;
 
-        if (preset < SDP_PRESET_MIN || preset > SDP_PRESET_MAX ||
+        if (presn < SDP_PRESET_MIN || presn > SDP_PRESET_MAX ||
                         volt < 0 || volt > 999 || 
                         curr < 0 || curr > 999)
                 return -1;
 
         ret = sdp_print_cmd(buf, sdp_cmd_prom, addr);
         if (ret != -1) {
-                buf[6] = preset + '0';
+                buf[6] = presn + '0';
                 sdp_print_num(buf + 7, 3, volt);
                 sdp_print_num(buf + 10, 3, curr);
         }
@@ -615,19 +615,19 @@ int sdp_set_preset(char *buf, int addr, int preset, int volt, int curr)
  *
  * buf:         output buffer (see SDP_BUF_SIZE_MIN)
  * addr:        rs485 device address: 1 - 31 (use anny valid for rs232)
- * program:     program item index for which values should be set: 0-19
+ * progn:       program number for which values should be set: 0-19
  * volt:        new volage for specified program item: 0-999
  * curr:        new curret for specified program item: 0-999
  * time:        new lenght of program item duration in seconds: 0-5999
  * returns:     number of writen characters not including trailing '\0',
  *      -1 on error
  */
-int sdp_set_program(char *buf, int addr, int program, int volt, int curr,
+int sdp_set_program(char *buf, int addr, int progn, int volt, int curr,
                 int time)
 {
         int ret;
 
-        if (program < SDP_PROGRAM_MIN || program > SDP_PROGRAM_MAX ||
+        if (progn < SDP_PROGRAM_MIN || progn > SDP_PROGRAM_MAX ||
                         volt < 0 || volt > 999 || 
                         curr < 0 || curr > 999 ||
                         time < 0 || time > (99*60+59))
@@ -635,7 +635,7 @@ int sdp_set_program(char *buf, int addr, int program, int volt, int curr,
 
         ret = sdp_print_cmd(buf, sdp_cmd_prop, addr);
         if (ret != -1) {
-                sdp_print_num(buf + 6, 2, program);
+                sdp_print_num(buf + 6, 2, progn);
                 sdp_print_num(buf + 8, 3, volt);
                 sdp_print_num(buf + 11, 3, curr);
                 sdp_print_num(buf + 14, 2, time / 60);

@@ -95,6 +95,46 @@ typedef struct {
         int remote;
 } sdp_ldc_info_t;
 
+typedef struct {
+        unsigned char addr;
+#ifdef __linux__
+        int f;
+#endif
+#ifdef _WIN32
+        HANDLE f;
+#endif
+} sdp_t;
+
+/* High leve operation functions */
+sdp_t *sdp_open(sdp_t *sdp, const char *fname, int addr);
+//sdp_t *sdp_reopen(sdp_t *sdp, int f, int addr);
+//sdp_t *sdp_reopen(sdp_t *sdp, HANDLE f, int addr);
+sdp_t *sdp_close(sdp_t *sdp);
+
+int sdp_fget_dev_addr(const sdp_t *sdp);
+int sdp_fget_va_maximums(const sdp_t *sdp, sdp_va_t *va_maximums);
+int sdp_fget_volt_limit(const sdp_t *sdp);
+int sdp_fget_va_data(const sdp_t *sdp, sdp_va_data_t *va_data);
+int sdp_fget_va_setpoint(const sdp_t *sdp, sdp_va_t *va_setpoints);
+int sdp_fget_preset(const sdp_t *sdp, int presn, sdp_va_t *va_preset);
+int sdp_fget_program(const sdp_t *sdp, int progn, sdp_program_t *program);
+int sdp_fget_ldc_info(const sdp_t *sdp, sdp_ldc_info_t *lcd_info);
+
+int sdp_fremote(const sdp_t *sdp, int enable);
+int sdp_frun_preset(const sdp_t *sdp, int preset);
+int sdp_frun_program(const sdp_t *sdp, int count);
+int sdp_fselect_ifce(const sdp_t *sdp, sdp_ifce_t ifce);
+int sdp_fset_curr(const sdp_t *sdp, int curr);
+int sdp_fset_volt(const sdp_t *sdp, int volt);
+int sdp_fset_volt_limit(const sdp_t *sdp, int volt);
+int sdp_fset_output(const sdp_t *sdp, int enable);
+int sdp_fset_poweron_output(const sdp_t *sdp, int preset, int enable);
+int sdp_fset_preset(const sdp_t *sdp, int presn, const sdp_va_t *va_preset);
+int sdp_fset_program(const sdp_t *sdp, int progn, const sdp_program_t *program);
+int sdp_fstop(const sdp_t *sdp);
+
+/* Low level operation functions */
+
 sdp_resp_t sdp_resp(const char *buf, int len);
 
 /* This functions return some data (sdp_resp_data), use corecponding
@@ -104,8 +144,8 @@ int sdp_get_va_maximums(char *buf, int addr);
 int sdp_get_volt_limit(char *buf, int addr);
 int sdp_get_va_data(char *buf, int addr);
 int sdp_get_va_setpoint(char *buf, int addr);
-int sdp_get_preset(char *buf, int addr, int preset);
-int sdp_get_program(char *buf, int addr, int program);
+int sdp_get_preset(char *buf, int addr, int presn);
+int sdp_get_program(char *buf, int addr, int progn);
 int sdp_get_ldc_info(char *buf, int addr);
 
 /* Response parsing function should look something like: */
@@ -127,9 +167,9 @@ int sdp_set_curr(char *buf, int addr, int curr);
 int sdp_set_volt(char *buf, int addr, int volt);
 int sdp_set_volt_limit(char *buf, int addr, int volt);
 int sdp_set_output(char *buf, int addr, int enable);
-int sdp_set_poweron_output(char *buf, int addr, int preset, int enable);
-int sdp_set_preset(char *buf, int addr, int preset, int volt, int curr);
-int sdp_set_program(char *buf, int addr, int program, int volt, int curr, 
+int sdp_set_poweron_output(char *buf, int addr, int presn, int enable);
+int sdp_set_preset(char *buf, int addr, int presn, int volt, int curr);
+int sdp_set_program(char *buf, int addr, int progn, int volt, int curr, 
                 int time);
 int sdp_stop(char *buf, int addr);
 
