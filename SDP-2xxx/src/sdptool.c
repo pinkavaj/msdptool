@@ -114,7 +114,8 @@ int open_serial(const char* fname)
         return fd;
 }
 
-static sdp_resp_t sdp_read(int fd, char *buf, ssize_t count)
+// TODO
+static int sdp_read(int fd, char *buf, ssize_t count)
 {
         ssize_t size;
 
@@ -262,14 +263,15 @@ int main(int argc, char **argv)
                 else
                         return printe("Invalid argument");
 
-                size = sdp_select_ifce(buf, addr, ifce);
+                // TODO
+                /*size = sdp_select_ifce(buf, addr, ifce);
                 if (size == -1)
                         return printe("bug: sdp_select_ifce");
                 if (sdp_write(fd_dev_out, buf, size) != size)
                         return perror_("Comunication with device failed");
 
                 if (sdp_read(fd_dev_in, buf, sizeof(buf) != sdp_resp_nodata))
-                        return perror_("Comunication with device failed");
+                        return perror_("Comunication with device failed");*/
                 // TODO
         }
         else if (!strcmp(cmd, "gcom")) {
@@ -318,8 +320,9 @@ int main(int argc, char **argv)
                 if (sdp_write(fd_dev_out, buf, size) != size)
                         return perror_("Comunication with device failed");
 
-                if (sdp_read(fd_dev_in, buf, sizeof(buf) != sdp_resp_nodata))
-                        return perror_("Comunication with device failed");
+                // TODO
+                /*if (sdp_read(fd_dev_in, buf, sizeof(buf) != sdp_resp_nodata))
+                        return perror_("Comunication with device failed");*/
         }
         else {
                 print_help();
