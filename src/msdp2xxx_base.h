@@ -45,13 +45,18 @@ extern "C" {
 
 #define SDP_PRESET_MIN (1)
 #define SDP_PRESET_MAX (9)
-#define SDP_PRESET_ALL ((SDP_PRESET_MAX + 1))
+#define SDP_PRESET_ALL ((SDP_PRESET_MAX) + 1)
 
 #define SDP_PROGRAM_MIN (0)
 #define SDP_PROGRAM_MAX (19)
-#define SDP_PROGRAM_ALL ((SDP_PROGRAM_MAX + 1))
+#define SDP_PROGRAM_ALL ((SDP_PROGRAM_MAX) + 1)
 
 #define SDP_RUN_PROG_INF (0)
+
+#define SDP_INT2VOLT(u) (((float)(u)) / 10)
+#define SDP_INT2CURR(i) (((float)(i)) / 100)
+#define SDP_VOLT2INT(x) ((int)round((x) * 10))
+#define SDP_CURR2INT(x) ((int)round((x) * 100))
 
 #ifdef __linux__
 #define SDP_F int
