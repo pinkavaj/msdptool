@@ -61,7 +61,7 @@ int sdp_set_curr(const sdp_t *sdp, int curr);
 int sdp_set_volt(const sdp_t *sdp, int volt);
 int sdp_set_volt_limit(const sdp_t *sdp, int volt);
 int sdp_set_output(const sdp_t *sdp, int enable);
-int sdp_set_poweron_output(const sdp_t *sdp, int preset, int enable);
+int sdp_set_poweron_output(const sdp_t *sdp, int presn, int enable);
 int sdp_set_preset(const sdp_t *sdp, int presn, const sdp_va_t *va_preset);
 int sdp_set_program(const sdp_t *sdp, int progn, const sdp_program_t *program);
 int sdp_stop(const sdp_t *sdp);

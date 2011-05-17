@@ -72,17 +72,30 @@ typedef enum {
         sdp_mode_cc = 1,
 } sdp_mode_t;
 
+/**
+ * curr:        current: [A * 100]
+ * volt:        voltage: [V * 10]
+ */
 typedef struct {
         int curr;
         int volt;
 } sdp_va_t;
 
+/**
+ * curr:        current: [A * 1000]
+ * volt:        voltage: [V * 100]
+ */
 typedef struct {
         int curr;
         int volt;
         sdp_mode_t mode;
 } sdp_va_data_t;
 
+/**
+ * curr:        current: [A * 100]
+ * volt:        voltage: [V * 10]
+ * time:        lenght of program item duration [sec]
+ */
 typedef struct {
         int curr;
         int volt;

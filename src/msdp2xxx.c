@@ -321,7 +321,7 @@ int sdp_get_va_maximums(const sdp_t *sdp, sdp_va_t *va_maximums)
  * Get upper voltage limit
  *
  * sdp:         pointer to sdp_t structure, initialized by sdp_open
- * returns:     upper voltage limit in units [V * 10], -1 on error
+ * returns:     upper voltage limit: [V * 10], error returns -1
  */
 int sdp_get_volt_limit(const sdp_t *sdp)
 {
@@ -353,11 +353,14 @@ int sdp_get_va_setpoint(const sdp_t *sdp, sdp_va_t *va_setpoints)
 }
 
 /**
+ * Get value of one or all presets stored in PS
  *
- * presn:
- * va_preset:
+ * presn:       number of preset in range 1 - 9 to get from PS or
+ *      SDP_PRESET_ALL to get all 9 preset values at once.
+ * va_preset:   pointer to sdp_va_t, used to store retrieved velue
+ *      or pointer to first item of array of 9 sdp_va_t, to store all presets
  * sdp:         pointer to sdp_t structure, initialized by sdp_open
- * returns:     
+ * returns:     0 on success, -1 on error
  */
 int sdp_get_preset(const sdp_t *sdp, int presn, sdp_va_t *va_preset)
 {
@@ -365,11 +368,15 @@ int sdp_get_preset(const sdp_t *sdp, int presn, sdp_va_t *va_preset)
 }
 
 /**
+ * Get one or all program items from PS
  *
- * progn:
- * program:
+ * progn:       program item number to get (0-19) or SDP_PROGRAM_ALL to get
+ *      all program items at once
+ * program:     pointer to sdp_program_t to store one program item or
+ *      pointer to firt item of array of 20 items of type sdp_program_t to
+ *      store all program items
  * sdp:         pointer to sdp_t structure, initialized by sdp_open
- * returns:     
+ * returns:     0 on success, -1 on error
  */
 int sdp_get_program(const sdp_t *sdp, int progn, sdp_program_t *program)
 {
@@ -377,10 +384,11 @@ int sdp_get_program(const sdp_t *sdp, int progn, sdp_program_t *program)
 }
 
 /**
+ * Get LCD info, return data about all informations currently shown on LCD
  *
- * lcd_info:
+ * lcd_info:    pointer to sdp_ldc_info_t where informations should be stored
  * sdp:         pointer to sdp_t structure, initialized by sdp_open
- * returns:     
+ * returns:     0 on success, -1 on error
  */
 int sdp_get_ldc_info(const sdp_t *sdp, sdp_ldc_info_t *lcd_info)
 {
@@ -388,10 +396,11 @@ int sdp_get_ldc_info(const sdp_t *sdp, sdp_ldc_info_t *lcd_info)
 }
 
 /**
+ * Enable/disable remote operation, disable/enable keyboard (manula) operation
  *
- * enable:
+ * enable:      when 0 disable remote operation, otherwise enable
  * sdp:         pointer to sdp_t structure, initialized by sdp_open
- * returns:     
+ * returns:     0 on success, -1 on error
  */
 int sdp_remote(const sdp_t *sdp, int enable)
 {
@@ -399,10 +408,11 @@ int sdp_remote(const sdp_t *sdp, int enable)
 }
 
 /**
+ * Load preset and set it as current wanted value
  *
- * preset:
+ * preset:      number of preset to load
  * sdp:         pointer to sdp_t structure, initialized by sdp_open
- * returns:     
+ * returns:     0 on success, -1 on error
  */
 int sdp_run_preset(const sdp_t *sdp, int preset)
 {
@@ -410,10 +420,11 @@ int sdp_run_preset(const sdp_t *sdp, int preset)
 }
 
 /**
+ * Run timed program, once or repeatly
  *
- * count:
+ * count:       count of program repeats or SDP_RUN_PROG_INF to repeat forever
  * sdp:         pointer to sdp_t structure, initialized by sdp_open
- * returns:     
+ * returns:     0 on success, -1 on error
  */
 int sdp_run_program(const sdp_t *sdp, int count)
 {
@@ -421,14 +432,15 @@ int sdp_run_program(const sdp_t *sdp, int count)
 }
 
 /**
+ * Select comunication interface (rs232/rs485)
  *
- * ifce:
+ * ifce:        one of sdp_ifce_rs232 or sdp_ifce_rs485
  * sdp:         pointer to sdp_t structure, initialized by sdp_open
- * returns:     
+ * returns:     0 on success, -1 on error
  */
-// TODO
 int sdp_select_ifce(const sdp_t *sdp, sdp_ifce_t ifce)
 {
+// TODO
         char buf[SDP_BUF_SIZE_MIN];
         ssize_t size;
 
@@ -448,10 +460,11 @@ int sdp_select_ifce(const sdp_t *sdp, sdp_ifce_t ifce)
 }
 
 /**
+ * Set setpont for current
  *
- * curr:
+ * curr:        wanted output current of PS: [A * 100]
  * sdp:         pointer to sdp_t structure, initialized by sdp_open
- * returns:     
+ * returns:     0 on success, -1 on error
  */
 int sdp_set_curr(const sdp_t *sdp, int curr)
 {
@@ -459,10 +472,11 @@ int sdp_set_curr(const sdp_t *sdp, int curr)
 }
 
 /**
+ * Set setpoint for voltage
  *
- * volt:
+ * volt:        wanted output voltage of PS: [V * 10]
  * sdp:         pointer to sdp_t structure, initialized by sdp_open
- * returns:     
+ * returns:     0 on success, -1 on error
  */
 int sdp_set_volt(const sdp_t *sdp, int volt)
 {
@@ -470,10 +484,11 @@ int sdp_set_volt(const sdp_t *sdp, int volt)
 }
 
 /**
+ * Set upper voltage limit
  *
- * volt:
+ * volt:        wanted upper voltage limit: [V * 10]
  * sdp:         pointer to sdp_t structure, initialized by sdp_open
- * returns:     
+ * returns:     0 on success, -1 on error
  */
 int sdp_set_volt_limit(const sdp_t *sdp, int volt)
 {
@@ -481,10 +496,11 @@ int sdp_set_volt_limit(const sdp_t *sdp, int volt)
 }
 
 /**
+ * Set PS output to on or off
  *
- * enable:
+ * enable:      when 0 turn output off, otherwise turn on
  * sdp:         pointer to sdp_t structure, initialized by sdp_open
- * returns:     
+ * returns:     0 on success, -1 on error
  */
 int sdp_set_output(const sdp_t *sdp, int enable)
 {
@@ -492,23 +508,25 @@ int sdp_set_output(const sdp_t *sdp, int enable)
 }
 
 /**
+ * Set power on status of output for specific preset item
  *
- * preset:
- * enable:
+ * presn:       number of preset to set output state
+ * enable:      when 0 output is disablen on power, otherwise enabled
  * sdp:         pointer to sdp_t structure, initialized by sdp_open
- * returns:     
+ * returns:     0 on success, -1 on error
  */
-int sdp_set_poweron_output(const sdp_t *sdp, int preset, int enable)
+int sdp_set_poweron_output(const sdp_t *sdp, int presn, int enable)
 {
         return -1;
 }
 
 /**
+ * Set value of preset item
  *
- * presn:
- * va_preset:
+ * presn:       number of preset to set
+ * va_preset:   new value of preset
  * sdp:         pointer to sdp_t structure, initialized by sdp_open
- * returns:     
+ * returns:     0 on success, -1 on error
  */
 int sdp_set_preset(const sdp_t *sdp, int presn, const sdp_va_t *va_preset)
 {
@@ -516,11 +534,12 @@ int sdp_set_preset(const sdp_t *sdp, int presn, const sdp_va_t *va_preset)
 }
 
 /**
+ * Set value of program item
  *
- * progn:
- * program:
+ * progn:       number of program item to set
+ * program:     new value of program item
  * sdp:         pointer to sdp_t structure, initialized by sdp_open
- * returns:     
+ * returns:     0 on success, -1 on error
  */
 int sdp_set_program(const sdp_t *sdp, int progn, const sdp_program_t *program)
 {
@@ -528,9 +547,10 @@ int sdp_set_program(const sdp_t *sdp, int progn, const sdp_program_t *program)
 }
 
 /**
+ * Stop running program
  *
  * sdp:         pointer to sdp_t structure, initialized by sdp_open
- * returns:     
+ * returns:     0 on success, -1 on error
  */
 int sdp_stop(const sdp_t *sdp)
 {
