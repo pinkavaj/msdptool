@@ -1,6 +1,6 @@
 Mansons power supply remote control library and tools.
 
-This is library is used to handle remote control of Mansons Remote programing
+This library is used to handle remote control of Mansons Remote programing
 switching mode DC regulated power Supply of SDP Series (SDP - 2210/2405/2603).
 There is also set of tools for basic operations with this class of power
 supplies. This library and most of tools are multiplatform and portable as
