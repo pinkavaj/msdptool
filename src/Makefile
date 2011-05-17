@@ -1,13 +1,13 @@
 
-LIB=sdp2xxx
-PROG=sdptool
+LIB=msdp2xxx
+PROG=msdptool
 
 CC=gcc
 CFLAGS=-Wall
 LDFLAGS=
 
-SRC_PROG=sdptool.c
-SRC_LIB=sdp2xxx.c sdp2xxx_low.c
+SRC_PROG=msdptool.c
+SRC_LIB=msdp2xxx.c msdp2xxx_low.c
 
 OBJS_PROG=$(SRC_PROG:%.c=%.o)
 OBJS_LIB=$(SRC_LIB:%.c=%.o)
