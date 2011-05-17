@@ -23,12 +23,12 @@
 #include <string.h>
 #include <strings.h>
 #include <sys/stat.h>
-#include <termios.h>
 #include <fcntl.h>
 #include <unistd.h>
 
 #ifdef __linux__
 
+#include <termios.h>
 #include <sys/select.h>
 
 static int open_serial(const char* fname)
@@ -102,34 +102,32 @@ static HANDLE open_serial(const char* fname)
 
         h = CreateFile(fname, GENERIC_READ | GENERIC_WRITE, 0, 0,
                         OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
-        if (h == INVALID_HANDLE_VALUE) {
-                char buf[1024];
-
-                FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM |
-                                FORMAT_MESSAGE_IGNORE_INSERTS,
-                                NULL, GetLastError(),
-                                MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-                                buf, sizeof(buf), NULL);
-                fprintf(stderr, buf);
-
-                return h;
-        }
+        if (h == INVALID_HANDLE_VALUE)
+                return INVALID_HANDLE_VALUE;
 
         DCB dcbSerialParams = { 0 };
 
         if (!GetCommState(h, &dcbSerialParams)) {
+                DWORD e;
+
+                e = GetLastError();
                 CloseHandle(h);
+                SetLastError(e);
                 return INVALID_HANDLE_VALUE;
         }
 
-        dcbSerial.DCBlenght = sizeof(dcbSerialParams);
+        dcbSerialParams.DCBlength = sizeof(dcbSerialParams);
         dcbSerialParams.BaudRate = CBR_9600;
         dcbSerialParams.ByteSize = 8;
         dcbSerialParams.StopBits = ONESTOPBIT;
-        dcbSerialParams.parity = NOPARITY;
+        dcbSerialParams.Parity = NOPARITY;
 
         if (!SetCommState(h, &dcbSerialParams)) {
+                DWORD e;
+
+                e = GetLastError();
                 CloseHandle(h);
+                SetLastError(e);
                 return INVALID_HANDLE_VALUE;
         }
 
@@ -142,8 +140,12 @@ static HANDLE open_serial(const char* fname)
         timeouts.WriteTotalTimeoutConstant = 1;
         timeouts.WriteTotalTimeoutMultiplier = 1;
 
-        if(!SetCommTimeouts(hSerial, &timeouts)) {
+        if(!SetCommTimeouts(h, &timeouts)) {
+                DWORD e;
+
+                e = GetLastError();
                 CloseHandle(h);
+                SetLastError(e);
                 return INVALID_HANDLE_VALUE;
         }
 

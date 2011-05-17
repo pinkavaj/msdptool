@@ -153,15 +153,28 @@ int main(int argc, char **argv)
         }
 #elif _WIN32
         if (!strcmp(argv[arg_idx], "-")) {
-                fd_dev_in = GetStdHandle(STD_INPUT_HANDLE);
-                fd_dev_out = GetStdHandle(STD_OUTPUT_HANDLE);
+                sdp.f_in = GetStdHandle(STD_INPUT_HANDLE);
+                sdp.f_out = GetStdHandle(STD_OUTPUT_HANDLE);
                 fd_std_out = GetStdHandle(STD_ERROR_HANDLE);
         } 
         else {
-                fd_dev_in = fd_dev_out = open_serial(argv[arg_idx]);
-                if (fd_dev_in == INVALID_HANDLE_VALUE)
+                int ret;
+
+                ret = sdp_open(&sdp, argv[arg_idx], addr);
+                // TODO
+                if (ret == -1)
                         return -1;
-                fd_std_out = GetStdHandle(STD_OUTPUT_HANDLE);;
+                fd_std_out = GetStdHandle(STD_OUTPUT_HANDLE);
+
+                //char buf[1024];
+
+                // TODO
+                /*FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM |
+                                FORMAT_MESSAGE_IGNORE_INSERTS,
+                                NULL, GetLastError(),
+                                MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+                                buf, sizeof(buf), NULL);
+                fprintf(stderr, buf);*/
         }
 #endif
 

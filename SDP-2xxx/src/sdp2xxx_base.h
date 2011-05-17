@@ -28,6 +28,10 @@
 #ifndef __SDP2XXX_BASE_H___
 #define __SDP2XXX_BASE_H___
 
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
