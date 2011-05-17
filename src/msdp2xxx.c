@@ -282,7 +282,7 @@ int sdp_openf(sdp_t *sdp, SDP_F f, int addr)
 /**
  * Close SDP and all asociated ports
  *
- * sdp:         pointer to sdp_t structure initialized by sdp_open
+ * sdp:         pointer to sdp_t structure, initialized by sdp_open
  */
 void sdp_close(sdp_t *sdp)
 {
@@ -297,8 +297,8 @@ void sdp_close(sdp_t *sdp)
  *      same value as specified on sdp_open addr field or -1 when device is
  *      not connected. For rs232 returns last set rs485 device address.
  *
- * sdp:         pointer to sdp_t structure initialized by sdp_open
- * returns:     SDP device address or -1
+ * sdp:         pointer to sdp_t structure, initialized by sdp_open
+ * returns:     SDP device address, -1 if device not found or error
  */
 int sdp_get_dev_addr(const sdp_t *sdp)
 {
@@ -306,10 +306,11 @@ int sdp_get_dev_addr(const sdp_t *sdp)
 }
 
 /**
+ * Get maximal values of current and voltage for this PS
  *
- * va_maximums:
- * sdp:         pointer to sdp_t structure initialized by sdp_open
- * returns:     
+ * va_maximums: pointer to sdp_va_t, used to store recieved values
+ * sdp:         pointer to sdp_t structure, initialized by sdp_open
+ * returns:     0 on success, -1 on error
  */
 int sdp_get_va_maximums(const sdp_t *sdp, sdp_va_t *va_maximums)
 {
@@ -317,9 +318,10 @@ int sdp_get_va_maximums(const sdp_t *sdp, sdp_va_t *va_maximums)
 }
 
 /**
+ * Get upper voltage limit
  *
- * sdp:         pointer to sdp_t structure initialized by sdp_open
- * returns:     
+ * sdp:         pointer to sdp_t structure, initialized by sdp_open
+ * returns:     upper voltage limit in units [V * 10], -1 on error
  */
 int sdp_get_volt_limit(const sdp_t *sdp)
 {
@@ -327,10 +329,11 @@ int sdp_get_volt_limit(const sdp_t *sdp)
 }
 
 /**
+ * Get actual value of current, voltage and mode of PS output
  *
- * va_data:
- * sdp:         pointer to sdp_t structure initialized by sdp_open
- * returns:     
+ * va_data:     pointer to sdp_va_data_t, used to store returned values
+ * sdp:         pointer to sdp_t structure, initialized by sdp_open
+ * returns:     0 on success, -1 on error
  */
 int sdp_get_va_data(const sdp_t *sdp, sdp_va_data_t *va_data)
 {
@@ -338,10 +341,11 @@ int sdp_get_va_data(const sdp_t *sdp, sdp_va_data_t *va_data)
 }
 
 /**
+ * Get actual setpoint - desired current / voltage value
  *
- * va_setpoints
- * sdp:         pointer to sdp_t structure initialized by sdp_open
- * returns:     
+ * va_setpoints: pointer to sdp_va_t, used to store retrieved values
+ * sdp:         pointer to sdp_t structure, initialized by sdp_open
+ * returns:     0 on success, -1 on error
  */
 int sdp_get_va_setpoint(const sdp_t *sdp, sdp_va_t *va_setpoints)
 {
@@ -352,7 +356,7 @@ int sdp_get_va_setpoint(const sdp_t *sdp, sdp_va_t *va_setpoints)
  *
  * presn:
  * va_preset:
- * sdp:         pointer to sdp_t structure initialized by sdp_open
+ * sdp:         pointer to sdp_t structure, initialized by sdp_open
  * returns:     
  */
 int sdp_get_preset(const sdp_t *sdp, int presn, sdp_va_t *va_preset)
@@ -364,7 +368,7 @@ int sdp_get_preset(const sdp_t *sdp, int presn, sdp_va_t *va_preset)
  *
  * progn:
  * program:
- * sdp:         pointer to sdp_t structure initialized by sdp_open
+ * sdp:         pointer to sdp_t structure, initialized by sdp_open
  * returns:     
  */
 int sdp_get_program(const sdp_t *sdp, int progn, sdp_program_t *program)
@@ -375,7 +379,7 @@ int sdp_get_program(const sdp_t *sdp, int progn, sdp_program_t *program)
 /**
  *
  * lcd_info:
- * sdp:         pointer to sdp_t structure initialized by sdp_open
+ * sdp:         pointer to sdp_t structure, initialized by sdp_open
  * returns:     
  */
 int sdp_get_ldc_info(const sdp_t *sdp, sdp_ldc_info_t *lcd_info)
@@ -386,7 +390,7 @@ int sdp_get_ldc_info(const sdp_t *sdp, sdp_ldc_info_t *lcd_info)
 /**
  *
  * enable:
- * sdp:         pointer to sdp_t structure initialized by sdp_open
+ * sdp:         pointer to sdp_t structure, initialized by sdp_open
  * returns:     
  */
 int sdp_remote(const sdp_t *sdp, int enable)
@@ -397,7 +401,7 @@ int sdp_remote(const sdp_t *sdp, int enable)
 /**
  *
  * preset:
- * sdp:         pointer to sdp_t structure initialized by sdp_open
+ * sdp:         pointer to sdp_t structure, initialized by sdp_open
  * returns:     
  */
 int sdp_run_preset(const sdp_t *sdp, int preset)
@@ -408,7 +412,7 @@ int sdp_run_preset(const sdp_t *sdp, int preset)
 /**
  *
  * count:
- * sdp:         pointer to sdp_t structure initialized by sdp_open
+ * sdp:         pointer to sdp_t structure, initialized by sdp_open
  * returns:     
  */
 int sdp_run_program(const sdp_t *sdp, int count)
@@ -419,7 +423,7 @@ int sdp_run_program(const sdp_t *sdp, int count)
 /**
  *
  * ifce:
- * sdp:         pointer to sdp_t structure initialized by sdp_open
+ * sdp:         pointer to sdp_t structure, initialized by sdp_open
  * returns:     
  */
 // TODO
@@ -446,7 +450,7 @@ int sdp_select_ifce(const sdp_t *sdp, sdp_ifce_t ifce)
 /**
  *
  * curr:
- * sdp:         pointer to sdp_t structure initialized by sdp_open
+ * sdp:         pointer to sdp_t structure, initialized by sdp_open
  * returns:     
  */
 int sdp_set_curr(const sdp_t *sdp, int curr)
@@ -457,7 +461,7 @@ int sdp_set_curr(const sdp_t *sdp, int curr)
 /**
  *
  * volt:
- * sdp:         pointer to sdp_t structure initialized by sdp_open
+ * sdp:         pointer to sdp_t structure, initialized by sdp_open
  * returns:     
  */
 int sdp_set_volt(const sdp_t *sdp, int volt)
@@ -468,7 +472,7 @@ int sdp_set_volt(const sdp_t *sdp, int volt)
 /**
  *
  * volt:
- * sdp:         pointer to sdp_t structure initialized by sdp_open
+ * sdp:         pointer to sdp_t structure, initialized by sdp_open
  * returns:     
  */
 int sdp_set_volt_limit(const sdp_t *sdp, int volt)
@@ -479,7 +483,7 @@ int sdp_set_volt_limit(const sdp_t *sdp, int volt)
 /**
  *
  * enable:
- * sdp:         pointer to sdp_t structure initialized by sdp_open
+ * sdp:         pointer to sdp_t structure, initialized by sdp_open
  * returns:     
  */
 int sdp_set_output(const sdp_t *sdp, int enable)
@@ -491,7 +495,7 @@ int sdp_set_output(const sdp_t *sdp, int enable)
  *
  * preset:
  * enable:
- * sdp:         pointer to sdp_t structure initialized by sdp_open
+ * sdp:         pointer to sdp_t structure, initialized by sdp_open
  * returns:     
  */
 int sdp_set_poweron_output(const sdp_t *sdp, int preset, int enable)
@@ -503,7 +507,7 @@ int sdp_set_poweron_output(const sdp_t *sdp, int preset, int enable)
  *
  * presn:
  * va_preset:
- * sdp:         pointer to sdp_t structure initialized by sdp_open
+ * sdp:         pointer to sdp_t structure, initialized by sdp_open
  * returns:     
  */
 int sdp_set_preset(const sdp_t *sdp, int presn, const sdp_va_t *va_preset)
@@ -515,7 +519,7 @@ int sdp_set_preset(const sdp_t *sdp, int presn, const sdp_va_t *va_preset)
  *
  * progn:
  * program:
- * sdp:         pointer to sdp_t structure initialized by sdp_open
+ * sdp:         pointer to sdp_t structure, initialized by sdp_open
  * returns:     
  */
 int sdp_set_program(const sdp_t *sdp, int progn, const sdp_program_t *program)
@@ -525,7 +529,7 @@ int sdp_set_program(const sdp_t *sdp, int progn, const sdp_program_t *program)
 
 /**
  *
- * sdp:         pointer to sdp_t structure initialized by sdp_open
+ * sdp:         pointer to sdp_t structure, initialized by sdp_open
  * returns:     
  */
 int sdp_stop(const sdp_t *sdp)
