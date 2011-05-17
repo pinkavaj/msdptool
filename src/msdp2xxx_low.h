@@ -74,9 +74,9 @@ int sdp_sset_output(char *buf, int addr, int enable);
 int sdp_sset_poweron_output(char *buf, int addr, int presn, int enable);
 int sdp_sset_preset(char *buf, int addr, int presn, int volt, int curr);
 int sdp_sset_program(char *buf, int addr, int progn, int volt, int curr, 
+                int time);
 int sdp_sset_volt(char *buf, int addr, int volt);
 int sdp_sset_volt_limit(char *buf, int addr, int volt);
-                int time);
 int sdp_sstop(char *buf, int addr);
 
 #ifdef __cplusplus
