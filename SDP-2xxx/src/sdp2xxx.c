@@ -196,7 +196,7 @@ static HANDLE open_serial(const char* fname)
  */
 void close_serial(HANDLE f)
 {
-        if (h != INVALID_HANDLE_VALUE)
+        if (f != INVALID_HANDLE_VALUE)
                 CloseHandle(f);
 }
 
