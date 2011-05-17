@@ -1,4 +1,3 @@
-
 LIB=msdp2xxx
 PROG=msdptool
 
@@ -28,10 +27,7 @@ ${LIB_}: ${OBJS_LIB}
 %.o:	%.c
 	${CC} ${CFLAGS} -c -o $@ $<
 
-%.c:	msdp2xxx_base.h  msdp2xxx.h  msdp2xxx_low.h
-	
-
-%.h:
+%.c:	msdp2xxx_base.h msdp2xxx.h msdp2xxx_low.h
 	
 
 clean:
