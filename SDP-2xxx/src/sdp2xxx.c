@@ -19,40 +19,78 @@
 #include "sdp2xxx.h"
 #include "sdp2xxx_low.h"
 #include <ctype.h>
+#include <errno.h>
 #include <string.h>
 #include <strings.h>
 #include <sys/stat.h>
+#include <termios.h>
 #include <fcntl.h>
 #include <unistd.h>
 
 #ifdef __linux__
+
+#include <sys/select.h>
+
 static int open_serial(const char* fname)
 {
         int fd;
+        struct termios tio;
 
-        fd = open(fname, O_RDWR);
-/*        if (fd == -1)
-                perror_("Failed to open port");*/
-        // TODO set parameters of serial port to 9600 8n1
+        fd = open(fname, O_RDWR | O_NONBLOCK);
+        if (fd == -1)
+                return -1;
+
+        memset(&tio, 0, sizeof(tio));
+        tio.c_cflag = CS8 | CREAD | CLOCAL;
+        tio.c_cc[VMIN] = 1;
+        tio.c_cc[VTIME] = 5;
+        cfsetispeed(&tio, B9600);
+        cfsetospeed(&tio, B9600);
+
+        if (tcsetattr(fd, TCSANOW, &tio) == -1) {
+                close(fd);
+                return -1;
+        }
+
         return fd;
 }
 
-// TODO
-static int sdp_read(int fd, char *buf, ssize_t count)
+static ssize_t sdp_read(int fd, char *buf, ssize_t count)
 {
-        ssize_t size;
+        ssize_t size = 0;
+        int ret;
+        struct timeval timeout;
+        fd_set readfds;
 
-        size = read(fd, buf, 1);
-        if (size == -1)
-                return -1;
-                //error
-        // TODO
-        return -1;
+        FD_ZERO(&readfds);
+        FD_SET(fd, &readfds);
+
+        // TODO: check this value
+        timeout.tv_sec = 0;
+        // (bytes + something) * msec / (bitrate / bits per byte)
+        timeout.tv_usec = ((count + 10) * 1000) / (9600 / 10);
+        do {
+                ssize_t size_;
+
+                ret = select(fd + 1, &readfds, NULL, NULL, &timeout);
+                if (ret <= 0) {
+                        if (ret == 0)
+                                errno = ETIMEDOUT;
+                        return -1;
+                }
+                size_ = read(fd, buf, count);
+                if (size_ == -1)
+                        return -1;
+                size += size_;
+                count -= size_;
+                buf += size_;
+        } while (count > 0);
+
+        return size;
 }
 
 static ssize_t sdp_write(int fd, char *buf, ssize_t count)
 {
-        // TODO
         return write(fd, buf, count);
 }
 #endif
@@ -76,7 +114,38 @@ static HANDLE open_serial(const char* fname)
 
                 return h;
         }
-        // TODO set parameters of serial port to 9600 8n1
+
+        DCB dcbSerialParams = { 0 };
+
+        if (!GetCommState(h, &dcbSerialParams)) {
+                CloseHandle(h);
+                return INVALID_HANDLE_VALUE;
+        }
+
+        dcbSerial.DCBlenght = sizeof(dcbSerialParams);
+        dcbSerialParams.BaudRate = CBR_9600;
+        dcbSerialParams.ByteSize = 8;
+        dcbSerialParams.StopBits = ONESTOPBIT;
+        dcbSerialParams.parity = NOPARITY;
+
+        if (!SetCommState(h, &dcbSerialParams)) {
+                CloseHandle(h);
+                return INVALID_HANDLE_VALUE;
+        }
+
+        COMMTIMEOUTS timeouts = { 0 };
+
+        // TODO: check this values
+        timeouts.ReadIntervalTimeout = 1;
+        timeouts.ReadTotalTimeoutConstant = 10;
+        timeouts.ReadTotalTimeoutMultiplier = 1;
+        timeouts.WriteTotalTimeoutConstant = 1;
+        timeouts.WriteTotalTimeoutMultiplier = 1;
+
+        if(!SetCommTimeouts(hSerial, &timeouts)) {
+                CloseHandle(h);
+                return INVALID_HANDLE_VALUE;
+        }
 
         return h;
 }
