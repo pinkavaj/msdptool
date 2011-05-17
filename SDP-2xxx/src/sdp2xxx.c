@@ -31,6 +31,12 @@
 #include <termios.h>
 #include <sys/select.h>
 
+/**
+ * Open serial port and set parameters as defined for SDP power source
+ *
+ * fname:       file name of serial port
+ * returns:     file descriptor on success, -1 on error
+ */
 static int open_serial(const char* fname)
 {
         int fd;
@@ -55,6 +61,24 @@ static int open_serial(const char* fname)
         return fd;
 }
 
+/**
+ * Close opened serial port, if f == -1 do nothigh
+ *
+ * f:           file descriptor
+ */
+void close_serial(int f)
+{
+        if (f != -1)
+                close(f);
+}
+
+/**
+ * Reads data from serial port
+ *
+ * fd:          file descriptor
+ * buf:         buffer to store readed data
+ * count:       number of bytes to read
+ */
 static ssize_t sdp_read(int fd, char *buf, ssize_t count)
 {
         ssize_t size = 0;
@@ -89,6 +113,13 @@ static ssize_t sdp_read(int fd, char *buf, ssize_t count)
         return size;
 }
 
+/**
+ * Write data into serial port
+ *
+ * fd:          file descriptor
+ * buf:         buffer with data to write
+ * count:       number of bytes to write
+ */
 static ssize_t sdp_write(int fd, char *buf, ssize_t count)
 {
         return write(fd, buf, count);
@@ -96,6 +127,12 @@ static ssize_t sdp_write(int fd, char *buf, ssize_t count)
 #endif
 
 #ifdef _WIN32
+/**
+ * Open serial port and set parameters as defined for SDP power source
+ *
+ * fname:       file name of serial port
+ * returns:     file descriptor on success, -1 on error
+ */
 static HANDLE open_serial(const char* fname)
 {
         HANDLE h;
@@ -152,104 +189,212 @@ static HANDLE open_serial(const char* fname)
         return h;
 }
 
-static sdp_resp_t sdp_read(HANDLE h, char *buf, ssize_t count)
+/**
+ * Close opened serial port, if f == INVALID_HANDLE_VALUE do nothigh
+ *
+ * f:           file handle
+ */
+void close_serial(HANDLE f)
+{
+        if (h != INVALID_HANDLE_VALUE)
+                CloseHandle(f);
+}
+
+/**
+ * Read data from serial port
+ *
+ * h:           file handle
+ * buf:         buffer to store readed data
+ * count:       number of bytes to read
+ * returns:     number of bytes read
+ */
+static ssize_t sdp_read(HANDLE h, char *buf, ssize_t count)
 {
         DWORD readb;
 
-        if (!ReadFile(h, buf, 1, &readb, NULL)) {
-                // error
-        }
-        // TODO
-        return -1;
+        if (!ReadFile(h, buf, count, &readb, NULL))
+                return -1;
+
+        return readb;
 }
 
+/**
+ * Write data into serial port
+ *
+ * h:           file handle
+ * buf:         buffer with data to send
+ * count:       number of bytes to send
+ * returns:     number of bytes succesfully writen
+ */
 static ssize_t sdp_write(HANDLE h, char *buf, ssize_t count)
 {
         DWORD writeb;
-        // TODO
+
         if (!WriteFile(h, buf, count, &writeb, NULL))
             return -1;
-        return count;
+
+        return writeb;
 }
 #endif
 
+/**
+ * Open serial port to comunicate with SDP power supply
+ *
+ * sdp:         sdp_t where to store informations about opened SDP PS
+ * fname:       name of serial port to open
+ * addr:        rs485 address of device, for rs232 is ignored - use anny valid
+ */
 int sdp_open(sdp_t *sdp, const char *fname, int addr)
 {
         SDP_F f;
+
+        if (addr < SDP_DEV_ADDR_MIN || addr > SDP_DEV_ADDR_MAX)
+                return -1;
 
         f = open_serial(fname);
         if (f == SDP_F_ERR)
                 return -1;
 
-        return -1;
+        sdp->f_in = sdp->f_out = f;
+        sdp->addr = addr;
+
+        return 0;
 }
 
+/**
+ * Initialize sdp usign existing opened file
+ *
+ * sdp:         sdp_t where to store informations about opened SDP PS
+ * f:           file descriptor or handle, depend on OS
+ * addr:        rs485 address of device, for rs232 is ignored - use anny valid
+ */
 int sdp_openf(sdp_t *sdp, SDP_F f, int addr)
 {
-        return -1;
+        if (addr < SDP_DEV_ADDR_MIN || addr > SDP_DEV_ADDR_MAX)
+                return -1;
+
+        sdp->f_in = sdp->f_out = f;
+        sdp->addr = addr;
+
+        return 0;
 }
 
+/**
+ * Close SDP and all asociated ports
+ *
+ * sdp:         sdp_t structure
+ */
 void sdp_close(sdp_t *sdp)
 {
-        return;
+        close_serial(sdp->f_in);
+        if (sdp->f_in != sdp->f_out)
+                close_serial(sdp->f_out);
 }
 
 
+/**
+ *
+ * returns:     
+ */
 int sdp_get_dev_addr(const sdp_t *sdp)
 {
         return -1;
 }
 
+/**
+ *
+ * returns:     
+ */
 int sdp_get_va_maximums(const sdp_t *sdp, sdp_va_t *va_maximums)
 {
         return -1;
 }
 
+/**
+ *
+ * returns:     
+ */
 int sdp_get_volt_limit(const sdp_t *sdp)
 {
         return -1;
 }
 
+/**
+ *
+ * returns:     
+ */
 int sdp_get_va_data(const sdp_t *sdp, sdp_va_data_t *va_data)
 {
         return -1;
 }
 
+/**
+ *
+ * returns:     
+ */
 int sdp_get_va_setpoint(const sdp_t *sdp, sdp_va_t *va_setpoints)
 {
         return -1;
 }
 
+/**
+ *
+ * returns:     
+ */
 int sdp_get_preset(const sdp_t *sdp, int presn, sdp_va_t *va_preset)
 {
         return -1;
 }
 
+/**
+ *
+ * returns:     
+ */
 int sdp_get_program(const sdp_t *sdp, int progn, sdp_program_t *program)
 {
         return -1;
 }
 
+/**
+ *
+ * returns:     
+ */
 int sdp_get_ldc_info(const sdp_t *sdp, sdp_ldc_info_t *lcd_info)
 {
         return -1;
 }
 
+/**
+ *
+ * returns:     
+ */
 int sdp_remote(const sdp_t *sdp, int enable)
 {
         return -1;
 }
 
+/**
+ *
+ * returns:     
+ */
 int sdp_run_preset(const sdp_t *sdp, int preset)
 {
         return -1;
 }
 
+/**
+ *
+ * returns:     
+ */
 int sdp_run_program(const sdp_t *sdp, int count)
 {
         return -1;
 }
 
+/**
+ *
+ * returns:     
+ */
 // TODO
 int sdp_select_ifce(const sdp_t *sdp, sdp_ifce_t ifce)
 {
@@ -271,41 +416,73 @@ int sdp_select_ifce(const sdp_t *sdp, sdp_ifce_t ifce)
         return -1;
 }
 
+/**
+ *
+ * returns:     
+ */
 int sdp_set_curr(const sdp_t *sdp, int curr)
 {
         return -1;
 }
 
+/**
+ *
+ * returns:     
+ */
 int sdp_set_volt(const sdp_t *sdp, int volt)
 {
         return -1;
 }
 
+/**
+ *
+ * returns:     
+ */
 int sdp_set_volt_limit(const sdp_t *sdp, int volt)
 {
         return -1;
 }
 
+/**
+ *
+ * returns:     
+ */
 int sdp_set_output(const sdp_t *sdp, int enable)
 {
         return -1;
 }
 
+/**
+ *
+ * returns:     
+ */
 int sdp_set_poweron_output(const sdp_t *sdp, int preset, int enable)
 {
         return -1;
 }
 
+/**
+ *
+ * returns:     
+ */
 int sdp_set_preset(const sdp_t *sdp, int presn, const sdp_va_t *va_preset)
 {
         return -1;
 }
 
+/**
+ *
+ * returns:     
+ */
 int sdp_set_program(const sdp_t *sdp, int progn, const sdp_program_t *program)
 {
         return -1;
 }
 
+/**
+ *
+ * returns:     
+ */
 int sdp_stop(const sdp_t *sdp)
 {
         return -1;
