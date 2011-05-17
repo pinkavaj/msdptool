@@ -17,7 +17,7 @@ all:	${PROG}
 	
 
 ${PROG}:	${LIB} ${OBJS_PROG}
-	${CC} ${CFLAGS} ${LDFLAGS} -o $@ -L. -l${LIB} ${OBJS_PROG}
+	${CC} ${CFLAGS} ${LDFLAGS} -o $@ -L. -lm -l${LIB} ${OBJS_PROG}
 
 ${LIB}:	${LIB_}
 	ln -sf ${LIB_} ${LIB}
@@ -30,9 +30,10 @@ ${LIB_}: ${OBJS_LIB}
 
 %.c:	msdp2xxx_base.h  msdp2xxx.h  msdp2xxx_low.h
 	
+
 %.h:
 	
 
 clean:
-	rm *.o ${LIB_} ${PROG}
+	rm *.o ${LIB} ${LIB_} ${PROG}
 
