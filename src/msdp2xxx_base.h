@@ -25,8 +25,8 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.                 *
 ##############################################################################*/
 
-#ifndef __SDP2XXX_BASE_H___
-#define __SDP2XXX_BASE_H___
+#ifndef __MSDP2XXX_BASE_H___
+#define __MSDP2XXX_BASE_H___
 
 #ifdef _WIN32
 #include <windows.h>

@@ -20,7 +20,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include "sdp2xxx.h"
+#include "msdp2xxx.h"
 #ifdef __linux__
 #else
 #ifdef _WIN32

@@ -25,10 +25,10 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.                 *
 ##############################################################################*/
 
-#ifndef __SDP2XXX_H___
-#define __SDP2XXX_H___
+#ifndef __MSDP2XXX_H___
+#define __MSDP2XXX_H___
 
-#include "sdp2xxx_base.h"
+#include "msdp2xxx_base.h"
 
 #ifdef __cplusplus
 extern "C" {

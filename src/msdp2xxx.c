@@ -16,8 +16,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  * */
 
-#include "sdp2xxx.h"
-#include "sdp2xxx_low.h"
+#include "msdp2xxx.h"
+#include "msdp2xxx_low.h"
 #include <ctype.h>
 #include <errno.h>
 #include <string.h>

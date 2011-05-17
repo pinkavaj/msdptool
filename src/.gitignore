@@ -1,4 +1,4 @@
-sdptool
+msdptool
 *.o
 *.so
 *.so.*
