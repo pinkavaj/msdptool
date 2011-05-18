@@ -17,7 +17,7 @@ LIB_SO=$(LIB:%=lib%.so)
 LIB_SO_VER=$(LIB_SO:%=%.$(VER_MAJ).$(VER_MIN))
 
 all:	${PROG}
-	
+	echo done
 
 ${PROG}:	${LIB} ${OBJS_PROG}
 	${CC} ${CFLAGS} ${LDFLAGS} -o $@ -L. -lm -l${LIB} ${OBJS_PROG}

@@ -45,7 +45,7 @@ sdp_resp_t sdp_resp(const char *buf, int len);
 
 /* This functions return some data (sdp_resp_data), use corecponding
  * sdp_resp_* function to get this data from response message */
-int sdp_sget_dev_addr(char *buf, int *addr);
+int sdp_sget_dev_addr(char *buf, int addr);
 int sdp_sget_ldc_info(char *buf, int addr);
 int sdp_sget_preset(char *buf, int addr, int presn);
 int sdp_sget_program(char *buf, int addr, int progn);
