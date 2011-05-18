@@ -328,7 +328,7 @@ sdp_resp_t sdp_resp(const char *buf, int len)
  * addr:        pointer to integer to store recieved addres
  * returns:     0 on success, -1 on error
  */
-int sdp_sresp_dev_addr(char *buf, int len, int *addr)
+int sdp_resp_dev_addr(char *buf, int len, int *addr)
 {       
         const char resp[] = "RS__\rOK\r";
 
@@ -356,7 +356,7 @@ int sdp_sresp_dev_addr(char *buf, int len, int *addr)
  * va_maximums: pointer to sdp_va_t where result should be stored
  * returns:     0 on success, -1 on error
  */
-int sdp_sresp_va_maximums(char *buf, int len, sdp_va_t *va_maximums)
+int sdp_resp_va_maximums(char *buf, int len, sdp_va_t *va_maximums)
 {
         const char resp[] = "uuuiii\rOK\r";
         int val;
@@ -385,7 +385,7 @@ int sdp_sresp_va_maximums(char *buf, int len, sdp_va_t *va_maximums)
  * volt_limit:  pointer to int where upper voltage limit should be stored
  * returns:     0 on success, -1 on error
  */
-int sdp_sresp_volt_limit(char *buf, int len, float *volt_limit)
+int sdp_resp_volt_limit(char *buf, int len, float *volt_limit)
 {
         const char resp[] = "uuu\rOK\r";
         int val;
@@ -410,7 +410,7 @@ int sdp_sresp_volt_limit(char *buf, int len, float *volt_limit)
  * va_data:     pointer to sdp_va_data_t to store current U, I and mode
  * returns:     0 on success, -1 on error
  */
-int sdp_sresp_va_data(char *buf, int len, sdp_va_data_t *va_data)
+int sdp_resp_va_data(char *buf, int len, sdp_va_data_t *va_data)
 {
         const char resp[] = "uuuuiiiic\rOK\r";
         int mode, val;
@@ -444,7 +444,7 @@ int sdp_sresp_va_data(char *buf, int len, sdp_va_data_t *va_data)
  * va_setpoints: pointer to sdp_va_t used to store current setpoint
  * returns:     0 on success, -1 on error
  */
-int sdp_sresp_va_setpoint(char *buf, int len, sdp_va_t *va_setpoints)
+int sdp_resp_va_setpoint(char *buf, int len, sdp_va_t *va_setpoints)
 {
         const char resp[] = "uuuiii\rOK\r";
         int val;
@@ -476,7 +476,7 @@ int sdp_sresp_va_setpoint(char *buf, int len, sdp_va_t *va_setpoints)
  *      sdp_va_t array of size 9 to store all presets values.
  * returns:     0 on success, -1 on error
  */
-int sdp_sresp_preset(char *buf, int len, sdp_va_t *va_preset)
+int sdp_resp_preset(char *buf, int len, sdp_va_t *va_preset)
 {
         const char resp[] = "uuuiii\r";
         const int resp_s1 = sizeof(resp) - 1 + sizeof(str_ok) - 1;
@@ -522,7 +522,7 @@ int sdp_sresp_preset(char *buf, int len, sdp_va_t *va_preset)
  *      array of sdp_program_t of size 20 to store all program items.
  * returns:     0 on success, -1 on error
  */
-int sdp_sresp_program(char *buf, int len, sdp_program_t *program)
+int sdp_resp_program(char *buf, int len, sdp_program_t *program)
 {
         const char resp[] = "uuuiiimmss\r";
         const int resp_s1 = sizeof(resp) - 1 + sizeof(str_ok) - 1;
@@ -576,7 +576,7 @@ int sdp_sresp_program(char *buf, int len, sdp_program_t *program)
  * lcd_info:    pointer to sdp_ldc_info_t to store recieved LCD info
  * returns:     0 on success, -1 on error
  */
-int sdp_sresp_ldc_info(char *buf, int len, sdp_ldc_info_t *lcd_info)
+int sdp_resp_ldc_info(char *buf, int len, sdp_ldc_info_t *lcd_info)
 {
         const char resp[] = "\rOK\r"; //TODO
 
