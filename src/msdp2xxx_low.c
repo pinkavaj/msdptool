@@ -18,6 +18,7 @@
 
 #include "msdp2xxx_low.h"
 #include <ctype.h>
+#include <errno.h>
 #include <math.h>
 #include <string.h>
 #include <strings.h>
@@ -107,8 +108,10 @@ static int sdp_scan_num(const char *buf, int len, int *val)
 {
         *val = 0;
         while (len--) {
-                if (!isdigit(buf[0]))
+                if (!isdigit(buf[0])) {
+                        errno = EINVAL;
                         return -1;
+                }
                 *val *= 10;
                 *val += buf[0] - '0';
                 buf++;
@@ -128,8 +131,10 @@ static int sdp_scan_num(const char *buf, int len, int *val)
  */
 static int sdp_print_cmd(char *buf, const char *cmd, int addr)
 {
-        if (addr < SDP_DEV_ADDR_MIN || addr > SDP_DEV_ADDR_MAX)
+        if (addr < SDP_DEV_ADDR_MIN || addr > SDP_DEV_ADDR_MAX) {
+                errno = ERANGE;
                 return -1;
+        }
        
         strcpy(buf, cmd);
         sdp_print_num(buf + 4, 2, addr);
@@ -209,7 +214,6 @@ int sdp_sget_va_maximums(char *buf, int addr)
 int sdp_sget_va_setpoint(char *buf, int addr)
 {
         return sdp_print_cmd(buf, sdp_cmd_gets, addr);
-        return -1;
 }
 
 /**
@@ -231,8 +235,10 @@ int sdp_sget_preset(char *buf, int addr, int presn)
         if (presn == SDP_PRESET_ALL)
                 return sdp_print_cmd(buf, sdp_cmd_getm, addr);
 
-        if (presn < SDP_PRESET_MIN || presn > SDP_PRESET_MAX)
+        if (presn < SDP_PRESET_MIN || presn > SDP_PRESET_MAX) {
+                errno = ERANGE;
                 return -1;
+        }
 
         ret = sdp_print_cmd(buf, sdp_cmd_getm, addr);
         if (ret == -1)
@@ -261,12 +267,14 @@ int sdp_sget_program(char *buf, int addr, int progn)
         if (progn == SDP_PROGRAM_ALL)
                 return sdp_print_cmd(buf, sdp_cmd_getp, addr);
 
-        if (progn < SDP_PROGRAM_MIN || progn > SDP_PROGRAM_MAX)
+        if (progn < SDP_PROGRAM_MIN || progn > SDP_PROGRAM_MAX) {
+                errno = ERANGE;
                 return -1;
+        }
 
         ret = sdp_print_cmd(buf, sdp_cmd_getp_prog, addr);
         if (ret == -1)
-                return ret;
+                return -1;
 
         sdp_print_num(buf + 6, 2, progn);
 
@@ -324,11 +332,15 @@ int sdp_sresp_dev_addr(char *buf, int len, int *addr)
 {       
         const char resp[] = "RS__\rOK\r";
 
-        if (len != (sizeof(resp) - 1))
+        if (len != (sizeof(resp) - 1)) {
+                errno = EINVAL;
                 return -1;
+        }
 
-        if (buf[0] != 'R' || buf[1] != 'S')
+        if (buf[0] != 'R' || buf[1] != 'S') {
+                errno = EINVAL;
                 return -1;
+        }
         
         if (sdp_scan_num(buf + 2, 2, addr) == -1)
                 return -1;
@@ -349,8 +361,10 @@ int sdp_sresp_va_maximums(char *buf, int len, sdp_va_t *va_maximums)
         const char resp[] = "uuuiii\rOK\r";
         int val;
 
-        if (len != (sizeof(resp) - 1))
+        if (len != (sizeof(resp) - 1)) {
+                errno = EINVAL;
                 return -1;
+        }
 
         if (sdp_scan_num(buf, 3, &val) == -1)
                 return -1;
@@ -376,8 +390,10 @@ int sdp_sresp_volt_limit(char *buf, int len, float *volt_limit)
         const char resp[] = "uuu\rOK\r";
         int val;
 
-        if (len != (sizeof(resp) - 1))
+        if (len != (sizeof(resp) - 1)) {
+                errno = EINVAL;
                 return -1;
+        }
 
         if (sdp_scan_num(buf, 3, &val) == -1)
                 return -1;
@@ -399,8 +415,10 @@ int sdp_sresp_va_data(char *buf, int len, sdp_va_data_t *va_data)
         const char resp[] = "uuuuiiiic\rOK\r";
         int mode, val;
 
-        if (len != (sizeof(resp) - 1))
+        if (len != (sizeof(resp) - 1)) {
+                errno = EINVAL;
                 return -1;
+        }
 
         if (sdp_scan_num(buf, 4, &val) == -1)
                 return -1;
@@ -431,8 +449,10 @@ int sdp_sresp_va_setpoint(char *buf, int len, sdp_va_t *va_setpoints)
         const char resp[] = "uuuiii\rOK\r";
         int val;
 
-        if (len != (sizeof(resp) - 1))
+        if (len != (sizeof(resp) - 1)) {
+                errno = EINVAL;
                 return -1;
+        }
 
         if (sdp_scan_num(buf, 3, &val) == -1)
                 return -1;
@@ -466,8 +486,10 @@ int sdp_sresp_preset(char *buf, int len, sdp_va_t *va_preset)
         if (len == resp_s9) {
                 count = 9;
         } else {
-                if (len != resp_s1)
+                if (len != resp_s1) {
+                        errno = EINVAL;
                         return -1;
+                }
                 count = 1;
         }
 
@@ -510,8 +532,10 @@ int sdp_sresp_program(char *buf, int len, sdp_program_t *program)
         if (len == resp_s20) {
                 count = 20;
         } else {
-                if (len != resp_s1)
+                if (len != resp_s1) {
+                        errno = EINVAL;
                         return -1;
+                }
                 count = 1;
         }
 
@@ -556,12 +580,15 @@ int sdp_sresp_ldc_info(char *buf, int len, sdp_ldc_info_t *lcd_info)
 {
         const char resp[] = "\rOK\r"; //TODO
 
-        if (len != (sizeof(resp) - 1))
+        if (len != (sizeof(resp) - 1)) {
+                errno = EINVAL;
                 return -1;
+        }
 
         //if (sdp_scan_num(buf, 2, &lcd_info->) == -1)
         //        return -1;
         // TODO
+        errno = ENOSYS;
         return -1;
 }
 
@@ -596,8 +623,10 @@ int sdp_srun_preset(char *buf, int addr, int presn)
 {
         int ret;
 
-        if (presn < SDP_PRESET_MIN || presn > SDP_PRESET_MAX)
+        if (presn < SDP_PRESET_MIN || presn > SDP_PRESET_MAX) {
+                errno = ERANGE;
                 return -1;
+        }
 
         ret = sdp_print_cmd(buf, sdp_cmd_runm, addr);
         if (ret != -1)
@@ -619,8 +648,10 @@ int sdp_srun_program(char *buf, int addr, int count)
 {
         int ret;
 
-        if ((count < 1 || count > 999) && count != SDP_RUN_PROG_INF)
+        if ((count < 1 || count > 999) && count != SDP_RUN_PROG_INF) {
+                errno = ERANGE;
                 return -1;
+        }
 
         ret = sdp_print_cmd(buf, sdp_cmd_runp, addr);
         if (ret != -1)
@@ -645,6 +676,7 @@ int sdp_sselect_ifce(char *buf, int addr, sdp_ifce_t ifce)
         if (ifce == sdp_ifce_rs485)
                 return sdp_print_cmd(buf, sdp_cmd_ccom_rs485, addr);
 
+        errno = ERANGE;
         return -1;
 }
 
@@ -662,8 +694,10 @@ int sdp_sset_volt(char *buf, int addr, float volt)
         int ret, val;
 
         val = SDP_VOLT2INT(volt);
-        if (val < 0 || val > 999)
+        if (val < 0 || val > 999) {
+                errno = ERANGE;
                 return -1;
+        }
 
         ret = sdp_print_cmd(buf, sdp_cmd_volt, addr);
         if (ret != -1)
@@ -686,8 +720,10 @@ int sdp_sset_curr(char *buf, int addr, float curr)
         int ret, val;
 
         val = SDP_CURR2INT(curr);
-        if (val < 0 || val > 999)
+        if (val < 0 || val > 999) {
+                errno = ERANGE;
                 return -1;
+        }
 
         ret = sdp_print_cmd(buf, sdp_cmd_curr, addr);
         if (ret != -1)
@@ -710,8 +746,10 @@ int sdp_sset_volt_limit(char *buf, int addr, float volt)
         int ret, val;
 
         val = SDP_VOLT2INT(volt);
-        if (val < 0 || val > 999)
+        if (val < 0 || val > 999) {
+                errno = ERANGE;
                 return -1;
+        }
 
         ret = sdp_print_cmd(buf, sdp_cmd_sovp, addr);
         if (ret != -1)
@@ -752,8 +790,10 @@ int sdp_sset_poweron_output(char *buf, int addr, int presn, int enable)
 {
         int ret;
 
-        if (presn < SDP_PRESET_MIN || presn > SDP_PRESET_MAX)
+        if (presn < SDP_PRESET_MIN || presn > SDP_PRESET_MAX) {
+                errno = ERANGE;
                 return -1;
+        }
 
         if (enable)
                 ret = sdp_print_cmd(buf, sdp_cmd_poww_en, addr);
@@ -783,8 +823,10 @@ int sdp_sset_preset(char *buf, int addr, int presn, int volt, int curr)
 
         if (presn < SDP_PRESET_MIN || presn > SDP_PRESET_MAX ||
                         volt < 0 || volt > 999 || 
-                        curr < 0 || curr > 999)
+                        curr < 0 || curr > 999) {
+                errno = ERANGE;
                 return -1;
+        }
 
         ret = sdp_print_cmd(buf, sdp_cmd_prom, addr);
         if (ret != -1) {
@@ -816,8 +858,10 @@ int sdp_sset_program(char *buf, int addr, int progn, int volt, int curr,
         if (progn < SDP_PROGRAM_MIN || progn > SDP_PROGRAM_MAX ||
                         volt < 0 || volt > 999 || 
                         curr < 0 || curr > 999 ||
-                        time < 0 || time > (99*60+59))
+                        time < 0 || time > (99*60+59)) {
+                errno = ERANGE;
                 return -1;
+        }
 
         ret = sdp_print_cmd(buf, sdp_cmd_prop, addr);
         if (ret != -1) {
