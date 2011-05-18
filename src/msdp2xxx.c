@@ -54,7 +54,10 @@ static int open_serial(const char* fname)
         cfsetospeed(&tio, B9600);
 
         if (tcsetattr(fd, TCSANOW, &tio) == -1) {
+                int e = errno;
                 close(fd);
+                errno = e;
+
                 return -1;
         }
 
@@ -248,8 +251,10 @@ int sdp_open(sdp_t *sdp, const char *fname, int addr)
 {
         SDP_F f;
 
-        if (addr < SDP_DEV_ADDR_MIN || addr > SDP_DEV_ADDR_MAX)
+        if (addr < SDP_DEV_ADDR_MIN || addr > SDP_DEV_ADDR_MAX) {
+                errno = ERANGE;
                 return -1;
+        }
 
         f = open_serial(fname);
         if (f == SDP_F_ERR)
@@ -270,8 +275,10 @@ int sdp_open(sdp_t *sdp, const char *fname, int addr)
  */
 int sdp_openf(sdp_t *sdp, SDP_F f, int addr)
 {
-        if (addr < SDP_DEV_ADDR_MIN || addr > SDP_DEV_ADDR_MAX)
+        if (addr < SDP_DEV_ADDR_MIN || addr > SDP_DEV_ADDR_MAX) {
+                errno = ERANGE;
                 return -1;
+        }
 
         sdp->f_in = sdp->f_out = f;
         sdp->addr = addr;
@@ -449,10 +456,12 @@ int sdp_select_ifce(const sdp_t *sdp, sdp_ifce_t ifce)
         if (size == -1)
                 return -1;
 
+        // FIXME: check -1 vs partial write, set errno
         if (sdp_write(sdp->f_out, buf, size) != size)
                 return -1;
                 //return perror_("Comunication with device failed");
 
+        // FIXME: check -1 vs partial write, set errno
         if (sdp_read(sdp->f_in, buf, sizeof(buf) != sdp_resp_nodata))
                 return -1;
                 //return perror_("Comunication with device failed");
