@@ -51,7 +51,7 @@ int perror_(const char *fmt)
  */
 int printe(const char *str)
 {
-        dprintf(STDERR_FILENO, str);
+        fprintf(stderr, "%s", str);
 
         return -1;
 }
@@ -105,7 +105,7 @@ int main(int argc, char **argv)
 {
         sdp_t sdp;
 #ifdef __linux__
-        int fd_std_out;
+        FILE *fd_std_out;
 #elif _WIN32
         HANDLE fd_std_out;
 #endif
@@ -142,7 +142,7 @@ int main(int argc, char **argv)
         if (!strcmp(argv[arg_idx], "-")) {
                 sdp.f_in = STDIN_FILENO;
                 sdp.f_out = STDOUT_FILENO;
-                fd_std_out = STDERR_FILENO;
+                fd_std_out = stderr;
         }
         else {
                 int ret;
@@ -150,7 +150,7 @@ int main(int argc, char **argv)
                 ret = sdp_open(&sdp, argv[arg_idx], addr);
                 if (ret == -1)
                         return perror_("sdp_open failed");
-                fd_std_out = STDOUT_FILENO;
+                fd_std_out = stdout;
         }
 #elif _WIN32
         if (!strcmp(argv[arg_idx], "-")) {
@@ -215,7 +215,7 @@ int main(int argc, char **argv)
                 if (ret == -1)
                         return perror_("sdp_get_dev_addr failed");
 
-                dprintf(fd_std_out, "%i\n", ret);
+                fprintf(fd_std_out, "%i\n", ret);
         }
         else if (!strcmp(cmd, "gmax")) {
                 sdp_va_t va;
@@ -226,7 +226,7 @@ int main(int argc, char **argv)
                 if (sdp_get_va_maximums(&sdp, &va) == -1)
                         return perror_("sdp_get_va_maximums failed");
 
-                dprintf(fd_std_out, "%2.1f %2.1f\n", va.volt, va.curr);
+                fprintf(fd_std_out, "%2.1f %2.1f\n", va.volt, va.curr);
         }
         else if (!strcmp(cmd, "govp")) {
                 int ret;
@@ -239,7 +239,7 @@ int main(int argc, char **argv)
                 if (ret == -1)
                         perror_("sdp_get_volt_limit failed");
 
-                dprintf(fd_std_out, "%2.1f\n", volt);
+                fprintf(fd_std_out, "%2.1f\n", volt);
         }
         else if (!strcmp(cmd, "getd")) {
                 sdp_va_data_t va_data;
@@ -251,10 +251,10 @@ int main(int argc, char **argv)
                         return perror_("sdp_get_va_data failed");
 
                 if (va_data.mode == sdp_mode_cc)
-                        dprintf(fd_std_out, "%2.1f %2.1f CC\n", va_data.volt,
+                        fprintf(fd_std_out, "%2.1f %2.1f CC\n", va_data.volt,
                                         va_data.curr);
                 else
-                        dprintf(fd_std_out, "%2.1f %2.1f CV\n", va_data.volt,
+                        fprintf(fd_std_out, "%2.1f %2.1f CV\n", va_data.volt,
                                         va_data.curr);
         }
         else if (!strcmp(cmd, "gets")) {
@@ -266,7 +266,7 @@ int main(int argc, char **argv)
                 if (sdp_get_va_setpoint(&sdp, &va) == -1)
                         return perror_("sdp_get_va_setpoint failed");
 
-                dprintf(fd_std_out, "%2.1f %2.1f\n", va.volt, va.curr);
+                fprintf(fd_std_out, "%2.1f %2.1f\n", va.volt, va.curr);
         }
         else if (!strcmp(cmd, "getm")) {
                 sdp_va_t va[9];
@@ -290,7 +290,7 @@ int main(int argc, char **argv)
                         return perror_("sdp_get_preset failed");
 
                 for (int x = 0; x < n; x++)
-                        dprintf(fd_std_out, "%2.1f %2.1f\n", va[x].volt,
+                        fprintf(fd_std_out, "%2.1f %2.1f\n", va[x].volt,
                                         va[x].curr);
         }
         else if (!strcmp(cmd, "getp")) {
@@ -315,7 +315,7 @@ int main(int argc, char **argv)
                         return perror_("sdp_get_program failed");
 
                 for (int x = 0; x < n; x++)
-                        dprintf(fd_std_out, "%2.1f %2.1f %2.i:%2.i\n",
+                        fprintf(fd_std_out, "%2.1f %2.1f %2.i:%2.i\n",
                                         prg[x].volt, prg[x].curr,
                                         prg[x].time / 60, prg[x].time % 60);
         }
