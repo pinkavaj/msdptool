@@ -229,7 +229,7 @@ int main(int argc, char **argv)
                 if (sdp_get_va_maximums(&sdp, &va) == -1)
                         return perror_("sdp_get_va_maximums failed");
 
-                fprintf(fd_std_out, "%2.1f %2.1f\n", va.volt, va.curr);
+                fprintf(fd_std_out, "%2.1f %1.2f\n", va.volt, va.curr);
         }
         else if (!strcmp(cmd, "govp")) {
                 float volt;
@@ -253,10 +253,10 @@ int main(int argc, char **argv)
                         return perror_("sdp_get_va_data failed");
 
                 if (va_data.mode == sdp_mode_cc)
-                        fprintf(fd_std_out, "%2.1f %2.1f CC\n", va_data.volt,
+                        fprintf(fd_std_out, "%2.1f %1.2f CC\n", va_data.volt,
                                         va_data.curr);
                 else
-                        fprintf(fd_std_out, "%2.1f %2.1f CV\n", va_data.volt,
+                        fprintf(fd_std_out, "%2.1f %1.2f CV\n", va_data.volt,
                                         va_data.curr);
         }
         else if (!strcmp(cmd, "gets")) {
@@ -268,7 +268,7 @@ int main(int argc, char **argv)
                 if (sdp_get_va_setpoint(&sdp, &va) == -1)
                         return perror_("sdp_get_va_setpoint failed");
 
-                fprintf(fd_std_out, "%2.1f %2.1f\n", va.volt, va.curr);
+                fprintf(fd_std_out, "%2.1f %1.2f\n", va.volt, va.curr);
         }
         else if (!strcmp(cmd, "getm")) {
                 sdp_va_t va[9];
@@ -292,7 +292,7 @@ int main(int argc, char **argv)
                         return perror_("sdp_get_preset failed");
 
                 for (int x = 0; x < n; x++)
-                        fprintf(fd_std_out, "%2.1f %2.1f\n", va[x].volt,
+                        fprintf(fd_std_out, "%2.1f %1.2f\n", va[x].volt,
                                         va[x].curr);
         }
         else if (!strcmp(cmd, "getp")) {
@@ -317,7 +317,7 @@ int main(int argc, char **argv)
                         return perror_("sdp_get_program failed");
 
                 for (int x = 0; x < n; x++)
-                        fprintf(fd_std_out, "%2.1f %2.1f %2.i:%2.i\n",
+                        fprintf(fd_std_out, "%2.1f %1.2f %2.i:%2.i\n",
                                         prg[x].volt, prg[x].curr,
                                         prg[x].time / 60, prg[x].time % 60);
         }
