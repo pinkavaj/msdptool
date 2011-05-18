@@ -37,3 +37,6 @@ ${LIB_SO_VER}: ${OBJS_LIB}
 clean:
 	rm *.o ${LIB_SO} ${LIB_SO_VER} ${PROG}
 
+Makefile:
+	
+
