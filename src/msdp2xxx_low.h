@@ -34,6 +34,9 @@
 extern "C" {
 #endif
 
+// lenght of shortest valid response ("OK\r")
+#define SDP_RESP_LEN_OK 3
+
 typedef enum {
         sdp_resp_incomplete = 0,
         sdp_resp_data,

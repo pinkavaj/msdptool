@@ -69,7 +69,7 @@ static int open_serial(const char* fname)
  *
  * f:           file descriptor
  */
-void close_serial(int f)
+static void close_serial(int f)
 {
         if (f != -1)
                 close(f);
@@ -82,12 +82,13 @@ void close_serial(int f)
  * buf:         buffer to store readed data
  * count:       number of bytes to read
  */
-static ssize_t sdp_read(int fd, char *buf, ssize_t count)
+static ssize_t sdp_read_resp(int fd, char *buf, ssize_t count)
 {
-        ssize_t size = 0;
-        int ret;
-        struct timeval timeout;
+        const char *buf_ = buf;
         fd_set readfds;
+        int ret;
+        ssize_t size = 0;
+        struct timeval timeout;
 
         FD_ZERO(&readfds);
         FD_SET(fd, &readfds);
@@ -111,9 +112,12 @@ static ssize_t sdp_read(int fd, char *buf, ssize_t count)
                 size += size_;
                 count -= size_;
                 buf += size_;
+                if (sdp_resp(buf_, size) != sdp_resp_incomplete)
+                        return size;
         } while (count > 0);
 
-        return size;
+        errno = ERANGE;
+        return -1;
 }
 
 /**
@@ -197,7 +201,7 @@ static HANDLE open_serial(const char* fname)
  *
  * f:           file handle
  */
-void close_serial(HANDLE f)
+static void close_serial(HANDLE f)
 {
         if (f != INVALID_HANDLE_VALUE)
                 CloseHandle(f);
@@ -211,10 +215,11 @@ void close_serial(HANDLE f)
  * count:       number of bytes to read
  * returns:     number of bytes read
  */
-static ssize_t sdp_read(HANDLE h, char *buf, ssize_t count)
+static ssize_t sdp_read_resp(HANDLE h, char *buf, ssize_t count)
 {
         DWORD readb;
 
+        // TODO
         if (!ReadFile(h, buf, count, &readb, NULL))
                 return -1;
 
@@ -309,6 +314,8 @@ void sdp_close(sdp_t *sdp)
  */
 int sdp_get_dev_addr(const sdp_t *sdp)
 {
+        // TODO
+
         return -1;
 }
 
@@ -321,6 +328,8 @@ int sdp_get_dev_addr(const sdp_t *sdp)
  */
 int sdp_get_va_maximums(const sdp_t *sdp, sdp_va_t *va_maximums)
 {
+        // TODO
+
         return -1;
 }
 
@@ -333,6 +342,8 @@ int sdp_get_va_maximums(const sdp_t *sdp, sdp_va_t *va_maximums)
  */
 int sdp_get_volt_limit(const sdp_t *sdp, float *volt)
 {
+        // TODO
+
         return -1;
 }
 
@@ -345,6 +356,8 @@ int sdp_get_volt_limit(const sdp_t *sdp, float *volt)
  */
 int sdp_get_va_data(const sdp_t *sdp, sdp_va_data_t *va_data)
 {
+        // TODO
+
         return -1;
 }
 
@@ -357,6 +370,8 @@ int sdp_get_va_data(const sdp_t *sdp, sdp_va_data_t *va_data)
  */
 int sdp_get_va_setpoint(const sdp_t *sdp, sdp_va_t *va_setpoints)
 {
+        // TODO
+
         return -1;
 }
 
@@ -372,6 +387,8 @@ int sdp_get_va_setpoint(const sdp_t *sdp, sdp_va_t *va_setpoints)
  */
 int sdp_get_preset(const sdp_t *sdp, int presn, sdp_va_t *va_preset)
 {
+        // TODO
+
         return -1;
 }
 
@@ -388,6 +405,8 @@ int sdp_get_preset(const sdp_t *sdp, int presn, sdp_va_t *va_preset)
  */
 int sdp_get_program(const sdp_t *sdp, int progn, sdp_program_t *program)
 {
+        // TODO
+
         return -1;
 }
 
@@ -400,6 +419,8 @@ int sdp_get_program(const sdp_t *sdp, int progn, sdp_program_t *program)
  */
 int sdp_get_ldc_info(const sdp_t *sdp, sdp_ldc_info_t *lcd_info)
 {
+        // TODO
+
         return -1;
 }
 
@@ -412,6 +433,8 @@ int sdp_get_ldc_info(const sdp_t *sdp, sdp_ldc_info_t *lcd_info)
  */
 int sdp_remote(const sdp_t *sdp, int enable)
 {
+        // TODO
+
         return -1;
 }
 
@@ -424,6 +447,8 @@ int sdp_remote(const sdp_t *sdp, int enable)
  */
 int sdp_run_preset(const sdp_t *sdp, int preset)
 {
+        // TODO
+
         return -1;
 }
 
@@ -436,6 +461,8 @@ int sdp_run_preset(const sdp_t *sdp, int preset)
  */
 int sdp_run_program(const sdp_t *sdp, int count)
 {
+        // TODO
+
         return -1;
 }
 
@@ -459,12 +486,9 @@ int sdp_select_ifce(const sdp_t *sdp, sdp_ifce_t ifce)
         // FIXME: check -1 vs partial write, set errno
         if (sdp_write(sdp->f_out, buf, size) != size)
                 return -1;
-                //return perror_("Comunication with device failed");
 
-        // FIXME: check -1 vs partial write, set errno
-        if (sdp_read(sdp->f_in, buf, sizeof(buf) != sdp_resp_nodata))
+        if (sdp_read_resp(sdp->f_in, buf, SDP_RESP_LEN_OK))
                 return -1;
-                //return perror_("Comunication with device failed");
 
         return -1;
 }
@@ -478,6 +502,8 @@ int sdp_select_ifce(const sdp_t *sdp, sdp_ifce_t ifce)
  */
 int sdp_set_curr(const sdp_t *sdp, float curr)
 {
+        // TODO
+
         return -1;
 }
 
@@ -490,6 +516,8 @@ int sdp_set_curr(const sdp_t *sdp, float curr)
  */
 int sdp_set_volt(const sdp_t *sdp, float volt)
 {
+        // TODO
+
         return -1;
 }
 
@@ -502,6 +530,8 @@ int sdp_set_volt(const sdp_t *sdp, float volt)
  */
 int sdp_set_volt_limit(const sdp_t *sdp, float volt)
 {
+        // TODO
+
         return -1;
 }
 
@@ -527,6 +557,8 @@ int sdp_set_output(const sdp_t *sdp, int enable)
  */
 int sdp_set_poweron_output(const sdp_t *sdp, int presn, int enable)
 {
+        // TODO
+
         return -1;
 }
 
@@ -540,6 +572,8 @@ int sdp_set_poweron_output(const sdp_t *sdp, int presn, int enable)
  */
 int sdp_set_preset(const sdp_t *sdp, int presn, const sdp_va_t *va_preset)
 {
+        // TODO
+
         return -1;
 }
 
@@ -553,6 +587,8 @@ int sdp_set_preset(const sdp_t *sdp, int presn, const sdp_va_t *va_preset)
  */
 int sdp_set_program(const sdp_t *sdp, int progn, const sdp_program_t *program)
 {
+        // TODO
+
         return -1;
 }
 
@@ -564,6 +600,19 @@ int sdp_set_program(const sdp_t *sdp, int progn, const sdp_program_t *program)
  */
 int sdp_stop(const sdp_t *sdp)
 {
-        return -1;
+        char buf[SDP_BUF_SIZE_MIN];
+        int ret;
+
+        ret = sdp_sstop(buf, sdp->addr);
+        if (ret == -1)
+                return -1;
+
+        if (sdp_write(sdp->f_out, buf, ret) != ret)
+                return -1;
+
+        if (sdp_read_resp(sdp->f_in, buf, SDP_RESP_LEN_OK) == -1)
+                return -1;
+
+        return 0;
 }
 
