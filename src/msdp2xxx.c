@@ -314,9 +314,24 @@ void sdp_close(sdp_t *sdp)
  */
 int sdp_get_dev_addr(const sdp_t *sdp)
 {
-        // TODO
+        int ret, addr;
+        char buf[SDP_BUF_SIZE_MIN];
 
-        return -1;
+        ret = sdp_sget_dev_addr(buf, sdp->addr);
+        if (ret == -1)
+                return -1;
+
+        if (sdp_write(sdp->f_out, buf, ret) == -1)
+                return -1;
+
+        ret = sdp_read_resp(sdp->f_in, buf, sizeof(buf));
+        if (ret == -1)
+                return -1;
+
+        if (sdp_resp_dev_addr(buf, ret, &addr) == -1)
+                return -1;
+
+        return addr;
 }
 
 /**
@@ -328,9 +343,24 @@ int sdp_get_dev_addr(const sdp_t *sdp)
  */
 int sdp_get_va_maximums(const sdp_t *sdp, sdp_va_t *va_maximums)
 {
-        // TODO
+        int ret;
+        char buf[SDP_BUF_SIZE_MIN];
 
-        return -1;
+        ret = sdp_sget_va_maximums(buf, sdp->addr);
+        if (ret == -1)
+                return -1;
+
+        if (sdp_write(sdp->f_out, buf, ret) == -1)
+                return -1;
+
+        ret = sdp_read_resp(sdp->f_in, buf, sizeof(buf));
+        if (ret == -1)
+                return -1;
+
+        if (sdp_resp_va_maximums(buf, ret, va_maximums) == -1)
+                return -1;
+
+        return 0;
 }
 
 /**
@@ -342,9 +372,24 @@ int sdp_get_va_maximums(const sdp_t *sdp, sdp_va_t *va_maximums)
  */
 int sdp_get_volt_limit(const sdp_t *sdp, float *volt)
 {
-        // TODO
+        int ret;
+        char buf[SDP_BUF_SIZE_MIN];
 
-        return -1;
+        ret = sdp_sget_volt_limit(buf, sdp->addr);
+        if (ret == -1)
+                return -1;
+
+        if (sdp_write(sdp->f_out, buf, ret) == -1)
+                return -1;
+
+        ret = sdp_read_resp(sdp->f_in, buf, sizeof(buf));
+        if (ret == -1)
+                return -1;
+
+        if (sdp_resp_volt_limit(buf, ret, volt) == -1)
+                return -1;
+
+        return 0;
 }
 
 /**
@@ -356,9 +401,24 @@ int sdp_get_volt_limit(const sdp_t *sdp, float *volt)
  */
 int sdp_get_va_data(const sdp_t *sdp, sdp_va_data_t *va_data)
 {
-        // TODO
+        int ret;
+        char buf[SDP_BUF_SIZE_MIN];
 
-        return -1;
+        ret = sdp_sget_va_data(buf, sdp->addr);
+        if (ret == -1)
+                return -1;
+
+        if (sdp_write(sdp->f_out, buf, ret) == -1)
+                return -1;
+
+        ret = sdp_read_resp(sdp->f_in, buf, sizeof(buf));
+        if (ret == -1)
+                return -1;
+
+        if (sdp_resp_va_data(buf, ret, va_data) == -1)
+                return -1;
+
+        return 0;
 }
 
 /**
@@ -370,9 +430,24 @@ int sdp_get_va_data(const sdp_t *sdp, sdp_va_data_t *va_data)
  */
 int sdp_get_va_setpoint(const sdp_t *sdp, sdp_va_t *va_setpoints)
 {
-        // TODO
+        int ret;
+        char buf[SDP_BUF_SIZE_MIN];
 
-        return -1;
+        ret = sdp_sget_va_setpoint(buf, sdp->addr);
+        if (ret == -1)
+                return -1;
+
+        if (sdp_write(sdp->f_out, buf, ret) == -1)
+                return -1;
+
+        ret = sdp_read_resp(sdp->f_in, buf, sizeof(buf));
+        if (ret == -1)
+                return -1;
+
+        if (sdp_resp_va_setpoint(buf, ret, va_setpoints) == -1)
+                return -1;
+
+        return 0;
 }
 
 /**
@@ -387,9 +462,24 @@ int sdp_get_va_setpoint(const sdp_t *sdp, sdp_va_t *va_setpoints)
  */
 int sdp_get_preset(const sdp_t *sdp, int presn, sdp_va_t *va_preset)
 {
-        // TODO
+        int ret;
+        char buf[(7*9+3+1)];
 
-        return -1;
+        ret = sdp_sget_preset(buf, sdp->addr, presn);
+        if (ret == -1)
+                return -1;
+
+        if (sdp_write(sdp->f_out, buf, ret) == -1)
+                return -1;
+
+        ret = sdp_read_resp(sdp->f_in, buf, sizeof(buf));
+        if (ret == -1)
+                return -1;
+
+        if (sdp_resp_preset(buf, ret, va_preset) == -1)
+                return -1;
+
+        return 0;
 }
 
 /**
@@ -405,9 +495,24 @@ int sdp_get_preset(const sdp_t *sdp, int presn, sdp_va_t *va_preset)
  */
 int sdp_get_program(const sdp_t *sdp, int progn, sdp_program_t *program)
 {
-        // TODO
+        int ret;
+        char buf[(11*20+3+1)];
 
-        return -1;
+        ret = sdp_sget_program(buf, sdp->addr, progn);
+        if (ret == -1)
+                return -1;
+
+        if (sdp_write(sdp->f_out, buf, ret) == -1)
+                return -1;
+
+        ret = sdp_read_resp(sdp->f_in, buf, sizeof(buf));
+        if (ret == -1)
+                return -1;
+
+        if (sdp_resp_program(buf, ret, program) == -1)
+                return -1;
+
+        return 0;
 }
 
 /**
@@ -419,9 +524,25 @@ int sdp_get_program(const sdp_t *sdp, int progn, sdp_program_t *program)
  */
 int sdp_get_ldc_info(const sdp_t *sdp, sdp_ldc_info_t *lcd_info)
 {
-        // TODO
+        int ret;
+        // TODO: setup proper buffer size
+        char buf[SDP_BUF_SIZE_MIN];
 
-        return -1;
+        ret = sdp_sget_ldc_info(buf, sdp->addr);
+        if (ret == -1)
+                return -1;
+
+        if (sdp_write(sdp->f_out, buf, ret) == -1)
+                return -1;
+
+        ret = sdp_read_resp(sdp->f_in, buf, sizeof(buf));
+        if (ret == -1)
+                return -1;
+
+        if (sdp_resp_ldc_info(buf, ret, lcd_info) == -1)
+                return -1;
+
+        return 0;
 }
 
 /**
@@ -433,9 +554,21 @@ int sdp_get_ldc_info(const sdp_t *sdp, sdp_ldc_info_t *lcd_info)
  */
 int sdp_remote(const sdp_t *sdp, int enable)
 {
-        // TODO
+        int ret;
+        char buf[SDP_BUF_SIZE_MIN];
 
-        return -1;
+        ret = sdp_sremote(buf, sdp->addr, enable);
+        if (ret == -1)
+                return -1;
+
+        if (sdp_write(sdp->f_out, buf, ret) == -1)
+                return -1;
+
+        ret = sdp_read_resp(sdp->f_in, buf, SDP_RESP_LEN_OK);
+        if (ret == -1)
+                return -1;
+
+        return 0;
 }
 
 /**
@@ -447,9 +580,21 @@ int sdp_remote(const sdp_t *sdp, int enable)
  */
 int sdp_run_preset(const sdp_t *sdp, int preset)
 {
-        // TODO
+        int ret;
+        char buf[SDP_BUF_SIZE_MIN];
 
-        return -1;
+        ret = sdp_srun_preset(buf, sdp->addr, preset);
+        if (ret == -1)
+                return -1;
+
+        if (sdp_write(sdp->f_out, buf, ret) == -1)
+                return -1;
+
+        ret = sdp_read_resp(sdp->f_in, buf, SDP_RESP_LEN_OK);
+        if (ret == -1)
+                return -1;
+
+        return 0;
 }
 
 /**
@@ -461,9 +606,21 @@ int sdp_run_preset(const sdp_t *sdp, int preset)
  */
 int sdp_run_program(const sdp_t *sdp, int count)
 {
-        // TODO
+        int ret;
+        char buf[SDP_BUF_SIZE_MIN];
 
-        return -1;
+        ret = sdp_srun_program(buf, sdp->addr, count);
+        if (ret == -1)
+                return -1;
+
+        if (sdp_write(sdp->f_out, buf, ret) == -1)
+                return -1;
+
+        ret = sdp_read_resp(sdp->f_in, buf, SDP_RESP_LEN_OK);
+        if (ret == -1)
+                return -1;
+
+        return 0;
 }
 
 /**
@@ -475,7 +632,6 @@ int sdp_run_program(const sdp_t *sdp, int count)
  */
 int sdp_select_ifce(const sdp_t *sdp, sdp_ifce_t ifce)
 {
-// TODO
         char buf[SDP_BUF_SIZE_MIN];
         ssize_t size;
 
@@ -483,14 +639,13 @@ int sdp_select_ifce(const sdp_t *sdp, sdp_ifce_t ifce)
         if (size == -1)
                 return -1;
 
-        // FIXME: check -1 vs partial write, set errno
         if (sdp_write(sdp->f_out, buf, size) != size)
                 return -1;
 
         if (sdp_read_resp(sdp->f_in, buf, SDP_RESP_LEN_OK))
                 return -1;
 
-        return -1;
+        return 0;
 }
 
 /**
@@ -502,9 +657,20 @@ int sdp_select_ifce(const sdp_t *sdp, sdp_ifce_t ifce)
  */
 int sdp_set_curr(const sdp_t *sdp, float curr)
 {
-        // TODO
+        char buf[SDP_BUF_SIZE_MIN];
+        ssize_t size;
 
-        return -1;
+        size = sdp_sset_curr(buf, sdp->addr, curr);
+        if (size == -1)
+                return -1;
+
+        if (sdp_write(sdp->f_out, buf, size) != size)
+                return -1;
+
+        if (sdp_read_resp(sdp->f_in, buf, SDP_RESP_LEN_OK))
+                return -1;
+
+        return 0;
 }
 
 /**
@@ -516,9 +682,20 @@ int sdp_set_curr(const sdp_t *sdp, float curr)
  */
 int sdp_set_volt(const sdp_t *sdp, float volt)
 {
-        // TODO
+        char buf[SDP_BUF_SIZE_MIN];
+        ssize_t size;
 
-        return -1;
+        size = sdp_sset_volt(buf, sdp->addr, volt);
+        if (size == -1)
+                return -1;
+
+        if (sdp_write(sdp->f_out, buf, size) != size)
+                return -1;
+
+        if (sdp_read_resp(sdp->f_in, buf, SDP_RESP_LEN_OK))
+                return -1;
+
+        return 0;
 }
 
 /**
@@ -530,9 +707,20 @@ int sdp_set_volt(const sdp_t *sdp, float volt)
  */
 int sdp_set_volt_limit(const sdp_t *sdp, float volt)
 {
-        // TODO
+        char buf[SDP_BUF_SIZE_MIN];
+        ssize_t size;
 
-        return -1;
+        size = sdp_sset_volt_limit(buf, sdp->addr, volt);
+        if (size == -1)
+                return -1;
+
+        if (sdp_write(sdp->f_out, buf, size) != size)
+                return -1;
+
+        if (sdp_read_resp(sdp->f_in, buf, SDP_RESP_LEN_OK))
+                return -1;
+
+        return 0;
 }
 
 /**
@@ -544,7 +732,20 @@ int sdp_set_volt_limit(const sdp_t *sdp, float volt)
  */
 int sdp_set_output(const sdp_t *sdp, int enable)
 {
-        return -1;
+        char buf[SDP_BUF_SIZE_MIN];
+        ssize_t size;
+
+        size = sdp_sset_output(buf, sdp->addr, enable);
+        if (size == -1)
+                return -1;
+
+        if (sdp_write(sdp->f_out, buf, size) != size)
+                return -1;
+
+        if (sdp_read_resp(sdp->f_in, buf, SDP_RESP_LEN_OK))
+                return -1;
+
+        return 0;
 }
 
 /**
@@ -557,9 +758,20 @@ int sdp_set_output(const sdp_t *sdp, int enable)
  */
 int sdp_set_poweron_output(const sdp_t *sdp, int presn, int enable)
 {
-        // TODO
+        char buf[SDP_BUF_SIZE_MIN];
+        ssize_t size;
 
-        return -1;
+        size = sdp_sset_poweron_output(buf, sdp->addr, presn, enable);
+        if (size == -1)
+                return -1;
+
+        if (sdp_write(sdp->f_out, buf, size) != size)
+                return -1;
+
+        if (sdp_read_resp(sdp->f_in, buf, SDP_RESP_LEN_OK))
+                return -1;
+
+        return 0;
 }
 
 /**
@@ -572,9 +784,21 @@ int sdp_set_poweron_output(const sdp_t *sdp, int presn, int enable)
  */
 int sdp_set_preset(const sdp_t *sdp, int presn, const sdp_va_t *va_preset)
 {
-        // TODO
+        char buf[SDP_BUF_SIZE_MIN];
+        ssize_t size;
 
-        return -1;
+        size = sdp_sset_preset(buf, sdp->addr, presn, va_preset->volt,
+                        va_preset->curr);
+        if (size == -1)
+                return -1;
+
+        if (sdp_write(sdp->f_out, buf, size) != size)
+                return -1;
+
+        if (sdp_read_resp(sdp->f_in, buf, SDP_RESP_LEN_OK))
+                return -1;
+
+        return 0;
 }
 
 /**
@@ -587,9 +811,21 @@ int sdp_set_preset(const sdp_t *sdp, int presn, const sdp_va_t *va_preset)
  */
 int sdp_set_program(const sdp_t *sdp, int progn, const sdp_program_t *program)
 {
-        // TODO
+        char buf[SDP_BUF_SIZE_MIN];
+        ssize_t size;
 
-        return -1;
+        size = sdp_sset_program(buf, sdp->addr, progn, program->volt,
+                        program->curr, program->time);
+        if (size == -1)
+                return -1;
+
+        if (sdp_write(sdp->f_out, buf, size) != size)
+                return -1;
+
+        if (sdp_read_resp(sdp->f_in, buf, SDP_RESP_LEN_OK))
+                return -1;
+
+        return 0;
 }
 
 /**
