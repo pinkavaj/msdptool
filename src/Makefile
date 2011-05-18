@@ -5,7 +5,7 @@ LIB=msdp2xxx
 PROG=msdptool
 
 CC=gcc
-CFLAGS=-Wall -std=gnu99
+CFLAGS=-Wall -std=gnu99 -I./include
 LDFLAGS=
 
 SRC_PROG=msdptool.c
