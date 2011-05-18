@@ -253,10 +253,10 @@ int main(int argc, char **argv)
                         return perror_("sdp_get_va_data failed");
 
                 if (va_data.mode == sdp_mode_cc)
-                        fprintf(fd_std_out, "%2.1f %1.2f CC\n", va_data.volt,
+                        fprintf(fd_std_out, "%2.2f %1.3f CC\n", va_data.volt,
                                         va_data.curr);
                 else
-                        fprintf(fd_std_out, "%2.1f %1.2f CV\n", va_data.volt,
+                        fprintf(fd_std_out, "%2.2f %1.3f CV\n", va_data.volt,
                                         va_data.curr);
         }
         else if (!strcmp(cmd, "gets")) {
