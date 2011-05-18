@@ -111,6 +111,7 @@ int main(int argc, char **argv)
 #endif
         int arg_idx = 1;
         int addr = 1;
+        int ret;
 
         /* no args, print short help */
         if (argc < 2) {
@@ -140,12 +141,15 @@ int main(int argc, char **argv)
 
 #ifdef __linux__
         if (!strcmp(argv[arg_idx], "-")) {
+                ret = sdp_openf(&sdp, -1, addr);
+                if (ret == -1)
+                        return perror_("sdp_open failed");
+
                 sdp.f_in = STDIN_FILENO;
                 sdp.f_out = STDOUT_FILENO;
                 fd_std_out = stderr;
         }
         else {
-                int ret;
 
                 ret = sdp_open(&sdp, argv[arg_idx], addr);
                 if (ret == -1)
@@ -154,13 +158,15 @@ int main(int argc, char **argv)
         }
 #elif _WIN32
         if (!strcmp(argv[arg_idx], "-")) {
+                ret = sdp_openf(&sdp, INVALID_HANDLE_VALUE, addr);
+                if (ret == -1)
+                        return perror_("sdp_open failed");
+
                 sdp.f_in = GetStdHandle(STD_INPUT_HANDLE);
                 sdp.f_out = GetStdHandle(STD_OUTPUT_HANDLE);
                 fd_std_out = GetStdHandle(STD_ERROR_HANDLE);
         } 
         else {
-                int ret;
-
                 ret = sdp_open(&sdp, argv[arg_idx], addr);
                 if (ret == -1)
                         return perror_("sdp_open failed");
@@ -189,7 +195,6 @@ int main(int argc, char **argv)
 
         if (!strcmp(cmd, "ccom")) {
                 sdp_ifce_t ifce;
-                int ret;
 
                 if (argc != 1)
                         return printe("Invalid number of parameters");
@@ -206,8 +211,6 @@ int main(int argc, char **argv)
                         return perror_("sdp_select_ifce failed");
         }
         else if (!strcmp(cmd, "gcom")) {
-                int ret;
-
                 if (argc != 0)
                         return printe("Invalid number of parameters");
 
@@ -229,7 +232,6 @@ int main(int argc, char **argv)
                 fprintf(fd_std_out, "%2.1f %2.1f\n", va.volt, va.curr);
         }
         else if (!strcmp(cmd, "govp")) {
-                int ret;
                 float volt;
 
                 if (argc != 0)
