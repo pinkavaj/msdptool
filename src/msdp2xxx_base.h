@@ -53,11 +53,6 @@ extern "C" {
 
 #define SDP_RUN_PROG_INF (0)
 
-#define SDP_INT2VOLT(u) (((float)(u)) / 10)
-#define SDP_INT2CURR(i) (((float)(i)) / 100)
-#define SDP_VOLT2INT(x) ((int)round((x) * 10))
-#define SDP_CURR2INT(x) ((int)round((x) * 100))
-
 #ifdef __linux__
 #define SDP_F int
 #define SDP_F_ERR -1
@@ -77,39 +72,31 @@ typedef enum {
         sdp_mode_cc = 1,
 } sdp_mode_t;
 
-/**
- * curr:        current: [A * 100]
- * volt:        voltage: [V * 10]
- */
 typedef struct {
-        int curr;
-        int volt;
+        float curr;
+        float volt;
 } sdp_va_t;
 
-/**
- * curr:        current: [A * 1000]
- * volt:        voltage: [V * 100]
- */
 typedef struct {
-        int curr;
-        int volt;
+        float curr;
+        float volt;
         sdp_mode_t mode;
 } sdp_va_data_t;
 
 /**
- * curr:        current: [A * 100]
- * volt:        voltage: [V * 10]
+ * curr:        current: [A]
+ * volt:        voltage: [V]
  * time:        lenght of program item duration [sec]
  */
 typedef struct {
-        int curr;
-        int volt;
+        float curr;
+        float volt;
         int time;
 } sdp_program_t;
 
 typedef struct {
         sdp_va_t va_data;
-        int wats;
+        float wats;
         int time;
         int timer;
         sdp_va_t va_setpoints;

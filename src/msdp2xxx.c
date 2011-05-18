@@ -321,9 +321,10 @@ int sdp_get_va_maximums(const sdp_t *sdp, sdp_va_t *va_maximums)
  * Get upper voltage limit
  *
  * sdp:         pointer to sdp_t structure, initialized by sdp_open
- * returns:     upper voltage limit: [V * 10], error returns -1
+ * volt:        pointer to float, uset to store retrieved value
+ * returns:     0 on success, -1 on error
  */
-int sdp_get_volt_limit(const sdp_t *sdp)
+int sdp_get_volt_limit(const sdp_t *sdp, float *volt)
 {
         return -1;
 }
@@ -462,11 +463,11 @@ int sdp_select_ifce(const sdp_t *sdp, sdp_ifce_t ifce)
 /**
  * Set setpont for current
  *
- * curr:        wanted output current of PS: [A * 100]
+ * curr:        wanted output current of PS: [A]
  * sdp:         pointer to sdp_t structure, initialized by sdp_open
  * returns:     0 on success, -1 on error
  */
-int sdp_set_curr(const sdp_t *sdp, int curr)
+int sdp_set_curr(const sdp_t *sdp, float curr)
 {
         return -1;
 }
@@ -474,11 +475,11 @@ int sdp_set_curr(const sdp_t *sdp, int curr)
 /**
  * Set setpoint for voltage
  *
- * volt:        wanted output voltage of PS: [V * 10]
+ * volt:        wanted output voltage of PS: [V]
  * sdp:         pointer to sdp_t structure, initialized by sdp_open
  * returns:     0 on success, -1 on error
  */
-int sdp_set_volt(const sdp_t *sdp, int volt)
+int sdp_set_volt(const sdp_t *sdp, float volt)
 {
         return -1;
 }
@@ -486,11 +487,11 @@ int sdp_set_volt(const sdp_t *sdp, int volt)
 /**
  * Set upper voltage limit
  *
- * volt:        wanted upper voltage limit: [V * 10]
+ * volt:        wanted upper voltage limit: [V]
  * sdp:         pointer to sdp_t structure, initialized by sdp_open
  * returns:     0 on success, -1 on error
  */
-int sdp_set_volt_limit(const sdp_t *sdp, int volt)
+int sdp_set_volt_limit(const sdp_t *sdp, float volt)
 {
         return -1;
 }

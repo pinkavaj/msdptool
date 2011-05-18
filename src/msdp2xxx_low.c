@@ -18,8 +18,14 @@
 
 #include "msdp2xxx_low.h"
 #include <ctype.h>
+#include <math.h>
 #include <string.h>
 #include <strings.h>
+
+#define SDP_INT2VOLT(u) (((float)(u)) / 10)
+#define SDP_INT2CURR(i) (((float)(i)) / 100)
+#define SDP_VOLT2INT(x) ((int)round((x) * 10))
+#define SDP_CURR2INT(x) ((int)round((x) * 100))
 
 /**
  * SDP command templates, see SDP power supply manual for more details about
@@ -341,14 +347,18 @@ int sdp_sresp_dev_addr(char *buf, int len, int *addr)
 int sdp_sresp_va_maximums(char *buf, int len, sdp_va_t *va_maximums)
 {
         const char resp[] = "uuuiii\rOK\r";
+        int val;
 
         if (len != (sizeof(resp) - 1))
                 return -1;
 
-        if (sdp_scan_num(buf, 3, &va_maximums->volt) == -1)
+        if (sdp_scan_num(buf, 3, &val) == -1)
                 return -1;
-        if (sdp_scan_num(buf + 3, 3, &va_maximums->curr) == -1)
+        va_maximums->volt = SDP_INT2VOLT(val);
+
+        if (sdp_scan_num(buf + 3, 3, &val) == -1)
                 return -1;
+        va_maximums->curr = SDP_INT2CURR(val);
         
         return 0;
 }
@@ -361,15 +371,17 @@ int sdp_sresp_va_maximums(char *buf, int len, sdp_va_t *va_maximums)
  * volt_limit:  pointer to int where upper voltage limit should be stored
  * returns:     0 on success, -1 on error
  */
-int sdp_sresp_volt_limit(char *buf, int len, int *volt_limit)
+int sdp_sresp_volt_limit(char *buf, int len, float *volt_limit)
 {
         const char resp[] = "uuu\rOK\r";
+        int val;
 
         if (len != (sizeof(resp) - 1))
                 return -1;
 
-        if (sdp_scan_num(buf, 3, volt_limit) == -1)
+        if (sdp_scan_num(buf, 3, &val) == -1)
                 return -1;
+        *volt_limit = SDP_INT2VOLT(val);
 
         return 0;
 }
@@ -385,15 +397,20 @@ int sdp_sresp_volt_limit(char *buf, int len, int *volt_limit)
 int sdp_sresp_va_data(char *buf, int len, sdp_va_data_t *va_data)
 {
         const char resp[] = "uuuuiiiic\rOK\r";
-        int mode;
+        int mode, val;
 
         if (len != (sizeof(resp) - 1))
                 return -1;
 
-        if (sdp_scan_num(buf, 4, &va_data->volt) == -1)
+        if (sdp_scan_num(buf, 4, &val) == -1)
                 return -1;
-        if (sdp_scan_num(buf + 4, 4, &va_data->curr) == -1)
+        // Data from measurement have one more decimal point
+        va_data->volt = SDP_INT2VOLT(val) / 10;
+
+        if (sdp_scan_num(buf + 4, 4, &val) == -1)
                 return -1;
+        va_data->curr = SDP_INT2CURR(val) / 10;
+
         if (sdp_scan_num(buf + 8, 1, &mode) == -1)
                 return -1;
         va_data->mode = mode;
@@ -412,14 +429,18 @@ int sdp_sresp_va_data(char *buf, int len, sdp_va_data_t *va_data)
 int sdp_sresp_va_setpoint(char *buf, int len, sdp_va_t *va_setpoints)
 {
         const char resp[] = "uuuiii\rOK\r";
+        int val;
 
         if (len != (sizeof(resp) - 1))
                 return -1;
 
-        if (sdp_scan_num(buf, 3, &va_setpoints->volt) == -1)
+        if (sdp_scan_num(buf, 3, &val) == -1)
                 return -1;
-        if (sdp_scan_num(buf + 3, 3, &va_setpoints->curr) == -1)
+        va_setpoints->volt = SDP_INT2VOLT(val);
+
+        if (sdp_scan_num(buf + 3, 3, &val) == -1)
                 return -1;
+        va_setpoints->curr = SDP_INT2CURR(val);
 
         return 0;
 }
@@ -440,20 +461,25 @@ int sdp_sresp_preset(char *buf, int len, sdp_va_t *va_preset)
         const char resp[] = "uuuiii\r";
         const int resp_s1 = sizeof(resp) - 1 + sizeof(str_ok) - 1;
         const int resp_s9 = (sizeof(resp) - 1) * 9 + sizeof(str_ok) - 1;
-        int count = 1;
+        int count, val;
 
         if (len == resp_s9) {
                 count = 9;
-        } else if (len != resp_s1)
-                return -1;
+        } else {
+                if (len != resp_s1)
+                        return -1;
+                count = 1;
+        }
 
         while (count--) {
-                if (sdp_scan_num(buf, 3, &va_preset->volt) == -1)
+                if (sdp_scan_num(buf, 3, &val) == -1)
                         return -1;
+                va_preset->volt = SDP_INT2VOLT(val);
                 buf += 3;
 
-                if (sdp_scan_num(buf, 3, &va_preset->curr) == -1)
+                if (sdp_scan_num(buf, 3, &val) == -1)
                         return -1;
+                va_preset->curr = SDP_INT2CURR(val);
                 buf += 3;
 
                 va_preset++;
@@ -479,26 +505,33 @@ int sdp_sresp_program(char *buf, int len, sdp_program_t *program)
         const char resp[] = "uuuiiimmss\r";
         const int resp_s1 = sizeof(resp) - 1 + sizeof(str_ok) - 1;
         const int resp_s20 = (sizeof(resp) - 1) * 20 + sizeof(str_ok) - 1;
-        int count = 1;
+        int count, val;
 
         if (len == resp_s20) {
                 count = 20;
-        } else if (len != resp_s1)
-                return -1;
+        } else {
+                if (len != resp_s1)
+                        return -1;
+                count = 1;
+        }
 
         while (count--) {
                 int min, sec;
 
-                if (sdp_scan_num(buf, 3, &program->volt) == -1)
+                if (sdp_scan_num(buf, 3, &val) == -1)
                         return -1;
+                program->volt = SDP_INT2VOLT(val);
                 buf += 3;
-                if (sdp_scan_num(buf, 3, &program->curr) == -1)
+
+                if (sdp_scan_num(buf, 3, &val) == -1)
                         return -1;
+                program->curr = SDP_INT2CURR(val);
                 buf += 3;
 
                 if (sdp_scan_num(buf, 2, &min) == -1)
                         return -1;
                 buf += 2;
+
                 if (sdp_scan_num(buf, 2, &sec) == -1)
                         return -1;
                 buf += 2;
@@ -620,20 +653,21 @@ int sdp_sselect_ifce(char *buf, int addr, sdp_ifce_t ifce)
  *
  * buf:         output buffer (see SDP_BUF_SIZE_MIN)
  * addr:        rs485 device address: 1-31 (use anny valid for rs232)
- * volt:        voltage level value (TODO: units)
+ * volt:        voltage level value
  * returns:     number of writen characters not including trailing '\0',
  *      -1 on error
  */
-int sdp_sset_volt(char *buf, int addr, int volt)
+int sdp_sset_volt(char *buf, int addr, float volt)
 {
-        int ret;
+        int ret, val;
 
-        if (volt < 0 || volt > 999)
+        val = SDP_VOLT2INT(volt);
+        if (val < 0 || val > 999)
                 return -1;
 
         ret = sdp_print_cmd(buf, sdp_cmd_volt, addr);
         if (ret != -1)
-                sdp_print_num(buf + 6, 3, volt);
+                sdp_print_num(buf + 6, 3, val);
         
         return ret;
 }
@@ -647,16 +681,17 @@ int sdp_sset_volt(char *buf, int addr, int volt)
  * returns:     number of writen characters not including trailing '\0',
  *      -1 on error
  */
-int sdp_sset_curr(char *buf, int addr, int curr)
+int sdp_sset_curr(char *buf, int addr, float curr)
 {
-        int ret;
+        int ret, val;
 
-        if (curr < 0 || curr > 999)
+        val = SDP_CURR2INT(curr);
+        if (val < 0 || val > 999)
                 return -1;
 
         ret = sdp_print_cmd(buf, sdp_cmd_curr, addr);
         if (ret != -1)
-                sdp_print_num(buf + 6, 3, curr);
+                sdp_print_num(buf + 6, 3, val);
 
         return ret;
 }
@@ -670,16 +705,17 @@ int sdp_sset_curr(char *buf, int addr, int curr)
  * returns:     number of writen characters not including trailing '\0',
  *      -1 on error
  */
-int sdp_sset_volt_limit(char *buf, int addr, int volt)
+int sdp_sset_volt_limit(char *buf, int addr, float volt)
 {
-        int ret;
+        int ret, val;
 
-        if (volt < 0 || volt > 999)
+        val = SDP_VOLT2INT(volt);
+        if (val < 0 || val > 999)
                 return -1;
 
         ret = sdp_print_cmd(buf, sdp_cmd_sovp, addr);
         if (ret != -1)
-                sdp_print_num(buf + 6, 3, volt);
+                sdp_print_num(buf + 6, 3, val);
 
         return ret;
 }
