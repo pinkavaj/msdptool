@@ -29,7 +29,21 @@
 #define __MSDP2XXX_BASE_H___
 
 #ifdef _WIN32
+
+#ifndef WINVER                  // Minimum required platform is Win XP
+#define WINVER 0x0501
+#endif
+
+#ifndef _WIN32_WINNT            // Minimum required platform is Win XP
+#define _WIN32_WINNT 0x0501
+#endif
+
+#ifndef _WIN32_WINDOWS          // Minimum required platform is Win XP
+#define _WIN32_WINDOWS 0x0501
+#endif
+
 #include <windows.h>
+
 #endif
 
 #ifdef __cplusplus
