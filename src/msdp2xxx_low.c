@@ -21,7 +21,6 @@
 #include <errno.h>
 #include <math.h>
 #include <string.h>
-#include <strings.h>
 
 #define SDP_INT2VOLT(u) (((float)(u)) / 10)
 #define SDP_INT2CURR(i) (((float)(i)) / 100)
