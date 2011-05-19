@@ -416,7 +416,7 @@ int main(int argc, char **argv_)
                 int enable, presn;
                 _TCHAR *endptr;
 
-                if (argc != 1)
+                if (argc != 2)
                         return printe("Invalid number of parameters");
 
                 presn = strtol(argv[0], &endptr, 0);
