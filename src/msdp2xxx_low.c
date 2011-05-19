@@ -173,7 +173,7 @@ int sdp_sget_dev_addr(char *buf, int addr)
  * returns:     number of characters put into buffer not including trailing
  *      '\0', -1 on error
  */
-int sdp_sget_ldc_info(char *buf, int addr)
+int sdp_sget_lcd_info(char *buf, int addr)
 {
         return sdp_print_cmd(buf, sdp_cmd_gpal, addr);
 }
@@ -577,21 +577,25 @@ int sdp_resp_program(char *buf, int len, sdp_program_t *program)
 }
 
 /**
- * Parse response on sdp_sget_ldc_info.
+ * Parse response on sdp_sget_lcd_info.
  *
  * buf:         buffer with irecieved response
  * len:         lenght of data in buffer
- * lcd_info:    pointer to sdp_ldc_info_t to store recieved LCD info
+ * lcd_info:    pointer to sdp_lcd_info_t to store recieved LCD info
  * returns:     0 on success, -1 on error
  */
-int sdp_resp_ldc_info(char *buf, int len, sdp_ldc_info_t *lcd_info)
+int sdp_resp_lcd_info(char *buf, int len, sdp_lcd_info_t *lcd_info)
 {
         const char resp[] = "\rOK\r"; //TODO
+		int x;
 
+		buf[len] = 0;
 			while (strchr(buf, '\r'))
 				strchr(buf, '\r')[0] = '\n';
 
-			printf("X %s\n", buf);
+			printf("%s\n", buf);
+			for(x = 0; x < len; x++)
+				printf("%02x ", buf[x]);
 
         if (len != (sizeof(resp) - 1)) {
                 errno = EINVAL;

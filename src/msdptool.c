@@ -344,13 +344,13 @@ int main(int argc, char **argv_)
                                         prg[x].time / 60, prg[x].time % 60);
         }
         else if (!strcmp(cmd, TEXT("gpal"))) {
-                sdp_ldc_info_t lcd;
+                sdp_lcd_info_t lcd;
 
                 if (argc != 0)
                         return printe("Invalid number of parameters");
 
-                if (sdp_get_ldc_info(&sdp, &lcd) == -1)
-                        return perror_("sdp_get_ldc_info failed");
+                if (sdp_get_lcd_info(&sdp, &lcd) == -1)
+                        return perror_("sdp_get_lcd_info failed");
                 // TODO
                 return -1;
         }
@@ -476,6 +476,7 @@ int main(int argc, char **argv_)
                 if (*endptr || !argv[2][0])
                         return printe("Invalid argument, not a number");
 
+                // FIXME
                 prg.time = strtol(argv[3], &endptr, 0);
                 if (!argv[3][0] || *endptr)
                         return printe("Invalid program number");

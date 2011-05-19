@@ -119,7 +119,7 @@ typedef struct {
         int fault;
         int output;
         int remote;
-} sdp_ldc_info_t;
+} sdp_lcd_info_t;
 
 #ifdef __cplusplus
 } // extern "C"

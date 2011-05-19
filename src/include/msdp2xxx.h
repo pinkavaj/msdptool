@@ -56,7 +56,7 @@ int sdp_get_va_data(const sdp_t *sdp, sdp_va_data_t *va_data);
 int sdp_get_va_setpoint(const sdp_t *sdp, sdp_va_t *va_setpoints);
 int sdp_get_preset(const sdp_t *sdp, int presn, sdp_va_t *va_preset);
 int sdp_get_program(const sdp_t *sdp, int progn, sdp_program_t *program);
-int sdp_get_ldc_info(const sdp_t *sdp, sdp_ldc_info_t *lcd_info);
+int sdp_get_lcd_info(const sdp_t *sdp, sdp_lcd_info_t *lcd_info);
 int sdp_remote(const sdp_t *sdp, int enable);
 int sdp_run_preset(const sdp_t *sdp, int preset);
 int sdp_run_program(const sdp_t *sdp, int count);

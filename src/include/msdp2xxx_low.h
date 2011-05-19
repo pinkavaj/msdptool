@@ -49,7 +49,7 @@ sdp_resp_t sdp_resp(const char *buf, int len);
 /* This functions return some data (sdp_resp_data), use corecponding
  * sdp_resp_* function to get this data from response message */
 int sdp_sget_dev_addr(char *buf, int addr);
-int sdp_sget_ldc_info(char *buf, int addr);
+int sdp_sget_lcd_info(char *buf, int addr);
 int sdp_sget_preset(char *buf, int addr, int presn);
 int sdp_sget_program(char *buf, int addr, int progn);
 int sdp_sget_va_maximums(char *buf, int addr);
@@ -59,7 +59,7 @@ int sdp_sget_volt_limit(char *buf, int addr);
 
 /* Response parsing function should look something like: */
 int sdp_resp_dev_addr(char *buf, int len, int *addr);
-int sdp_resp_ldc_info(char *buf, int len, sdp_ldc_info_t *lcd_info);
+int sdp_resp_lcd_info(char *buf, int len, sdp_lcd_info_t *lcd_info);
 int sdp_resp_preset(char *buf, int len, sdp_va_t *va_preset);
 int sdp_resp_program(char *buf, int len, sdp_program_t *program);
 int sdp_resp_va_maximums(char *buf, int len, sdp_va_t *va_maximums);
