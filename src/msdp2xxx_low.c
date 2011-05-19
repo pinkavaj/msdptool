@@ -430,7 +430,7 @@ int sdp_resp_va_data(char *buf, int len, sdp_va_data_t *va_data)
 
         if (sdp_scan_num(buf + 8, 1, &mode) == -1)
                 return -1;
-        va_data->mode = mode;
+        va_data->mode = (sdp_mode_t)mode;
 
         return 0;
 }
