@@ -1,4 +1,7 @@
-msdptool
 *.o
 *.so
 *.so.*
+msdp2xxx.dll
+msdp2xxx.dll.0.0
+msdptool
+msdptool.exe
