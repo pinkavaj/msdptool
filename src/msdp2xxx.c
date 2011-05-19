@@ -661,7 +661,7 @@ int sdp_select_ifce(const sdp_t *sdp, sdp_ifce_t ifce)
         if (sdp_write(sdp->f_out, buf, size) != size)
                 return -1;
 
-        if (sdp_read_resp(sdp->f_in, buf, SDP_RESP_LEN_OK))
+        if (sdp_read_resp(sdp->f_in, buf, SDP_RESP_LEN_OK) == -1)
                 return -1;
 
         return 0;
@@ -686,7 +686,7 @@ int sdp_set_curr(const sdp_t *sdp, double curr)
         if (sdp_write(sdp->f_out, buf, size) != size)
                 return -1;
 
-        if (sdp_read_resp(sdp->f_in, buf, SDP_RESP_LEN_OK))
+        if (sdp_read_resp(sdp->f_in, buf, SDP_RESP_LEN_OK) == -1)
                 return -1;
 
         return 0;
@@ -736,7 +736,7 @@ int sdp_set_volt_limit(const sdp_t *sdp, double volt)
         if (sdp_write(sdp->f_out, buf, size) != size)
                 return -1;
 
-        if (sdp_read_resp(sdp->f_in, buf, SDP_RESP_LEN_OK))
+        if (sdp_read_resp(sdp->f_in, buf, SDP_RESP_LEN_OK) == -1)
                 return -1;
 
         return 0;
@@ -761,7 +761,7 @@ int sdp_set_output(const sdp_t *sdp, int enable)
         if (sdp_write(sdp->f_out, buf, size) != size)
                 return -1;
 
-        if (sdp_read_resp(sdp->f_in, buf, SDP_RESP_LEN_OK))
+        if (sdp_read_resp(sdp->f_in, buf, SDP_RESP_LEN_OK) == -1)
                 return -1;
 
         return 0;
@@ -787,7 +787,7 @@ int sdp_set_poweron_output(const sdp_t *sdp, int presn, int enable)
         if (sdp_write(sdp->f_out, buf, size) != size)
                 return -1;
 
-        if (sdp_read_resp(sdp->f_in, buf, SDP_RESP_LEN_OK))
+        if (sdp_read_resp(sdp->f_in, buf, SDP_RESP_LEN_OK) == -1)
                 return -1;
 
         return 0;
@@ -813,7 +813,7 @@ int sdp_set_preset(const sdp_t *sdp, int presn, const sdp_va_t *va_preset)
         if (sdp_write(sdp->f_out, buf, size) != size)
                 return -1;
 
-        if (sdp_read_resp(sdp->f_in, buf, SDP_RESP_LEN_OK))
+        if (sdp_read_resp(sdp->f_in, buf, SDP_RESP_LEN_OK) == -1)
                 return -1;
 
         return 0;
@@ -839,7 +839,7 @@ int sdp_set_program(const sdp_t *sdp, int progn, const sdp_program_t *program)
         if (sdp_write(sdp->f_out, buf, size) != size)
                 return -1;
 
-        if (sdp_read_resp(sdp->f_in, buf, SDP_RESP_LEN_OK))
+        if (sdp_read_resp(sdp->f_in, buf, SDP_RESP_LEN_OK) == -1)
                 return -1;
 
         return 0;
