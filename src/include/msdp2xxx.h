@@ -41,7 +41,11 @@ typedef struct {
 } sdp_t;
 
 /* High leve operation functions */
+#ifdef _MSVC
+int sdp_open(sdp_t *sdp, LPCWSTR fname, int addr);
+#else
 int sdp_open(sdp_t *sdp, const char *fname, int addr);
+#endif
 int sdp_openf(sdp_t *sdp, SDP_F f, int addr);
 void sdp_close(sdp_t *sdp);
 

@@ -133,13 +133,22 @@ static ssize_t sdp_write(int fd, char *buf, ssize_t count)
 #endif
 
 #ifdef _WIN32
+
+#ifdef _MSVC
+typedef int ssize_t;
+#endif
+
 /**
  * Open serial port and set parameters as defined for SDP power source
  *
  * fname:       file name of serial port
  * returns:     file descriptor on success, -1 on error
  */
+#ifdef _MSVC
 static HANDLE open_serial(LPCWSTR fname)
+#else
+static HANDLE open_serial(const char *fname)
+#endif
 {
         HANDLE h;
 
@@ -150,7 +159,7 @@ static HANDLE open_serial(LPCWSTR fname)
 
         DCB dcbSerialParams;
 
-        SecureZeroMemory(&dcbSerialParams, sizeof(DCB));
+        memset(&dcbSerialParams, 0, sizeof(DCB));
 		dcbSerialParams.DCBlength = sizeof(dcbSerialParams);
 
         if (!GetCommState(h, &dcbSerialParams)) {
@@ -253,7 +262,11 @@ static ssize_t sdp_write(HANDLE h, char *buf, ssize_t count)
  * fname:       name of serial port to open
  * addr:        rs485 address of device, for rs232 is ignored - use anny valid
  */
+#ifdef _MSVC
+int sdp_open(sdp_t *sdp, LPCWSTR fname, int addr)
+#else
 int sdp_open(sdp_t *sdp, const char *fname, int addr)
+#endif
 {
         SDP_F f;
 

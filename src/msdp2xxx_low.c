@@ -22,6 +22,7 @@
 #include <math.h>
 #include <string.h>
 
+
 #define SDP_INT2VOLT(u) (((float)(u)) / 10)
 #define SDP_INT2CURR(i) (((float)(i)) / 100)
 #define SDP_VOLT2INT(x) ((int)round((x) * 10))
@@ -68,6 +69,13 @@ static const char sdp_cmd_runp[] = "RUNP__nnn\r";
 static const char sdp_cmd_stop[] = "STOP__\r";
 
 static const char str_ok[] = "OK\r";
+
+#ifdef _MSVC
+inline double round( double d )
+{
+    return floor( d + 0.5 );
+}
+#endif
 
 /**
  * Print 3, 2 or 1 digits unsigned number into buffer.
