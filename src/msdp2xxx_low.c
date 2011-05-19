@@ -337,21 +337,23 @@ sdp_resp_t sdp_resp(const char *buf, int len)
  */
 int sdp_resp_dev_addr(char *buf, int len, int *addr)
 {       
-        const char resp[] = "RS__\rOK\r";
+        const char resp[] = "OK\r___\rOK\r";
+        const int resp_len = sizeof(resp) - 1;
 
-        if (len != (sizeof(resp) - 1)) {
+        if (len != resp_len) {
                 errno = EINVAL;
                 return -1;
         }
 
-        if (buf[0] != 'R' || buf[1] != 'S') {
+        if (sdp_scan_num(buf + 3, 3, addr) == -1)
+                return -1;
+
+        memset(buf + 3, '_', 3);
+        if (memcmp(resp, buf, resp_len)) {
                 errno = EINVAL;
                 return -1;
         }
         
-        if (sdp_scan_num(buf + 2, 2, addr) == -1)
-                return -1;
-
         return 0;
 }
 
