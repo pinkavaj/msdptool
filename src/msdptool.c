@@ -19,12 +19,11 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
 #include "msdp2xxx.h"
 #ifdef __linux__
+#include <unistd.h>
 #else
 #ifdef _WIN32
-#include <windows.h>
 #else
 #error "Unsupported OS"
 #endif
