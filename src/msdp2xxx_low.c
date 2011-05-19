@@ -811,15 +811,17 @@ int sdp_sset_poweron_output(char *buf, int addr, int presn, int enable)
  * buf:         output buffer (see SDP_BUF_SIZE_MIN)
  * addr:        rs485 device address: 1-31 (use anny valid for rs232)
  * presn:       number of preset to set: 1-9
- * volt:        preset voltage value: 0-999
- * curr:        preset current value: 0-999
+ * va_preset:   pointer to sdp_va_t containign values to be set
  * returns:     number of writen characters not including trailing '\0',
  *      -1 on error
  */
-int sdp_sset_preset(char *buf, int addr, int presn, int volt, int curr)
+int sdp_sset_preset(char *buf, int addr, int presn, const sdp_va_t *va_preset)
 {
         int ret;
+        int volt, curr;
 
+        volt = SDP_VOLT2INT(va_preset->volt);
+        curr = SDP_CURR2INT(va_preset->curr);
         if (presn < SDP_PRESET_MIN || presn > SDP_PRESET_MAX ||
                         volt < 0 || volt > 999 || 
                         curr < 0 || curr > 999) {
@@ -843,21 +845,22 @@ int sdp_sset_preset(char *buf, int addr, int presn, int volt, int curr)
  * buf:         output buffer (see SDP_BUF_SIZE_MIN)
  * addr:        rs485 device address: 1-31 (use anny valid for rs232)
  * progn:       program number for which values should be set: 0-19
- * volt:        new volage for specified program item: 0-999
- * curr:        new curret for specified program item: 0-999
- * time:        new lenght of program item duration in seconds: 0-5999
+ * program:     pointer to sdp_program_t containing new program item values
  * returns:     number of writen characters not including trailing '\0',
  *      -1 on error
  */
-int sdp_sset_program(char *buf, int addr, int progn, int volt, int curr,
-                int time)
+int sdp_sset_program(char *buf, int addr, int progn, const sdp_program_t *program)
 {
         int ret;
+        int volt, curr;
+
+        volt = SDP_VOLT2INT(program->volt);
+        curr = SDP_CURR2INT(program->curr);
 
         if (progn < SDP_PROGRAM_MIN || progn > SDP_PROGRAM_MAX ||
                         volt < 0 || volt > 999 || 
                         curr < 0 || curr > 999 ||
-                        time < 0 || time > (99*60+59)) {
+                        program->time < 0 || program->time > (99*60+59)) {
                 errno = ERANGE;
                 return -1;
         }
@@ -867,8 +870,8 @@ int sdp_sset_program(char *buf, int addr, int progn, int volt, int curr,
                 sdp_print_num(buf + 6, 2, progn);
                 sdp_print_num(buf + 8, 3, volt);
                 sdp_print_num(buf + 11, 3, curr);
-                sdp_print_num(buf + 14, 2, time / 60);
-                sdp_print_num(buf + 16, 2, time % 60);
+                sdp_print_num(buf + 14, 2, program->time / 60);
+                sdp_print_num(buf + 16, 2, program->time % 60);
         }
         
         return ret;

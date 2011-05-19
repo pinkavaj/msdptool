@@ -75,9 +75,9 @@ int sdp_sselect_ifce(char *buf, int addr, sdp_ifce_t ifce);
 int sdp_sset_curr(char *buf, int addr, float curr);
 int sdp_sset_output(char *buf, int addr, int enable);
 int sdp_sset_poweron_output(char *buf, int addr, int presn, int enable);
-int sdp_sset_preset(char *buf, int addr, int presn, int volt, int curr);
-int sdp_sset_program(char *buf, int addr, int progn, int volt, int curr, 
-                int time);
+int sdp_sset_preset(char *buf, int addr, int presn, const sdp_va_t *va_preset);
+int sdp_sset_program(char *buf, int addr, int progn,
+                const sdp_program_t *program);
 int sdp_sset_volt(char *buf, int addr, float volt);
 int sdp_sset_volt_limit(char *buf, int addr, float volt);
 int sdp_sstop(char *buf, int addr);

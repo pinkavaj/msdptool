@@ -786,8 +786,7 @@ int sdp_set_preset(const sdp_t *sdp, int presn, const sdp_va_t *va_preset)
         char buf[SDP_BUF_SIZE_MIN];
         ssize_t size;
 
-        size = sdp_sset_preset(buf, sdp->addr, presn, va_preset->volt,
-                        va_preset->curr);
+        size = sdp_sset_preset(buf, sdp->addr, presn, va_preset);
         if (size == -1)
                 return -1;
 
@@ -813,8 +812,7 @@ int sdp_set_program(const sdp_t *sdp, int progn, const sdp_program_t *program)
         char buf[SDP_BUF_SIZE_MIN];
         ssize_t size;
 
-        size = sdp_sset_program(buf, sdp->addr, progn, program->volt,
-                        program->curr, program->time);
+        size = sdp_sset_program(buf, sdp->addr, progn, program);
         if (size == -1)
                 return -1;
 
