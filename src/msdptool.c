@@ -35,7 +35,7 @@
  * fmt:         format message, see man printf for details
  * returns:     -1 always
  **/
-int perror_(const char *fmt)
+static int perror_(const char *fmt)
 {
         perror(fmt);
 
@@ -48,7 +48,7 @@ int perror_(const char *fmt)
  * str:         string to print
  * return:      -1 always
  */
-int printe(const char *str)
+static int printe(const char *str)
 {
         fprintf(stderr, "%s", str);
 
@@ -58,7 +58,7 @@ int printe(const char *str)
 /**
  * Print program help to standard output
  */
-void print_help(void)
+static void print_help(void)
 {
         printf("sdptool [-h] [-a <addr>] <io port> <CMD>\n"
         "        -h - print help\n"
