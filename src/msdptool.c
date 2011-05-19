@@ -259,7 +259,7 @@ int main(int argc, char **argv_)
 
                 ret = sdp_get_volt_limit(&sdp, &volt);
                 if (ret == -1)
-                        perror_("sdp_get_volt_limit failed");
+                        return perror_("sdp_get_volt_limit failed");
 
                 fprintf(f_stdout, "%2.1f\n", volt);
         }
