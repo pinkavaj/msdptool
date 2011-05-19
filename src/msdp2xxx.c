@@ -144,15 +144,15 @@ typedef int ssize_t;
  * fname:       file name of serial port
  * returns:     file descriptor on success, -1 on error
  */
-#ifdef _MSVC
-static HANDLE open_serial(const _TCHAR *fname)
+#ifdef _WIN32
+static HANDLE open_serial(const wchar_t *fname)
 #else
 static HANDLE open_serial(const char *fname)
 #endif
 {
         HANDLE h;
 
-        h = CreateFile(fname, GENERIC_READ | GENERIC_WRITE, 0, 0,
+        h = CreateFileW(fname, GENERIC_READ | GENERIC_WRITE, 0, 0,
                         OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
         if (h == INVALID_HANDLE_VALUE)
                 return INVALID_HANDLE_VALUE;
@@ -262,8 +262,8 @@ static ssize_t sdp_write(HANDLE h, char *buf, ssize_t count)
  * fname:       name of serial port to open
  * addr:        rs485 address of device, for rs232 is ignored - use anny valid
  */
-#ifdef _MSVC
-int sdp_open(sdp_t *sdp, const _TCHAR *fname, int addr);
+#ifdef _WIN32
+int sdp_open(sdp_t *sdp, const wchar_t *fname, int addr)
 #else
 int sdp_open(sdp_t *sdp, const char *fname, int addr)
 #endif

@@ -16,14 +16,28 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  * */
 
-#include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "msdp2xxx.h"
 #ifdef __linux__
 #include <unistd.h>
+#define TEXT(s) (s)
+#define _TCHAR char
 #else
 #ifdef _WIN32
+#include <wchar.h>
+#define _TCHAR wchar_t
+
+// FIXME this is hack for MinGW
+#ifdef TEXT
+#undef TEXT
+#endif
+#define TEXT(s) (L##s)
+
+#define strcmp(a, b) wcscmp(a, b)
+#define strtof(a, b) wcstof(a, b)
+#define strtol(a, b, c) wcstol(a, b, c)
 #else
 #error "Unsupported OS"
 #endif
@@ -37,6 +51,16 @@
  **/
 static int perror_(const char *fmt)
 {
+        // TODO
+        /*
+		char buf[1024];
+
+		FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM |
+                        FORMAT_MESSAGE_IGNORE_INSERTS,
+                        NULL, GetLastError(),
+                        MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+                        buf, sizeof(buf), NULL);
+        fprintf(stderr, buf);*/
         perror(fmt);
 
         return -1;
@@ -93,25 +117,29 @@ static void print_help(void)
         "        See SDP power supply manual for detailed informations about commands\n");
 }
 
-void print_help_short(void)
+static void print_help_short(void)
 {
         printf("sdptool - commandline utility for remote control of SDP series power supplies\n"
                "        Use -h or --help for help\n");
                         
 }
 
-int main(int argc, char **argv)
+int main(int argc, char **argv_)
 {
-        sdp_t sdp;
-#ifdef __linux__
-        FILE *fd_std_out;
-#elif _WIN32
-        HANDLE fd_std_out;
-#endif
-        int arg_idx = 1;
         int addr = 1;
+        int arg_idx = 1;
+        FILE *f_stdout;
         int ret;
+        sdp_t sdp;
 
+#ifdef _WIN32
+		wchar_t **argv;
+
+        argv = CommandLineToArgvW(GetCommandLineW(), &argc);
+		// TODO call LocalFree(argv);
+#else
+        char **argv = argv_;
+#endif
         /* no args, print short help */
         if (argc < 2) {
                 print_help_short();
@@ -119,15 +147,16 @@ int main(int argc, char **argv)
         }
 
         if (argc == 2) {
-                if (!strcmp(argv[1], "-h") || !strcmp(argv[1], "--help")) {
+                if (!strcmp(argv[1], TEXT("-h")) ||
+                                !strcmp(argv[1], TEXT("--help"))) {
                         print_help();
                         return 0;
                 }
                 return printe("Invalid or missing argument");
         }
 
-        if (!strcmp(argv[1], "-a")) {
-                char *endptr;
+        if (!strcmp(argv[1], TEXT("-a"))) {
+                _TCHAR *endptr;
 
                 if (argc < 5)
                         return printe("Invalid or missing argument");
@@ -146,61 +175,52 @@ int main(int argc, char **argv)
 
                 sdp.f_in = STDIN_FILENO;
                 sdp.f_out = STDOUT_FILENO;
-                fd_std_out = stderr;
+                f_stdout = stderr;
         }
         else {
 
                 ret = sdp_open(&sdp, argv[arg_idx], addr);
                 if (ret == -1)
                         return perror_("sdp_open failed");
-                fd_std_out = stdout;
+                f_stdout = stdout;
         }
 #elif _WIN32
-        if (!strcmp(argv[arg_idx], "-")) {
+        if (!strcmp(argv[arg_idx], TEXT("-"))) {
                 ret = sdp_openf(&sdp, INVALID_HANDLE_VALUE, addr);
                 if (ret == -1)
                         return perror_("sdp_open failed");
 
                 sdp.f_in = GetStdHandle(STD_INPUT_HANDLE);
                 sdp.f_out = GetStdHandle(STD_OUTPUT_HANDLE);
-                fd_std_out = GetStdHandle(STD_ERROR_HANDLE);
+                f_stdout = stderr;
         } 
         else {
                 ret = sdp_open(&sdp, argv[arg_idx], addr);
                 if (ret == -1)
                         return perror_("sdp_open failed");
-                fd_std_out = GetStdHandle(STD_OUTPUT_HANDLE);
-
-                //char buf[1024];
-
-                // TODO
-                /*FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM |
-                                FORMAT_MESSAGE_IGNORE_INSERTS,
-                                NULL, GetLastError(),
-                                MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-                                buf, sizeof(buf), NULL);
-                fprintf(stderr, buf);*/
+                f_stdout = stdout;
         }
 #endif
 
         if (sdp_remote(&sdp, 1) == -1)
                 return perror_("Failed to switch to remote mode");
 
-        char *cmd = argv[arg_idx];
         // Drop already processed arguments
+        arg_idx++;
+        const _TCHAR *cmd = argv[arg_idx++];
         argv += arg_idx;
         argc -= arg_idx;
         arg_idx = 0;
 
-        if (!strcmp(cmd, "ccom")) {
+        if (!strcmp(cmd, TEXT("ccom"))) {
                 sdp_ifce_t ifce;
 
                 if (argc != 1)
                         return printe("Invalid number of parameters");
 
-                if (!strcmp(argv[0], "rs232"))
+                if (!strcmp(argv[0], TEXT("rs232")))
                         ifce = sdp_ifce_rs232;
-                else if (!strcmp(argv[0], "rs485"))
+                else if (!strcmp(argv[0], TEXT("rs485")))
                         ifce = sdp_ifce_rs485;
                 else
                         return printe("Invalid argument");
@@ -209,7 +229,7 @@ int main(int argc, char **argv)
                 if (ret == -1)
                         return perror_("sdp_select_ifce failed");
         }
-        else if (!strcmp(cmd, "gcom")) {
+        else if (!strcmp(cmd, TEXT("gcom"))) {
                 if (argc != 0)
                         return printe("Invalid number of parameters");
 
@@ -217,9 +237,9 @@ int main(int argc, char **argv)
                 if (ret == -1)
                         return perror_("sdp_get_dev_addr failed");
 
-                fprintf(fd_std_out, "%i\n", ret);
+                fprintf(f_stdout, "%i\n", ret);
         }
-        else if (!strcmp(cmd, "gmax")) {
+        else if (!strcmp(cmd, TEXT("gmax"))) {
                 sdp_va_t va;
 
                 if (argc != 0)
@@ -228,9 +248,9 @@ int main(int argc, char **argv)
                 if (sdp_get_va_maximums(&sdp, &va) == -1)
                         return perror_("sdp_get_va_maximums failed");
 
-                fprintf(fd_std_out, "%2.1f %1.2f\n", va.volt, va.curr);
+                fprintf(f_stdout, "%2.1f %1.2f\n", va.volt, va.curr);
         }
-        else if (!strcmp(cmd, "govp")) {
+        else if (!strcmp(cmd, TEXT("govp"))) {
                 float volt;
 
                 if (argc != 0)
@@ -240,9 +260,9 @@ int main(int argc, char **argv)
                 if (ret == -1)
                         perror_("sdp_get_volt_limit failed");
 
-                fprintf(fd_std_out, "%2.1f\n", volt);
+                fprintf(f_stdout, "%2.1f\n", volt);
         }
-        else if (!strcmp(cmd, "getd")) {
+        else if (!strcmp(cmd, TEXT("getd"))) {
                 sdp_va_data_t va_data;
 
                 if (argc != 0)
@@ -252,13 +272,13 @@ int main(int argc, char **argv)
                         return perror_("sdp_get_va_data failed");
 
                 if (va_data.mode == sdp_mode_cc)
-                        fprintf(fd_std_out, "%2.2f %1.3f CC\n", va_data.volt,
+                        fprintf(f_stdout, "%2.2f %1.3f CC\n", va_data.volt,
                                         va_data.curr);
                 else
-                        fprintf(fd_std_out, "%2.2f %1.3f CV\n", va_data.volt,
+                        fprintf(f_stdout, "%2.2f %1.3f CV\n", va_data.volt,
                                         va_data.curr);
         }
-        else if (!strcmp(cmd, "gets")) {
+        else if (!strcmp(cmd, TEXT("gets"))) {
                 sdp_va_t va;
 
                 if (argc != 0)
@@ -267,17 +287,17 @@ int main(int argc, char **argv)
                 if (sdp_get_va_setpoint(&sdp, &va) == -1)
                         return perror_("sdp_get_va_setpoint failed");
 
-                fprintf(fd_std_out, "%2.1f %1.2f\n", va.volt, va.curr);
+                fprintf(f_stdout, "%2.1f %1.2f\n", va.volt, va.curr);
         }
-        else if (!strcmp(cmd, "getm")) {
+        else if (!strcmp(cmd, TEXT("getm"))) {
                 sdp_va_t va[9];
                 int presn, n;
-                char *endptr;
+                _TCHAR *endptr;
 
                 if (argc != 1)
                         return printe("Invalid number of parameters");
 
-                if (!strcmp(argv[0], "all")) {
+                if (!strcmp(argv[0], TEXT("all"))) {
                         presn = SDP_PRESET_ALL;
                         n = 9;
                 } else {
@@ -291,18 +311,18 @@ int main(int argc, char **argv)
                         return perror_("sdp_get_preset failed");
 
                 for (int x = 0; x < n; x++)
-                        fprintf(fd_std_out, "%2.1f %1.2f\n", va[x].volt,
+                        fprintf(f_stdout, "%2.1f %1.2f\n", va[x].volt,
                                         va[x].curr);
         }
-        else if (!strcmp(cmd, "getp")) {
+        else if (!strcmp(cmd, TEXT("getp"))) {
                 int progn, n;
                 sdp_program_t prg[20];
-                char *endptr;
+                _TCHAR *endptr;
 
                 if (argc != 1)
                         return printe("Invalid number of parameters");
 
-                if (!strcmp(argv[0], "all")) {
+                if (!strcmp(argv[0], TEXT("all"))) {
                         progn = SDP_PROGRAM_ALL;
                         n = 20;
                 } else {
@@ -316,11 +336,11 @@ int main(int argc, char **argv)
                         return perror_("sdp_get_program failed");
 
                 for (int x = 0; x < n; x++)
-                        fprintf(fd_std_out, "%2.1f %1.2f %2.i:%2.i\n",
+                        fprintf(f_stdout, "%2.1f %1.2f %2.i:%2.i\n",
                                         prg[x].volt, prg[x].curr,
                                         prg[x].time / 60, prg[x].time % 60);
         }
-        else if (!strcmp(cmd, "gpal")) {
+        else if (!strcmp(cmd, TEXT("gpal"))) {
                 sdp_ldc_info_t lcd;
 
                 if (argc != 0)
@@ -331,9 +351,9 @@ int main(int argc, char **argv)
                 // TODO
                 return -1;
         }
-        else if (!strcmp(cmd, "volt")) {
+        else if (!strcmp(cmd, TEXT("volt"))) {
                 float u;
-                char *endptr;
+                _TCHAR *endptr;
 
                 if (argc != 1)
                         return printe("Invalid number of parameters");
@@ -345,9 +365,9 @@ int main(int argc, char **argv)
                 if (sdp_set_volt(&sdp, u) == -1)
                         return perror_("sdp_set_volt failed");
         }
-        else if (!strcmp(cmd, "curr")) {
+        else if (!strcmp(cmd, TEXT("curr"))) {
                 float i;
-                char *endptr;
+                _TCHAR *endptr;
 
                 if (argc != 1)
                         return printe("Invalid number of parameters");
@@ -359,9 +379,9 @@ int main(int argc, char **argv)
                 if (sdp_set_curr(&sdp, i) == -1)
                         return perror_("sdp_set_curr failed");
         }
-        else if (!strcmp(cmd, "sovp")) {
+        else if (!strcmp(cmd, TEXT("sovp"))) {
                 int u;
-                char *endptr;
+                _TCHAR *endptr;
 
                 if (argc != 1)
                         return printe("Invalid number of parameters");
@@ -373,15 +393,15 @@ int main(int argc, char **argv)
                 if (sdp_set_volt_limit(&sdp, u) == -1)
                         return perror_("sdp_set_volt_limit failed");
         }
-        else if (!strcmp(cmd, "sout")) {
+        else if (!strcmp(cmd, TEXT("sout"))) {
                 int enable;
 
                 if (argc != 1)
                         return printe("Invalid number of parameters");
 
-                if (!strcmp(argv[0], "on"))
+                if (!strcmp(argv[0], TEXT("on")))
                         enable = 1;
-                else if (!strcmp(argv[0], "off"))
+                else if (!strcmp(argv[0], TEXT("off")))
                         enable = 0;
                 else
                         return printe("Expected one of on/off");
@@ -389,9 +409,9 @@ int main(int argc, char **argv)
                 if (sdp_set_output(&sdp, enable) == -1)
                         return perror_("sdp_set_output failed");
         }
-        else if (!strcmp(cmd, "poww")) {
+        else if (!strcmp(cmd, TEXT("poww"))) {
                 int enable, presn;
-                char *endptr;
+                _TCHAR *endptr;
 
                 if (argc != 1)
                         return printe("Invalid number of parameters");
@@ -400,9 +420,9 @@ int main(int argc, char **argv)
                 if (!argv[0][0] || *endptr)
                         return printe("Expected preset number");
 
-                if (!strcmp(argv[1], "on"))
+                if (!strcmp(argv[1], TEXT("on")))
                         enable = 1;
-                else if (!strcmp(argv[1], "off"))
+                else if (!strcmp(argv[1], TEXT("off")))
                         enable = 0;
                 else
                         return printe("Expected one of on/off");
@@ -410,10 +430,10 @@ int main(int argc, char **argv)
                 if (sdp_set_poweron_output(&sdp, presn, enable) == -1)
                         return perror_("sdp_set_poweron_output failed");
         }
-        else if (!strcmp(cmd, "prom")) {
+        else if (!strcmp(cmd, TEXT("prom"))) {
                 int presn;
                 sdp_va_t va;
-                char *endptr;
+                _TCHAR *endptr;
 
                 if (argc != 3)
                         return printe("Invalid number of parameters");
@@ -433,10 +453,10 @@ int main(int argc, char **argv)
                 if (sdp_set_preset(&sdp, presn, &va) == -1)
                         return perror_("sdp_set_preset failed");
         }
-        else if (!strcmp(cmd, "prop")) {
+        else if (!strcmp(cmd, TEXT("prop"))) {
                 int progn;
                 sdp_program_t prg;
-                char *endptr;
+                _TCHAR *endptr;
 
                 if (argc != 4)
                         return printe("Invalid number of parameters");
@@ -460,9 +480,9 @@ int main(int argc, char **argv)
                 if (sdp_set_program(&sdp, progn, &prg) == -1)
                         return perror_("sdp_set_program failed");
         }
-        else if (!strcmp(cmd, "runm")) {
+        else if (!strcmp(cmd, TEXT("runm"))) {
                 int presn;
-                char *endptr;
+                _TCHAR *endptr;
 
                 if (argc != 1)
                         return printe("Invalid number of parameters");
@@ -474,9 +494,9 @@ int main(int argc, char **argv)
                 if (sdp_run_preset(&sdp, presn) == -1)
                         return perror_("sdp_run_preset failed");
         }
-        else if (!strcmp(cmd, "runp")) {
+        else if (!strcmp(cmd, TEXT("runp"))) {
                 int progn;
-                char *endptr;
+                _TCHAR *endptr;
 
                 if (argc != 1)
                         return printe("Invalid number of parameters");
@@ -488,7 +508,7 @@ int main(int argc, char **argv)
                 if (sdp_run_program(&sdp, progn) == -1)
                         return perror_("sdp_run_program failed");
         }
-        else if (!strcmp(cmd, "stop")) {
+        else if (!strcmp(cmd, TEXT("stop"))) {
                 if (argc != 0)
                         return printe("Invalid number of parameters");
 
