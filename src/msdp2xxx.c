@@ -148,7 +148,10 @@ static HANDLE open_serial(LPCWSTR fname)
         if (h == INVALID_HANDLE_VALUE)
                 return INVALID_HANDLE_VALUE;
 
-        DCB dcbSerialParams = { 0 };
+        DCB dcbSerialParams;
+
+        SecureZeroMemory(&dcbSerialParams, sizeof(DCB));
+		dcbSerialParams.DCBlength = sizeof(dcbSerialParams);
 
         if (!GetCommState(h, &dcbSerialParams)) {
                 DWORD e;
@@ -159,7 +162,6 @@ static HANDLE open_serial(LPCWSTR fname)
                 return INVALID_HANDLE_VALUE;
         }
 
-        dcbSerialParams.DCBlength = sizeof(dcbSerialParams);
         dcbSerialParams.BaudRate = CBR_9600;
         dcbSerialParams.ByteSize = 8;
         dcbSerialParams.StopBits = ONESTOPBIT;
