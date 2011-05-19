@@ -247,7 +247,7 @@ int sdp_sget_preset(char *buf, int addr, int presn)
                 return -1;
         }
 
-        ret = sdp_print_cmd(buf, sdp_cmd_getm, addr);
+        ret = sdp_print_cmd(buf, sdp_cmd_getm_loc, addr);
         if (ret == -1)
                 return -1;
 
@@ -587,6 +587,11 @@ int sdp_resp_program(char *buf, int len, sdp_program_t *program)
 int sdp_resp_ldc_info(char *buf, int len, sdp_ldc_info_t *lcd_info)
 {
         const char resp[] = "\rOK\r"; //TODO
+
+			while (strchr(buf, '\r'))
+				strchr(buf, '\r')[0] = '\n';
+
+			printf("X %s\n", buf);
 
         if (len != (sizeof(resp) - 1)) {
                 errno = EINVAL;
