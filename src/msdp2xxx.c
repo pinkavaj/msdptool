@@ -711,7 +711,7 @@ int sdp_set_volt(const sdp_t *sdp, double volt)
         if (sdp_write(sdp->f_out, buf, size) != size)
                 return -1;
 
-        if (sdp_read_resp(sdp->f_in, buf, SDP_RESP_LEN_OK))
+        if (sdp_read_resp(sdp->f_in, buf, SDP_RESP_LEN_OK) == -1)
                 return -1;
 
         return 0;
