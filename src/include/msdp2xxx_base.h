@@ -87,13 +87,13 @@ typedef enum {
 } sdp_mode_t;
 
 typedef struct {
-        float curr;
-        float volt;
+        double curr;
+        double volt;
 } sdp_va_t;
 
 typedef struct {
-        float curr;
-        float volt;
+        double curr;
+        double volt;
         sdp_mode_t mode;
 } sdp_va_data_t;
 
@@ -103,14 +103,14 @@ typedef struct {
  * time:        lenght of program item duration [sec]
  */
 typedef struct {
-        float curr;
-        float volt;
+        double curr;
+        double volt;
         int time;
 } sdp_program_t;
 
 typedef struct {
         sdp_va_t va_data;
-        float wats;
+        double wats;
         int time;
         int timer;
         sdp_va_t va_setpoints;

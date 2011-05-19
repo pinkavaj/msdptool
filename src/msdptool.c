@@ -36,7 +36,7 @@
 #define TEXT(s) (L##s)
 
 #define strcmp(a, b) wcscmp(a, b)
-#define strtof(a, b) wcstof(a, b)
+#define strtod(a, b) wcstod(a, b)
 #define strtol(a, b, c) wcstol(a, b, c)
 #else
 #error "Unsupported OS"
@@ -131,6 +131,7 @@ int main(int argc, char **argv_)
         FILE *f_stdout;
         int ret;
         sdp_t sdp;
+		const _TCHAR *cmd;
 
 #ifdef _WIN32
 		wchar_t **argv;
@@ -207,7 +208,7 @@ int main(int argc, char **argv_)
 
         // Drop already processed arguments
         arg_idx++;
-        const _TCHAR *cmd = argv[arg_idx++];
+		cmd = argv[arg_idx++];
         argv += arg_idx;
         argc -= arg_idx;
         arg_idx = 0;
@@ -251,7 +252,7 @@ int main(int argc, char **argv_)
                 fprintf(f_stdout, "%2.1f %1.2f\n", va.volt, va.curr);
         }
         else if (!strcmp(cmd, TEXT("govp"))) {
-                float volt;
+                double volt;
 
                 if (argc != 0)
                         return printe("Invalid number of parameters");
@@ -293,6 +294,7 @@ int main(int argc, char **argv_)
                 sdp_va_t va[9];
                 int presn, n;
                 _TCHAR *endptr;
+				int x;
 
                 if (argc != 1)
                         return printe("Invalid number of parameters");
@@ -310,7 +312,7 @@ int main(int argc, char **argv_)
                 if (sdp_get_preset(&sdp, presn, va) == -1)
                         return perror_("sdp_get_preset failed");
 
-                for (int x = 0; x < n; x++)
+                for (x = 0; x < n; x++)
                         fprintf(f_stdout, "%2.1f %1.2f\n", va[x].volt,
                                         va[x].curr);
         }
@@ -318,6 +320,7 @@ int main(int argc, char **argv_)
                 int progn, n;
                 sdp_program_t prg[20];
                 _TCHAR *endptr;
+				int x;
 
                 if (argc != 1)
                         return printe("Invalid number of parameters");
@@ -335,7 +338,7 @@ int main(int argc, char **argv_)
                 if (sdp_get_program(&sdp, progn, prg) == -1)
                         return perror_("sdp_get_program failed");
 
-                for (int x = 0; x < n; x++)
+                for (x = 0; x < n; x++)
                         fprintf(f_stdout, "%2.1f %1.2f %2.i:%2.i\n",
                                         prg[x].volt, prg[x].curr,
                                         prg[x].time / 60, prg[x].time % 60);
@@ -352,13 +355,13 @@ int main(int argc, char **argv_)
                 return -1;
         }
         else if (!strcmp(cmd, TEXT("volt"))) {
-                float u;
+                double u;
                 _TCHAR *endptr;
 
                 if (argc != 1)
                         return printe("Invalid number of parameters");
 
-                u = strtof(argv[0], &endptr);
+                u = strtod(argv[0], &endptr);
                 if (*endptr || !argv[0][0])
                         return printe("Invalid argument, not a number");
 
@@ -366,13 +369,13 @@ int main(int argc, char **argv_)
                         return perror_("sdp_set_volt failed");
         }
         else if (!strcmp(cmd, TEXT("curr"))) {
-                float i;
+                double i;
                 _TCHAR *endptr;
 
                 if (argc != 1)
                         return printe("Invalid number of parameters");
 
-                i = strtof(argv[0], &endptr);
+                i = strtod(argv[0], &endptr);
                 if (*endptr || !argv[0][0])
                         return printe("Invalid argument, not a number");
 
@@ -380,13 +383,13 @@ int main(int argc, char **argv_)
                         return perror_("sdp_set_curr failed");
         }
         else if (!strcmp(cmd, TEXT("sovp"))) {
-                int u;
+                double u;
                 _TCHAR *endptr;
 
                 if (argc != 1)
                         return printe("Invalid number of parameters");
 
-                u = strtof(argv[0], &endptr);
+                u = strtod(argv[0], &endptr);
                 if (*endptr || !argv[0][0])
                         return printe("Invalid argument, not a number");
 
@@ -442,11 +445,11 @@ int main(int argc, char **argv_)
                 if (!argv[0][0] || *endptr)
                         return printe("Expected preset number");
 
-                va.volt = strtof(argv[1], &endptr);
+                va.volt = strtod(argv[1], &endptr);
                 if (*endptr || !argv[1][0])
                         return printe("Invalid argument, not a number");
 
-                va.curr = strtof(argv[2], &endptr);
+                va.curr = strtod(argv[2], &endptr);
                 if (*endptr || !argv[2][0])
                         return printe("Invalid argument, not a number");
 
@@ -465,11 +468,11 @@ int main(int argc, char **argv_)
                 if (!argv[0][0] || *endptr)
                         return printe("Expected program number");
 
-                prg.volt = strtof(argv[1], &endptr);
+                prg.volt = strtod(argv[1], &endptr);
                 if (*endptr || !argv[1][0])
                         return printe("Invalid argument, not a number");
 
-                prg.curr = strtof(argv[2], &endptr);
+                prg.curr = strtod(argv[2], &endptr);
                 if (*endptr || !argv[2][0])
                         return printe("Invalid argument, not a number");
 

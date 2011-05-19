@@ -23,8 +23,8 @@
 #include <string.h>
 
 
-#define SDP_INT2VOLT(u) (((float)(u)) / 10)
-#define SDP_INT2CURR(i) (((float)(i)) / 100)
+#define SDP_INT2VOLT(u) (((double)(u)) / 10)
+#define SDP_INT2CURR(i) (((double)(i)) / 100)
 #define SDP_VOLT2INT(x) ((int)round((x) * 10))
 #define SDP_CURR2INT(x) ((int)round((x) * 100))
 
@@ -394,7 +394,7 @@ int sdp_resp_va_maximums(char *buf, int len, sdp_va_t *va_maximums)
  * volt_limit:  pointer to int where upper voltage limit should be stored
  * returns:     0 on success, -1 on error
  */
-int sdp_resp_volt_limit(char *buf, int len, float *volt_limit)
+int sdp_resp_volt_limit(char *buf, int len, double *volt_limit)
 {
         const char resp[] = "uuu\rOK\r";
         int val;
@@ -698,7 +698,7 @@ int sdp_sselect_ifce(char *buf, int addr, sdp_ifce_t ifce)
  * returns:     number of writen characters not including trailing '\0',
  *      -1 on error
  */
-int sdp_sset_volt(char *buf, int addr, float volt)
+int sdp_sset_volt(char *buf, int addr, double volt)
 {
         int ret, val;
 
@@ -724,7 +724,7 @@ int sdp_sset_volt(char *buf, int addr, float volt)
  * returns:     number of writen characters not including trailing '\0',
  *      -1 on error
  */
-int sdp_sset_curr(char *buf, int addr, float curr)
+int sdp_sset_curr(char *buf, int addr, double curr)
 {
         int ret, val;
 
@@ -750,7 +750,7 @@ int sdp_sset_curr(char *buf, int addr, float curr)
  * returns:     number of writen characters not including trailing '\0',
  *      -1 on error
  */
-int sdp_sset_volt_limit(char *buf, int addr, float volt)
+int sdp_sset_volt_limit(char *buf, int addr, double volt)
 {
         int ret, val;
 

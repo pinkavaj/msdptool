@@ -381,10 +381,10 @@ int sdp_get_va_maximums(const sdp_t *sdp, sdp_va_t *va_maximums)
  * Get upper voltage limit
  *
  * sdp:         pointer to sdp_t structure, initialized by sdp_open
- * volt:        pointer to float, uset to store retrieved value
+ * volt:        pointer to double, uset to store retrieved value
  * returns:     0 on success, -1 on error
  */
-int sdp_get_volt_limit(const sdp_t *sdp, float *volt)
+int sdp_get_volt_limit(const sdp_t *sdp, double *volt)
 {
         int ret;
         char buf[SDP_BUF_SIZE_MIN];
@@ -669,7 +669,7 @@ int sdp_select_ifce(const sdp_t *sdp, sdp_ifce_t ifce)
  * sdp:         pointer to sdp_t structure, initialized by sdp_open
  * returns:     0 on success, -1 on error
  */
-int sdp_set_curr(const sdp_t *sdp, float curr)
+int sdp_set_curr(const sdp_t *sdp, double curr)
 {
         char buf[SDP_BUF_SIZE_MIN];
         ssize_t size;
@@ -694,7 +694,7 @@ int sdp_set_curr(const sdp_t *sdp, float curr)
  * sdp:         pointer to sdp_t structure, initialized by sdp_open
  * returns:     0 on success, -1 on error
  */
-int sdp_set_volt(const sdp_t *sdp, float volt)
+int sdp_set_volt(const sdp_t *sdp, double volt)
 {
         char buf[SDP_BUF_SIZE_MIN];
         ssize_t size;
@@ -719,7 +719,7 @@ int sdp_set_volt(const sdp_t *sdp, float volt)
  * sdp:         pointer to sdp_t structure, initialized by sdp_open
  * returns:     0 on success, -1 on error
  */
-int sdp_set_volt_limit(const sdp_t *sdp, float volt)
+int sdp_set_volt_limit(const sdp_t *sdp, double volt)
 {
         char buf[SDP_BUF_SIZE_MIN];
         ssize_t size;

@@ -65,21 +65,21 @@ int sdp_resp_program(char *buf, int len, sdp_program_t *program);
 int sdp_resp_va_maximums(char *buf, int len, sdp_va_t *va_maximums);
 int sdp_resp_va_data(char *buf, int len, sdp_va_data_t *va_data);
 int sdp_resp_va_setpoint(char *buf, int len, sdp_va_t *va_setpoints);
-int sdp_resp_volt_limit(char *buf, int len, float *volt_limit);
+int sdp_resp_volt_limit(char *buf, int len, double *volt_limit);
 
 /* This functions respond only "OK" (sdp_resp_nodata) */
 int sdp_sremote(char *buf, int addr, int enable);
 int sdp_srun_preset(char *buf, int addr, int preset);
 int sdp_srun_program(char *buf, int addr, int count);
 int sdp_sselect_ifce(char *buf, int addr, sdp_ifce_t ifce);
-int sdp_sset_curr(char *buf, int addr, float curr);
+int sdp_sset_curr(char *buf, int addr, double curr);
 int sdp_sset_output(char *buf, int addr, int enable);
 int sdp_sset_poweron_output(char *buf, int addr, int presn, int enable);
 int sdp_sset_preset(char *buf, int addr, int presn, const sdp_va_t *va_preset);
 int sdp_sset_program(char *buf, int addr, int progn,
                 const sdp_program_t *program);
-int sdp_sset_volt(char *buf, int addr, float volt);
-int sdp_sset_volt_limit(char *buf, int addr, float volt);
+int sdp_sset_volt(char *buf, int addr, double volt);
+int sdp_sset_volt_limit(char *buf, int addr, double volt);
 int sdp_sstop(char *buf, int addr);
 
 #ifdef __cplusplus
