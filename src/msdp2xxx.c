@@ -145,7 +145,7 @@ typedef int ssize_t;
  * returns:     file descriptor on success, -1 on error
  */
 #ifdef _MSVC
-static HANDLE open_serial(LPCWSTR fname)
+static HANDLE open_serial(const _TCHAR *fname)
 #else
 static HANDLE open_serial(const char *fname)
 #endif
@@ -263,7 +263,7 @@ static ssize_t sdp_write(HANDLE h, char *buf, ssize_t count)
  * addr:        rs485 address of device, for rs232 is ignored - use anny valid
  */
 #ifdef _MSVC
-int sdp_open(sdp_t *sdp, LPCWSTR fname, int addr)
+int sdp_open(sdp_t *sdp, const _TCHAR *fname, int addr);
 #else
 int sdp_open(sdp_t *sdp, const char *fname, int addr)
 #endif

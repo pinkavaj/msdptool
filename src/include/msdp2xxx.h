@@ -42,7 +42,7 @@ typedef struct {
 
 /* High leve operation functions */
 #ifdef _MSVC
-int sdp_open(sdp_t *sdp, LPCWSTR fname, int addr);
+int sdp_open(sdp_t *sdp, const _TCHAR *fname, int addr);
 #else
 int sdp_open(sdp_t *sdp, const char *fname, int addr);
 #endif
