@@ -21,15 +21,14 @@
 #include <ctype.h>
 #include <errno.h>
 #include <string.h>
-#include <strings.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include <unistd.h>
 
 #ifdef __linux__
 
 #include <termios.h>
 #include <sys/select.h>
+#include <unistd.h>
 
 /**
  * Open serial port and set parameters as defined for SDP power source
@@ -140,7 +139,7 @@ static ssize_t sdp_write(int fd, char *buf, ssize_t count)
  * fname:       file name of serial port
  * returns:     file descriptor on success, -1 on error
  */
-static HANDLE open_serial(const char* fname)
+static HANDLE open_serial(LPCWSTR fname)
 {
         HANDLE h;
 
