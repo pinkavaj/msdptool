@@ -339,7 +339,7 @@ int main(int argc, char **argv_)
                         return perror_("sdp_get_program failed");
 
                 for (x = 0; x < n; x++)
-                        fprintf(f_stdout, "%2.1f %1.2f %2.i:%2.i\n",
+                        fprintf(f_stdout, "%2.1f %1.2f %02i:%02i\n",
                                         prg[x].volt, prg[x].curr,
                                         prg[x].time / 60, prg[x].time % 60);
         }
