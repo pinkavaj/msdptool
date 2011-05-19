@@ -95,7 +95,7 @@ static ssize_t sdp_read_resp(int fd, char *buf, ssize_t count)
         // TODO: check this value
         timeout.tv_sec = 0;
         // (bytes + something) * msec / (bitrate / bits per byte)
-        timeout.tv_usec = ((count + 10) * 1000) / (9600 / 10);
+        timeout.tv_usec = ((count + 50) * 1000) / (9600 / 10);
         do {
                 ssize_t size_;
 
@@ -189,7 +189,7 @@ static HANDLE open_serial(const char *fname)
 
         // TODO: check this values
         timeouts.ReadIntervalTimeout = 1;
-        timeouts.ReadTotalTimeoutConstant = 10;
+        timeouts.ReadTotalTimeoutConstant = 50;
         timeouts.ReadTotalTimeoutMultiplier = 1;
         timeouts.WriteTotalTimeoutConstant = 1;
         timeouts.WriteTotalTimeoutMultiplier = 1;
@@ -232,6 +232,11 @@ static ssize_t sdp_read_resp(HANDLE h, char *buf, ssize_t count)
         // TODO
         if (!ReadFile(h, buf, count, &readb, NULL))
                 return -1;
+
+		if (readb == 0) {
+			errno = EIO;
+			return -1;
+		}
 
         return readb;
 }
