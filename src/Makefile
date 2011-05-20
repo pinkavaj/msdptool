@@ -4,6 +4,7 @@ VER_MIN=0
 LIB=msdp2xxx
 PROG=msdptool
 
+AR=ar
 CC=gcc
 CFLAGS=-Wall -std=gnu99 -I./include
 LDFLAGS=
@@ -35,6 +36,7 @@ ${LIB}:	${LIB_SO_VER}
 
 ${LIB_SO_VER}: ${OBJS_LIB}
 	$(CC) ${CFLAGS} ${LDFLAGS} -shared -Wl,-soname,$(LIB_SO_VER) -o $@ $^
+	$(AR) rcs ${LIB_SO:%.so=%.a} $^
 
 %.o:	%.c
 	${CC} ${CFLAGS} -c -o $@ $<
@@ -43,7 +45,7 @@ ${LIB_SO_VER}: ${OBJS_LIB}
 	
 
 clean:
-	rm *.o ${LIB_SO} ${LIB_SO_VER} ${PROG}
+	rm *.a *.o ${LIB_SO} ${LIB_SO_VER} ${PROG}
 
 Makefile:
 	
