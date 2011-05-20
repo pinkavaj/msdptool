@@ -110,7 +110,7 @@ static void print_help(void)
         "                sout { on | off } |\n"
         "                poww { 1 - 9 } { on | off } |\n"
         "                prom { 1 - 9 } { 0 - 99.9 } { 0 - 9.99 } |\n"
-        "                prop { 0 - 19 } { 0 - 99.9 } { 0 - 9.99 } { 00:00 - 99:59 } |\n"
+        "                prop { 0 - 19 } { 0 - 99.9 } { 0 - 9.99 } { 00:00 - 99:59 | 0 -  5999 } |\n"
         "                runm { 1 - 9 } |\n"
         "                runp { 1 - 999 | inf } |\n"
         "                stop }\n"
@@ -476,10 +476,16 @@ int main(int argc, char **argv_)
                 if (*endptr || !argv[2][0])
                         return printe("Invalid argument, not a number");
 
-                // FIXME
                 prg.time = strtol(argv[3], &endptr, 0);
-                if (!argv[3][0] || *endptr)
-                        return printe("Invalid program number");
+                if (!argv[3][0] || *endptr) {
+                        if (*endptr == L':') {
+                                endptr++;
+                                prg.time *= 60;
+                                prg.time += strtol(endptr, &endptr, 0);
+                        }
+                        if (!argv[3][0] || *endptr)
+                                return printe("Invalid time format");
+                }
 
                 if (sdp_set_program(&sdp, progn, &prg) == -1)
                         return perror_("sdp_set_program failed");
