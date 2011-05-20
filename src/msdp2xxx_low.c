@@ -65,7 +65,7 @@ static const char sdp_cmd_poww_en[] = "POWW__ll0\r";
 static const char sdp_cmd_prom[] = "PROM__luuuiii\r";
 static const char sdp_cmd_prop[] = "PROP__lluuuiiimmss\r";
 static const char sdp_cmd_runm[] = "RUNM__l\r";
-static const char sdp_cmd_runp[] = "RUNP__nnn\r";
+static const char sdp_cmd_runp[] = "RUNP__nnnn\r";
 static const char sdp_cmd_stop[] = "STOP__\r";
 
 static const char str_ok[] = "OK\r";
@@ -703,14 +703,14 @@ int sdp_srun_program(char *buf, int addr, int count)
 {
         int ret;
 
-        if ((count < 1 || count > 999) && count != SDP_RUN_PROG_INF) {
+        if ((count < 1 || count > 9999) && count != SDP_RUN_PROG_INF) {
                 errno = ERANGE;
                 return -1;
         }
 
         ret = sdp_print_cmd(buf, sdp_cmd_runp, addr);
         if (ret != -1)
-                sdp_print_num(buf + 6, 3, count);
+                sdp_print_num(buf + 6, 4, count);
  
         return ret;
 }
