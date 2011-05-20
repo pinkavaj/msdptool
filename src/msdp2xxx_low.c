@@ -60,8 +60,8 @@ static const char sdp_cmd_curr[] = "CURR__iii\r";
 static const char sdp_cmd_sovp[] = "SOVP__uuu\r";
 static const char sdp_cmd_sout_dis[] = "SOUT__1\r";
 static const char sdp_cmd_sout_en[] = "SOUT__0\r";
-static const char sdp_cmd_poww_dis[] = "POWW__i1\r";
-static const char sdp_cmd_poww_en[] = "POWW__i0\r";
+static const char sdp_cmd_poww_dis[] = "POWW__ll1\r";
+static const char sdp_cmd_poww_en[] = "POWW__ll0\r";
 static const char sdp_cmd_prom[] = "PROM__luuuiii\r";
 static const char sdp_cmd_prop[] = "PROP__lluuuiiimmss\r";
 static const char sdp_cmd_runm[] = "RUNM__l\r";
@@ -818,7 +818,7 @@ int sdp_sset_poweron_output(char *buf, int addr, int presn, int enable)
                 ret = sdp_print_cmd(buf, sdp_cmd_poww_dis, addr);
 
         if (ret != -1)
-                buf[6] = presn + '0';
+                sdp_print_num(buf + 6, 2, presn);
         
         return ret;
 }
