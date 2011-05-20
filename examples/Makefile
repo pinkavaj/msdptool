@@ -23,7 +23,7 @@ all:	${PROG}
 	echo done
 
 ${PROG}:	${OBJS_PROG}
-	${CC} ${CFLAGS} ${LDFLAGS} -o $@ -L. -lm -lmsdp2xxx ${OBJS_PROG}
+	${CC} -static ${CFLAGS} ${LDFLAGS} -o $@ ${OBJS_PROG} -lmsdp2xxx -lm
 
 %.o:	%.c
 	${CC} ${CFLAGS} -c -o $@ $<
