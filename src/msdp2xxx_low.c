@@ -959,7 +959,7 @@ static int lcd_bcd(unsigned char lcd_num)
         // codes representing numbers 0-9 is coded by LCD LED segments
         const unsigned char lcd_nums[] = {
                 // 0     1     2     3     4     5     6     7      8     9
-                0x3f, 0x06, 0x5b, 0x4f, 0x64, 0x6d, 0x7d, 0x07, 0x07f, 0x67,
+                0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x07f, 0x6f,
         };
 
         if (!lcd_num)
