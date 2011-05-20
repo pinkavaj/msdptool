@@ -478,7 +478,7 @@ int main(int argc, char **argv_)
 
                 prg.time = strtol(argv[3], &endptr, 0);
                 if (!argv[3][0] || *endptr) {
-                        if (*endptr == L':') {
+                        if (*endptr == TEXT(':')) {
                                 endptr++;
                                 prg.time *= 60;
                                 prg.time += strtol(endptr, &endptr, 0);

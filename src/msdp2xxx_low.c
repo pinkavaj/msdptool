@@ -589,13 +589,13 @@ int sdp_resp_lcd_info(char *buf, int len, sdp_lcd_info_t *lcd_info)
         const char resp[] = "\rOK\r"; //TODO
 		int x;
 
-		buf[len] = 0;
-			while (strchr(buf, '\r'))
-				strchr(buf, '\r')[0] = '\n';
+        /*buf[len] = 0;
+        while (strchr(buf, '\r'))
+		        strchr(buf, '\r')[0] = '\n';
 
-			printf("%s\n", buf);
-			for(x = 0; x < len; x++)
-				printf("%02x ", buf[x]);
+        printf("%s\n", buf);
+        for(x = 0; x < len; x++)
+                printf("%02x ", buf[x]);*/
 
         if (len != (sizeof(resp) - 1)) {
                 errno = EINVAL;
