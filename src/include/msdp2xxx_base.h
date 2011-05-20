@@ -148,7 +148,33 @@ typedef struct {
 } sdp_lcd_info_raw_t;
 
 typedef struct {
-	int output;
+	double read_V;
+	unsigned char read_V_ind;
+	double read_A;
+	unsigned char read_A_ind;
+	double read_W;
+	unsigned char read_W_ind;
+	int time;
+	unsigned char timer_ind;
+	unsigned char colon_ind;
+	unsigned char m_ind;
+	unsigned char s_ind;
+	double set_V;
+	unsigned char set_V_const;
+	unsigned char set_V_bar;
+	unsigned char set_V_ind;
+	double set_A;
+	unsigned char set_A_const;
+	unsigned char set_A_bar;
+	unsigned char set_A_ind;
+	int prog;
+	unsigned char prog_on;
+	unsigned char prog_bar;
+	unsigned char setting_ind;
+	unsigned char key;
+	unsigned char fault_ind;
+	unsigned char output;
+	unsigned char remote_ind;
 } sdp_lcd_info_t;
 
 #ifdef __cplusplus

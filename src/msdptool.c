@@ -344,7 +344,7 @@ int main(int argc, char **argv_)
                                         prg[x].time / 60, prg[x].time % 60);
         }
         else if (!strcmp(cmd, TEXT("gpal"))) {
-                sdp_lcd_info_raw_t lcd;
+                sdp_lcd_info_t lcd;
 
                 if (argc != 0)
                         return printe("Invalid number of parameters");

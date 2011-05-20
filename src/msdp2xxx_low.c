@@ -946,36 +946,86 @@ int sdp_sstop(char *buf, int addr)
         return sdp_print_cmd(buf, sdp_cmd_stop, addr);
 }
 
+/**
+ * Convert LCD coded number into bcd (0-9), ignote top bit moustly
+ * used as dot.
+ *
+ * i:        LCD coded number
+ * returns:  BCD coded number
+ */
+static int lcd_bcd(unsigned char lcd_num)
+{
+        int idx;
+        // codes representing numbers 0-9 is coded by LCD LED segments
+        const unsigned char lcd_nums[] = {
+                // 0     1     2     3     4     5     6     7      8     9
+                0x3f, 0x06, 0x5b, 0x4f, 0x64, 0x6d, 0x7d, 0x07, 0x07f, 0x67,
+        };
+
+		for (idx = 0; idx < 10; idx++) {
+				if (lcd_nums[idx] == (lcd_num & 0x7f))
+						return idx;
+		}
+
+		return 0xff;
+}
+
+/**
+FIXME
+ */
 void sdp_lcd_to_data(sdp_lcd_info_t *lcd_info,
                 sdp_lcd_info_raw_t *lcd_info_raw)
 {
-	/*read_V[4];
-    read_V_ind;
-    read_A[4];
-    read_A_ind;
-    read_W[4];
-    read_W_ind;
-    time[4];
-    timer_ind;
-    colon_ind;
-    m_ind;
-    s_ind;
-    set_V[3];
-    set_V_const;
-    set_V_bar;
-    set_V_ind;
-    set_A[3];
-    set_A_const;
-    set_A_bar;
-    set_A_ind;
-    prog;
-    prog_on;
-    prog_bar;
-    setting_ind;
-    key_lock;
-    key_open;
-    fault_ind;
-    output_on;
-    output_off;
-    remote_ind;*/
+	// FIXME: check for decimal point
+		lcd_info->read_V = (lcd_bcd(lcd_info_raw->read_V[0]) * 1000 +
+				lcd_bcd(lcd_info_raw->read_V[1]) * 100 +
+				lcd_bcd(lcd_info_raw->read_V[2]) * 10 +
+				lcd_bcd(lcd_info_raw->read_V[3])) / 100.;
+		lcd_info->read_V_ind = lcd_info_raw->read_V_ind;
+
+		lcd_info->read_A = (lcd_bcd(lcd_info_raw->read_A[0]) * 1000 +
+				lcd_bcd(lcd_info_raw->read_A[1]) * 100 +
+				lcd_bcd(lcd_info_raw->read_A[2]) * 10 +
+				lcd_bcd(lcd_info_raw->read_A[3])) / 1000.;
+		lcd_info->read_A_ind = lcd_info_raw->read_A_ind;
+
+		lcd_info->read_W = (lcd_bcd(lcd_info_raw->read_W[0]) * 1000 +
+			lcd_bcd(lcd_info_raw->read_W[1]) * 100 +
+			lcd_bcd(lcd_info_raw->read_W[2]) * 10 +
+			lcd_bcd(lcd_info_raw->read_W[3])) / 100.;
+		lcd_info->read_W_ind = lcd_info_raw->read_W_ind;
+
+		lcd_info->time = lcd_bcd(lcd_info_raw->time[0]) * 600 +
+			lcd_bcd(lcd_info_raw->time[1]) * 60 +
+			lcd_bcd(lcd_info_raw->time[2]) * 10 +
+			lcd_bcd(lcd_info_raw->time[3]);
+		lcd_info->timer_ind = lcd_info_raw->timer_ind;
+		lcd_info->colon_ind = lcd_info_raw->colon_ind;
+		lcd_info->m_ind = lcd_info_raw->m_ind;
+		lcd_info->s_ind = lcd_info_raw->s_ind;
+
+		lcd_info->set_V = (lcd_bcd(lcd_info_raw->set_V[0]) * 100 +
+			lcd_bcd(lcd_info_raw->set_V[1]) * 10 +
+			lcd_bcd(lcd_info_raw->set_V[2])) / 10.;
+		lcd_info->set_V_const = lcd_info_raw->set_V_const;
+		lcd_info->set_V_bar = lcd_info_raw->set_V_bar;
+		lcd_info->set_V_ind = lcd_info_raw->set_V_ind;
+
+		lcd_info->set_A = (lcd_bcd(lcd_info_raw->set_A[0]) * 100 +
+			lcd_bcd(lcd_info_raw->set_A[1]) * 10 +
+			lcd_bcd(lcd_info_raw->set_A[2]));
+		lcd_info->set_A_const = lcd_info_raw->set_A_const;
+		lcd_info->set_A_bar = lcd_info_raw->set_A_bar;
+		lcd_info->set_A_ind = lcd_info_raw->set_A_ind;
+
+		lcd_info->prog = lcd_bcd(lcd_info_raw->prog);
+		lcd_info->prog_on = lcd_info_raw->prog_on;
+		lcd_info->prog_bar = lcd_info_raw->prog_bar;
+		lcd_info->setting_ind = lcd_info_raw->setting_ind;
+		//key_lock;
+		lcd_info->key = lcd_info_raw->key_open;
+		lcd_info->fault_ind = lcd_info_raw->fault_ind;
+		lcd_info->output = lcd_info_raw->output_on;
+		//output_off;
+		lcd_info->remote_ind = lcd_info_raw->remote_ind;
 }
