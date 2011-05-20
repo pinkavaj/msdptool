@@ -95,7 +95,7 @@ static ssize_t sdp_read_resp(int fd, char *buf, ssize_t count)
         // TODO: check this value
         timeout.tv_sec = 0;
         // (bytes + something) * msec / (bitrate / bits per byte)
-        timeout.tv_usec = ((count + 50) * 1000) / (9600 / 10);
+        timeout.tv_usec = (count * 2000 + 50000) / (9600 / 10);
         do {
                 ssize_t size_;
 
@@ -190,7 +190,7 @@ static HANDLE open_serial(const char *fname)
         // TODO: check this values
         timeouts.ReadIntervalTimeout = 1;
         timeouts.ReadTotalTimeoutConstant = 50;
-        timeouts.ReadTotalTimeoutMultiplier = 1;
+        timeouts.ReadTotalTimeoutMultiplier = 2;
         timeouts.WriteTotalTimeoutConstant = 1;
         timeouts.WriteTotalTimeoutMultiplier = 1;
 
@@ -515,7 +515,7 @@ int sdp_get_preset(const sdp_t *sdp, int presn, sdp_va_t *va_preset)
 int sdp_get_program(const sdp_t *sdp, int progn, sdp_program_t *program)
 {
         int ret;
-        char buf[(11*20+3+1)];
+        char buf[11*20+3+1];
 
         ret = sdp_sget_program(buf, sdp->addr, progn);
         if (ret == -1)
