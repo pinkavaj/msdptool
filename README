@@ -2,9 +2,9 @@ Mansons power supply remote control library and tools.
 
 This software pack comprises:
 
- * libmsdp2xxx -library to easy remote control of Mansons SDP 2210/2405/2603
+ * libmsdp2xxx - library to easy remote control of Mansons SDP 2210/2405/2603
         power supplyes
- * msdptool - commandline utility allowing control of PS from cmd line
+ * msdptool    - commandline utility allowing control of PS from cmd line
 
 This library is used to handle remote control of Mansons Remote programing
 switching mode DC regulated power Supply of SDP Series (SDP - 2210/2405/2603).
