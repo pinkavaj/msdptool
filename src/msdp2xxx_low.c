@@ -962,12 +962,15 @@ static int lcd_bcd(unsigned char lcd_num)
                 0x3f, 0x06, 0x5b, 0x4f, 0x64, 0x6d, 0x7d, 0x07, 0x07f, 0x67,
         };
 
-		for (idx = 0; idx < 10; idx++) {
-				if (lcd_nums[idx] == (lcd_num & 0x7f))
-						return idx;
-		}
+        if (!lcd_num)
+                return 0;
 
-		return 0xff;
+        for (idx = 0; idx < 10; idx++) {
+                if (lcd_nums[idx] == (lcd_num & 0x7f))
+                        return idx;
+        }
+
+        return 0xff;
 }
 
 /**

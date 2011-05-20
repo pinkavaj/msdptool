@@ -352,7 +352,75 @@ int main(int argc, char **argv_)
                 if (sdp_get_lcd_info(&sdp, &lcd) == -1)
                         return perror_("sdp_get_lcd_info failed");
 
-                // TODO
+                if (lcd.read_V_ind)
+                        fprintf(f_stdout, "U: %5.2f V\n", lcd.read_V);
+                else
+                        fprintf(f_stdout, "U: --.--\n");
+
+                if (lcd.read_A_ind)
+                        fprintf(f_stdout, "I: %5.3f A\n", lcd.read_A);
+                else
+                        fprintf(f_stdout, "I: -.---\n");
+
+                if (lcd.read_W_ind)
+                        fprintf(f_stdout, "P: %5.2f W\n", lcd.read_W);
+                else
+                        fprintf(f_stdout, "P: --.--\n");
+
+                if (lcd.timer_ind)
+                        fprintf(f_stdout, "t: %2i:%2i sec\n", lcd.time / 60,
+                                        lcd.time % 60);
+                else
+                        fprintf(f_stdout, "t: --:--\n");
+                //lcd.colon_ind,
+                //lcd.m_ind,
+                //lcd.s_ind,
+
+                if (lcd.set_V_ind) {
+                        if (lcd.set_V_const)
+                                fprintf(f_stdout, "U set: %4.1f V (CV)\n",
+                                                lcd.set_V);
+                        else
+                                fprintf(f_stdout, "U set: %4.1f V\n",
+                                                lcd.set_V);
+                } else
+                        fprintf(f_stdout, "U set: --.-\n");
+                //lcd.set_V_bar,
+
+                if (lcd.set_A_ind) {
+                        if (lcd.set_A_const)
+                                fprintf(f_stdout, "I set: %4.2f A (CC)\n",
+                                        lcd.set_A);
+                        else
+                                fprintf(f_stdout, "I set: %4.2f A\n",
+                                        lcd.set_A);
+                } else
+                        fprintf(f_stdout, "I set: -.--\n");
+                //lcd.set_A_bar,
+
+                if (lcd.prog_on)
+                        fprintf(f_stdout, "prog: %2i\n", lcd.prog);
+                else
+                        fprintf(f_stdout, "prog: --\n");
+
+                //lcd.prog_bar,
+                //lcd.setting_ind,
+                //lcd.key,
+                if (lcd.fault_ind)
+                        fprintf(f_stdout, "fault: YES\n");
+                else
+                        fprintf(f_stdout, "fault: no\n");
+
+                if (lcd.output)
+                        fprintf(f_stdout, "output: on\n");
+                else
+                        fprintf(f_stdout, "output: off\n");
+
+                if (lcd.remote_ind)
+                        fprintf(f_stdout, "remote: on\n");
+                else
+                        fprintf(f_stdout, "remote: off\n");
+
                 return -1;
         }
         else if (!strcmp(cmd, TEXT("volt"))) {
