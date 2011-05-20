@@ -108,17 +108,47 @@ typedef struct {
         int time;
 } sdp_program_t;
 
+
+/**
+ * This structure stores data returned from GPAL call.
+ * GPAL command returns "ASCII encoded" raw dump of registers
+ * used to drive LCD panel. Use sdp_xxx to convert this data into
+ * more usefull form shown in structure sdp_lcd_info_t
+ */
 typedef struct {
-        sdp_va_t va_data;
-        double wats;
-        int time;
-        int timer;
-        sdp_va_t va_setpoints;
-        int program;
-        int key;
-        int fault;
-        int output;
-        int remote;
+        unsigned char read_V[4];
+        unsigned char read_V_ind;
+        unsigned char read_A[4];
+        unsigned char read_A_ind;
+        unsigned char read_W[4];
+        unsigned char read_W_ind;
+        unsigned char time[4];
+        unsigned char timer_ind;
+        unsigned char colon_ind;
+        unsigned char m_ind;
+        unsigned char s_ind;
+        unsigned char set_V[3];
+        unsigned char set_V_const;
+        unsigned char set_V_bar;
+        unsigned char set_V_ind;
+        unsigned char set_A[3];
+        unsigned char set_A_const;
+        unsigned char set_A_bar;
+        unsigned char set_A_ind;
+        unsigned char prog;
+        unsigned char prog_on;
+        unsigned char prog_bar;
+        unsigned char setting_ind;
+        unsigned char key_lock;
+        unsigned char key_open;
+        unsigned char fault_ind;
+        unsigned char output_on;
+        unsigned char output_off;
+        unsigned char remote_ind;
+} sdp_lcd_info_raw_t;
+
+typedef struct {
+	int output;
 } sdp_lcd_info_t;
 
 #ifdef __cplusplus

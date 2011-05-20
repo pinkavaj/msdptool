@@ -581,32 +581,70 @@ int sdp_resp_program(char *buf, int len, sdp_program_t *program)
  *
  * buf:         buffer with irecieved response
  * len:         lenght of data in buffer
- * lcd_info:    pointer to sdp_lcd_info_t to store recieved LCD info
+ * lcd_info:    pointer to sdp_lcd_info_raw_t to store recieved LCD info
  * returns:     0 on success, -1 on error
  */
-int sdp_resp_lcd_info(char *buf, int len, sdp_lcd_info_t *lcd_info)
+int sdp_resp_lcd_info(char *buf, int len, sdp_lcd_info_raw_t *lcd_info)
 {
-        const char resp[] = "\rOK\r"; //TODO
-		int x;
-
-        /*buf[len] = 0;
-        while (strchr(buf, '\r'))
-		        strchr(buf, '\r')[0] = '\n';
-
-        printf("%s\n", buf);
-        for(x = 0; x < len; x++)
-                printf("%02x ", buf[x]);*/
+        const char resp[] = "UUUUUUUUVIIIIIIIIAPPPPPPPPWmmmmssss____uuuuuu___iiiiii___pp_________\rOK\r";
+		int idx;
 
         if (len != (sizeof(resp) - 1)) {
                 errno = EINVAL;
                 return -1;
         }
 
-        //if (sdp_scan_num(buf, 2, &lcd_info->) == -1)
-        //        return -1;
-        // TODO
-        errno = ENOSYS;
-        return -1;
+        // convert from "ASCII" to binary, (data are in lower nibble)
+        for (idx = 0; idx < (sizeof(resp) - 4 - 1); idx++)
+                buf[idx] &= 0x0f;
+
+        lcd_info->read_V[0] = (buf[0] << 4) | buf[1];
+        lcd_info->read_V[1] = (buf[2] << 4) | buf[3];
+        lcd_info->read_V[2] = (buf[4] << 4) | buf[5];
+        lcd_info->read_V[3] = (buf[6] << 4) | buf[7];
+        lcd_info->read_V_ind = buf[8];
+        lcd_info->read_A[0] = (buf[9] << 4) | buf[10];
+        lcd_info->read_A[1] = (buf[11] << 4) | buf[12];
+        lcd_info->read_A[2] = (buf[13] << 4) | buf[14];
+        lcd_info->read_A[3] = (buf[15] << 4) | buf[16];
+        lcd_info->read_A_ind = buf[17];
+        lcd_info->read_W[0] = (buf[18] << 4) | buf[19];
+        lcd_info->read_W[1] = (buf[20] << 4) | buf[21];
+        lcd_info->read_W[2] = (buf[22] << 4) | buf[23];
+        lcd_info->read_W[3] = (buf[24] << 4) | buf[25];
+        lcd_info->read_W_ind = buf[26];
+        lcd_info->time[0] = (buf[27] << 4) | buf[28];
+        lcd_info->time[1] = (buf[29] << 4) | buf[30];
+        lcd_info->time[2] = (buf[31] << 4) | buf[32];
+        lcd_info->time[3] = (buf[33] << 4) | buf[34];
+        lcd_info->timer_ind = buf[35];
+        lcd_info->colon_ind = buf[36];
+        lcd_info->m_ind = buf[37];
+        lcd_info->s_ind = buf[38];
+        lcd_info->set_V[0] = (buf[39] << 4) | buf[40];
+        lcd_info->set_V[1] = (buf[41] << 4) | buf[42];
+        lcd_info->set_V[2] = (buf[43] << 4) | buf[44];
+        lcd_info->set_V_const = buf[45];
+        lcd_info->set_V_bar = buf[46];
+        lcd_info->set_V_ind = buf[47];
+        lcd_info->set_A[3] = (buf[48] << 4) | buf[49];
+        lcd_info->set_A[3] = (buf[50] << 4) | buf[51];
+        lcd_info->set_A[3] = (buf[52] << 4) | buf[53];
+        lcd_info->set_A_const = buf[54];
+        lcd_info->set_A_bar = buf[55];
+        lcd_info->set_A_ind = buf[56];
+        lcd_info->prog = (buf[57] << 4) | buf[58];
+        lcd_info->prog_on = buf[59];
+        lcd_info->prog_bar = buf[60];
+        lcd_info->setting_ind = buf[61];
+        lcd_info->key_lock = buf[62];
+        lcd_info->key_open = buf[63];
+        lcd_info->fault_ind = buf[64];
+        lcd_info->output_on = buf[65];
+        lcd_info->output_off = buf[66];
+        lcd_info->remote_ind = buf[67];
+
+        return 0;
 }
 
 
@@ -908,3 +946,36 @@ int sdp_sstop(char *buf, int addr)
         return sdp_print_cmd(buf, sdp_cmd_stop, addr);
 }
 
+void sdp_lcd_to_data(sdp_lcd_info_t *lcd_info,
+                sdp_lcd_info_raw_t *lcd_info_raw)
+{
+	/*read_V[4];
+    read_V_ind;
+    read_A[4];
+    read_A_ind;
+    read_W[4];
+    read_W_ind;
+    time[4];
+    timer_ind;
+    colon_ind;
+    m_ind;
+    s_ind;
+    set_V[3];
+    set_V_const;
+    set_V_bar;
+    set_V_ind;
+    set_A[3];
+    set_A_const;
+    set_A_bar;
+    set_A_ind;
+    prog;
+    prog_on;
+    prog_bar;
+    setting_ind;
+    key_lock;
+    key_open;
+    fault_ind;
+    output_on;
+    output_off;
+    remote_ind;*/
+}

@@ -59,7 +59,7 @@ int sdp_sget_volt_limit(char *buf, int addr);
 
 /* Response parsing function should look something like: */
 int sdp_resp_dev_addr(char *buf, int len, int *addr);
-int sdp_resp_lcd_info(char *buf, int len, sdp_lcd_info_t *lcd_info);
+int sdp_resp_lcd_info(char *buf, int len, sdp_lcd_info_raw_t *lcd_info);
 int sdp_resp_preset(char *buf, int len, sdp_va_t *va_preset);
 int sdp_resp_program(char *buf, int len, sdp_program_t *program);
 int sdp_resp_va_maximums(char *buf, int len, sdp_va_t *va_maximums);
@@ -81,6 +81,9 @@ int sdp_sset_program(char *buf, int addr, int progn,
 int sdp_sset_volt(char *buf, int addr, double volt);
 int sdp_sset_volt_limit(char *buf, int addr, double volt);
 int sdp_sstop(char *buf, int addr);
+
+void sdp_lcd_to_data(sdp_lcd_info_t *lcd_info,
+                sdp_lcd_info_raw_t *lcd_info_raw);
 
 #ifdef __cplusplus
 } // extern "C"

@@ -537,15 +537,15 @@ int sdp_get_program(const sdp_t *sdp, int progn, sdp_program_t *program)
 /**
  * Get LCD info, return data about all informations currently shown on LCD
  *
- * lcd_info:    pointer to sdp_lcd_info_t where informations should be stored
+ * lcd_info:    pointer to sdp_lcd_info_raw_t where informations should be stored
  * sdp:         pointer to sdp_t structure, initialized by sdp_open
  * returns:     0 on success, -1 on error
  */
 int sdp_get_lcd_info(const sdp_t *sdp, sdp_lcd_info_t *lcd_info)
 {
         int ret;
-        // TODO: setup proper buffer size
-        char buf[SDP_BUF_SIZE_MIN*20];
+        char buf[100];
+        sdp_lcd_info_raw_t lcd_info_raw;
 
         ret = sdp_sget_lcd_info(buf, sdp->addr);
         if (ret == -1)
@@ -558,8 +558,10 @@ int sdp_get_lcd_info(const sdp_t *sdp, sdp_lcd_info_t *lcd_info)
         if (ret == -1)
                 return -1;
 
-        if (sdp_resp_lcd_info(buf, ret, lcd_info) == -1)
+        if (sdp_resp_lcd_info(buf, ret, &lcd_info_raw) == -1)
                 return -1;
+
+		sdp_lcd_to_data(lcd_info, &lcd_info_raw);
 
         return 0;
 }
