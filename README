@@ -1,14 +1,22 @@
 Mansons power supply remote control library and tools.
 
+This software pack comprises:
+
+ * libmsdp2xxx -library to easy remote control of Mansons SDP 2210/2405/2603
+        power supplyes
+ * msdptool - commandline utility allowing control of PS from cmd line
+
 This library is used to handle remote control of Mansons Remote programing
 switching mode DC regulated power Supply of SDP Series (SDP - 2210/2405/2603).
-There is also set of tools for basic operations with this class of power
-supplies. This library and most of tools are multiplatform and portable as
-much as posible (mainly Linux and Windows is tested, but other *NIX like
-operting systems should work too).
+There is also set of tools for basic operations for this class of power
+supplies. This library and most of included tools are multiplatform and
+portable, as much as posible (mainly Linux and Windows is tested, but other
+*NIX like operting systems should work, too).
 
-This stuff is licensed uder conditions defined in LGPL version 2.1, header
-files are licensed under BSD license, (see LICENSE.txt file for details).
-I'm keepen rights to change license to BSD (all contributing developers will
-be explicitly asked for confirmation of this before anny code will be accepted).
+This program equipment uses two licenses. The default one is LGPL version 2.1
+and is used for all files if not specified in particular case otherwise.
+Namely header files and some other, where this is explicitly specified, are
+licensed under BSD license, (see LICENSE.txt file for details). I'm keeping
+all rights to change license to BSD (all contributing developers will be
+asked to confirm this before anny code will be accepted).
 
