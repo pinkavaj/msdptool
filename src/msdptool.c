@@ -368,13 +368,11 @@ int main(int argc, char **argv_)
                         fprintf(f_stdout, "P: --.--\n");
 
                 if (lcd.timer_ind)
-                        fprintf(f_stdout, "t: %2i:%2i sec\n", lcd.time / 60,
+                        fprintf(f_stdout, "t: %02i:%02i sec\n", lcd.time / 60,
                                         lcd.time % 60);
                 else
                         fprintf(f_stdout, "t: --:--\n");
                 //lcd.colon_ind,
-                //lcd.m_ind,
-                //lcd.s_ind,
 
                 if (lcd.set_V_ind) {
                         if (lcd.set_V_const)
@@ -385,7 +383,6 @@ int main(int argc, char **argv_)
                                                 lcd.set_V);
                 } else
                         fprintf(f_stdout, "U set: --.-\n");
-                //lcd.set_V_bar,
 
                 if (lcd.set_A_ind) {
                         if (lcd.set_A_const)
@@ -396,16 +393,13 @@ int main(int argc, char **argv_)
                                         lcd.set_A);
                 } else
                         fprintf(f_stdout, "I set: -.--\n");
-                //lcd.set_A_bar,
 
-                if (lcd.prog_on)
-                        fprintf(f_stdout, "prog: %2i\n", lcd.prog);
+                if (lcd.prog_bar)
+                        fprintf(f_stdout, "running program: yes\n");
                 else
-                        fprintf(f_stdout, "prog: --\n");
+                        fprintf(f_stdout, "running program: no\n");
 
-                //lcd.prog_bar,
-                //lcd.setting_ind,
-                //lcd.key,
+                // lcd.key,
                 if (lcd.fault_ind)
                         fprintf(f_stdout, "fault: YES\n");
                 else
