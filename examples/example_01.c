@@ -31,6 +31,9 @@
  * For simplicity it miss some of error handling!
  */
 
+#include <errno.h>
+#include <stdio.h>
+
 #include "msdp2xxx.h"
 
 #ifdef __linux__
@@ -41,11 +44,10 @@ const char filename[] = "COM1";
 
 int main()
 {
-        int ret;
         sdp_t sdp;
 
         // Open SDP power supply, start remote operations
-        if (sdp_open(&sdp, filename) == -1) {
+        if (sdp_open(&sdp, filename, 1) == -1) {
                 perror("Failed to open serial port connected to SDP");
                 return -1;
         }
@@ -57,11 +59,11 @@ int main()
         }
 
         // set output voltage and current
-        sdp_volt(&sdp, 1.5);
-        sdp_curr(&sdp, 0.05);
+        sdp_set_volt(&sdp, 1.5);
+        sdp_set_curr(&sdp, 0.05);
 
         // set output to on
-        sdp_output(&sdp, 1);
+        sdp_set_output(&sdp, 1);
 
         // Set to local controll mode and close comunication
         sdp_close(&sdp);
