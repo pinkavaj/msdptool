@@ -581,8 +581,11 @@ int main(int argc, char **argv_)
                         return printe("Invalid number of parameters");
 
                 progn = strtol(argv[0], &endptr, 0);
-                if (!argv[0][0] || *endptr)
-                        return printe("Expected program number");
+                if (!argv[0][0] || *endptr) {
+                        if (strcmp(argv[0], TEXT("inf")))
+                                return printe("Expected program number");
+                        progn = SDP_RUN_PROG_INF;
+                }
 
                 if (sdp_run_program(&sdp, progn) == -1)
                         return perror_("sdp_run_program failed");
