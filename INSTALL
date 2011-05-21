@@ -1,0 +1,13 @@
+Linux:
+
+make
+make install
+
+Windows - MinGW:
+
+make
+make install
+
+Windows - MS Visual Studio:
+open project file in build/MSVC directory
+
