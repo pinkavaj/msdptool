@@ -71,9 +71,16 @@ static const char sdp_cmd_stop[] = "STOP__\r";
 static const char str_ok[] = "OK\r";
 
 #ifdef _MSVC
+/**
+ * Rounds number usign common rounding rules, there is missing
+ *		of round function in MSVC
+ *
+ * d:           value to round
+ * return:      number rounded to intereg
+ */
 inline double round( double d )
 {
-    return floor( d + 0.5 );
+        return floor( d + 0.5 );
 }
 #endif
 
@@ -83,7 +90,7 @@ inline double round( double d )
  * buf:         output buffer, mus be at least lenB long
  * len:         count of printed digits
  * num:         value to print
- * returns:     pointer to buf
+ * return:      pointer to buf
  */
 static char *sdp_print_num(char *buf, int len, int num)
 {
@@ -109,7 +116,7 @@ static char *sdp_print_num(char *buf, int len, int num)
  * buf:         buffer with character data
  * len:         number of digits
  * val:         pointer to integet to store result
- * returns:     -1 on error, 0 otherwise
+ * return:      -1 on error, 0 otherwise
  */
 static int sdp_scan_num(const char *buf, int len, int *val)
 {
@@ -133,7 +140,7 @@ static int sdp_scan_num(const char *buf, int len, int *val)
  * cmd:         template of command wich should be printed
  * addr:        rs485 address of device in range 1-31,
  *      for device connected on rs232 use anny number in range 1-31
- * returns:     number of writen characters not including trailing '\0',
+ * return:      number of writen characters not including trailing '\0',
  *      -1 on error
  */
 static int sdp_print_cmd(char *buf, const char *cmd, int addr)
@@ -156,7 +163,7 @@ static int sdp_print_cmd(char *buf, const char *cmd, int addr)
  * buf:         output buffer, must have size at least SDP_BUF_SIZE_MIN
  * addr:        rs485 device address in range 1-31, for rs232
  *      connected devices is ignored, use anny number in range 1-31
- * returns:     number of characters put into buffer not including trailing
+ * return:      number of characters put into buffer not including trailing
  *      '\0', -1 on error
  */
 int sdp_sget_dev_addr(char *buf, int addr)
@@ -170,7 +177,7 @@ int sdp_sget_dev_addr(char *buf, int addr)
  * buf:         output buffer, must have size at least SDP_BUF_SIZE_MIN
  * addr:        rs485 device address, number in range 1-31, for rs232
  *      connected devices is ignored, use anny number in range 1-31
- * returns:     number of characters put into buffer not including trailing
+ * return:      number of characters put into buffer not including trailing
  *      '\0', -1 on error
  */
 int sdp_sget_lcd_info(char *buf, int addr)
@@ -185,7 +192,7 @@ int sdp_sget_lcd_info(char *buf, int addr)
  * buf:         output buffer, must have size at least SDP_BUF_SIZE_MIN
  * addr:        rs485 device address, number in range 1-31, for rs232
  *      connected devices is ignored, use anny number in range 1-31
- * returns:     number of characters put into buffer not including trailing
+ * return:      number of characters put into buffer not including trailing
  *      '\0', -1 on error
  */
 int sdp_sget_va_data(char *buf, int addr)
@@ -200,7 +207,7 @@ int sdp_sget_va_data(char *buf, int addr)
  * buf:         output buffer, must have size at least SDP_BUF_SIZE_MIN
  * addr:        rs485 device address, number in range 1-31, for rs232
  *      connected devices is ignored, use anny number in range 1-31
- * returns:     number of characters put into buffer not including trailing
+ * return:      number of characters put into buffer not including trailing
  *      '\0', -1 on error
  */
 int sdp_sget_va_maximums(char *buf, int addr)
@@ -215,7 +222,7 @@ int sdp_sget_va_maximums(char *buf, int addr)
  * buf:         output buffer, must have size at least SDP_BUF_SIZE_MIN
  * addr:        rs485 device address, number in range 1-31, for rs232
  *      connected devices is ignored, use anny number in range 1-31
- * returns:     number of characters put into buffer not including trailing
+ * return:      number of characters put into buffer not including trailing
  *      '\0', -1 on error
  */
 int sdp_sget_va_setpoint(char *buf, int addr)
@@ -232,7 +239,7 @@ int sdp_sget_va_setpoint(char *buf, int addr)
  *      connected devices is ignored, use anny number in range 1-31
  * presn:       preset number in range 1-9 to get or SDP_PRESET_ALL to gel
  *      all presets
- * returns:     number of characters put into buffer not including trailing
+ * return:      number of characters put into buffer not including trailing
  *      '\0', -1 on error
  */
 int sdp_sget_preset(char *buf, int addr, int presn)
@@ -264,7 +271,7 @@ int sdp_sget_preset(char *buf, int addr, int presn)
  *      connected devices is ignored, use anny number in range 1-31
  * progn:       program number in range 0-19 to get or SDP_PROGRAM_ALL to get
  *      all program items
- * returns:     number of characters put into buffer not including trailing
+ * return:      number of characters put into buffer not including trailing
  *      '\0', -1 on error
  */
 int sdp_sget_program(char *buf, int addr, int progn)
@@ -294,7 +301,7 @@ int sdp_sget_program(char *buf, int addr, int progn)
  * buf:         output buffer, must have size at least SDP_BUF_SIZE_MIN
  * addr:        rs485 device address, number in range 1-31, for rs232
  *      connected devices is ignored, use anny number in range 1-31
- * returns:     number of characters put into buffer not including trailing
+ * return:      number of characters put into buffer not including trailing
  *      '\0', -1 on error
  */
 int sdp_sget_volt_limit(char *buf, int addr)
@@ -307,7 +314,7 @@ int sdp_sget_volt_limit(char *buf, int addr)
  *
  * buf:         buffer containing recieved response
  * len:         lenght of data in buffer
- * returns:     response status (nodata, data, incomplete)
+ * return:      response status (nodata, data, incomplete)
  */
 sdp_resp_t sdp_resp(const char *buf, int len)
 {
@@ -333,7 +340,7 @@ sdp_resp_t sdp_resp(const char *buf, int len)
  * buf:         buffer with recieved response
  * len:         lenght of data in buffer
  * addr:        pointer to integer to store recieved addres
- * returns:     0 on success, -1 on error
+ * return:      0 on success, -1 on error
  */
 int sdp_resp_dev_addr(char *buf, int len, int *addr)
 {       
@@ -362,7 +369,7 @@ int sdp_resp_dev_addr(char *buf, int len, int *addr)
  * buf:         buffer with irecieved response
  * len:         lenght of data in buffer
  * va_maximums: pointer to sdp_va_t where result should be stored
- * returns:     0 on success, -1 on error
+ * return:      0 on success, -1 on error
  */
 int sdp_resp_va_maximums(char *buf, int len, sdp_va_t *va_maximums)
 {
@@ -391,7 +398,7 @@ int sdp_resp_va_maximums(char *buf, int len, sdp_va_t *va_maximums)
  * buf:         buffer with irecieved response
  * len:         lenght of data in buffer
  * volt_limit:  pointer to int where upper voltage limit should be stored
- * returns:     0 on success, -1 on error
+ * return:      0 on success, -1 on error
  */
 int sdp_resp_volt_limit(char *buf, int len, double *volt_limit)
 {
@@ -416,7 +423,7 @@ int sdp_resp_volt_limit(char *buf, int len, double *volt_limit)
  * buf:         buffer with irecieved response
  * len:         lenght of data in buffer
  * va_data:     pointer to sdp_va_data_t to store current U, I and mode
- * returns:     0 on success, -1 on error
+ * return:      0 on success, -1 on error
  */
 int sdp_resp_va_data(char *buf, int len, sdp_va_data_t *va_data)
 {
@@ -450,7 +457,7 @@ int sdp_resp_va_data(char *buf, int len, sdp_va_data_t *va_data)
  * buf:         buffer with irecieved response
  * len:         lenght of data in buffer
  * va_setpoints: pointer to sdp_va_t used to store current setpoint
- * returns:     0 on success, -1 on error
+ * return:      0 on success, -1 on error
  */
 int sdp_resp_va_setpoint(char *buf, int len, sdp_va_t *va_setpoints)
 {
@@ -482,7 +489,7 @@ int sdp_resp_va_setpoint(char *buf, int len, sdp_va_t *va_setpoints)
  *      to sdp_va_t to store value from requested preset. 
  *      When sdp_sget_preset called with SDP_PRESET_ALL expects pointer to
  *      sdp_va_t array of size 9 to store all presets values.
- * returns:     0 on success, -1 on error
+ * return:      0 on success, -1 on error
  */
 int sdp_resp_preset(char *buf, int len, sdp_va_t *va_preset)
 {
@@ -528,7 +535,7 @@ int sdp_resp_preset(char *buf, int len, sdp_va_t *va_preset)
  *      pointer to sdp_program_t to store requested program item.
  *      When sdp_sget_program called with SDP_PROGRAM_ALL expects pointer to
  *      array of sdp_program_t of size 20 to store all program items.
- * returns:     0 on success, -1 on error
+ * return:      0 on success, -1 on error
  */
 int sdp_resp_program(char *buf, int len, sdp_program_t *program)
 {
@@ -582,7 +589,7 @@ int sdp_resp_program(char *buf, int len, sdp_program_t *program)
  * buf:         buffer with irecieved response
  * len:         lenght of data in buffer
  * lcd_info:    pointer to sdp_lcd_info_raw_t to store recieved LCD info
- * returns:     0 on success, -1 on error
+ * return:      0 on success, -1 on error
  */
 int sdp_resp_lcd_info(char *buf, int len, sdp_lcd_info_raw_t *lcd_info)
 {
@@ -654,7 +661,7 @@ int sdp_resp_lcd_info(char *buf, int len, sdp_lcd_info_raw_t *lcd_info)
  * buf:         output buffer (see SDP_BUF_SIZE_MIN)
  * addr:        rs485 device address: 1-31 (use anny valid for rs232)
  * enable:      when 0 disable remote control, enable otherwise
- * returns:     number of writen characters not including trailing '\0',
+ * return:      number of writen characters not including trailing '\0',
  *      -1 on error
  */
 int sdp_sremote(char *buf, int addr, int enable)
@@ -671,7 +678,7 @@ int sdp_sremote(char *buf, int addr, int enable)
  * buf:         output buffer (see SDP_BUF_SIZE_MIN)
  * addr:        rs485 device address: 1-31 (use anny valid for rs232)
  * presn:       preset number to recall: 1-9
- * returns:     number of writen characters not including trailing '\0',
+ * return:      number of writen characters not including trailing '\0',
  *      -1 on error
  */
 int sdp_srun_preset(char *buf, int addr, int presn)
@@ -696,7 +703,7 @@ int sdp_srun_preset(char *buf, int addr, int presn)
  * buf:         output buffer (see SDP_BUF_SIZE_MIN)
  * addr:        rs485 device address: 1-31 (use anny valid for rs232)
  * count:       number of program repeats: 0-999 or SDP_RUN_PROG_INF
- * returns:     number of writen characters not including trailing '\0',
+ * return:      number of writen characters not including trailing '\0',
  *      -1 on error
  */
 int sdp_srun_program(char *buf, int addr, int count)
@@ -721,7 +728,7 @@ int sdp_srun_program(char *buf, int addr, int count)
  * buf:         output buffer (see SDP_BUF_SIZE_MIN)
  * addr:        rs485 device address: 1-31 (use anny valid for rs232)
  * ifce:        selected interface type
- * returns:     number of writen characters not including trailing '\0',
+ * return:      number of writen characters not including trailing '\0',
  *      -1 on error
  */
 int sdp_sselect_ifce(char *buf, int addr, sdp_ifce_t ifce)
@@ -741,7 +748,7 @@ int sdp_sselect_ifce(char *buf, int addr, sdp_ifce_t ifce)
  * buf:         output buffer (see SDP_BUF_SIZE_MIN)
  * addr:        rs485 device address: 1-31 (use anny valid for rs232)
  * volt:        voltage level value
- * returns:     number of writen characters not including trailing '\0',
+ * return:      number of writen characters not including trailing '\0',
  *      -1 on error
  */
 int sdp_sset_volt(char *buf, int addr, double volt)
@@ -767,7 +774,7 @@ int sdp_sset_volt(char *buf, int addr, double volt)
  * buf:         output buffer (see SDP_BUF_SIZE_MIN)
  * addr:        rs485 device address: 1-31 (use anny valid for rs232)
  * curr:        current level value
- * returns:     number of writen characters not including trailing '\0',
+ * return:      number of writen characters not including trailing '\0',
  *      -1 on error
  */
 int sdp_sset_curr(char *buf, int addr, double curr)
@@ -793,7 +800,7 @@ int sdp_sset_curr(char *buf, int addr, double curr)
  * buf:         output buffer (see SDP_BUF_SIZE_MIN)
  * addr:        rs485 device address: 1-31 (use anny valid for rs232)
  * volt:        voltage limit (TODO: units)
- * returns:     number of writen characters not including trailing '\0',
+ * return:      number of writen characters not including trailing '\0',
  *      -1 on error
  */
 int sdp_sset_volt_limit(char *buf, int addr, double volt)
@@ -820,7 +827,7 @@ int sdp_sset_volt_limit(char *buf, int addr, double volt)
  * addr:        rs485 device address: 1-31 (use anny valid for rs232)
  * addr:        address of device (used only for devices connected with rs485)
  * enable:      when 0 set output to off, set to on otherwise
- * returns:     number of writen characters not including trailing '\0',
+ * return:      number of writen characters not including trailing '\0',
  *      -1 on error
  */
 int sdp_sset_output(char *buf, int addr, int enable)
@@ -838,7 +845,7 @@ int sdp_sset_output(char *buf, int addr, int enable)
  * addr:        rs485 device address: 1-31 (use anny valid for rs232)
  * presn:       preset number: 1-9
  * enable:      when 0 disable, oneble oterwise
- * returns:     number of writen characters not including trailing '\0',
+ * return:      number of writen characters not including trailing '\0',
  *      -1 on error
  */
 int sdp_sset_poweron_output(char *buf, int addr, int presn, int enable)
@@ -868,7 +875,7 @@ int sdp_sset_poweron_output(char *buf, int addr, int presn, int enable)
  * addr:        rs485 device address: 1-31 (use anny valid for rs232)
  * presn:       number of preset to set: 1-9
  * va_preset:   pointer to sdp_va_t containign values to be set
- * returns:     number of writen characters not including trailing '\0',
+ * return:      number of writen characters not including trailing '\0',
  *      -1 on error
  */
 int sdp_sset_preset(char *buf, int addr, int presn, const sdp_va_t *va_preset)
@@ -902,7 +909,7 @@ int sdp_sset_preset(char *buf, int addr, int presn, const sdp_va_t *va_preset)
  * addr:        rs485 device address: 1-31 (use anny valid for rs232)
  * progn:       program number for which values should be set: 0-19
  * program:     pointer to sdp_program_t containing new program item values
- * returns:     number of writen characters not including trailing '\0',
+ * return:      number of writen characters not including trailing '\0',
  *      -1 on error
  */
 int sdp_sset_program(char *buf, int addr, int progn, const sdp_program_t *program)
@@ -938,7 +945,7 @@ int sdp_sset_program(char *buf, int addr, int progn, const sdp_program_t *progra
  *
  * buf:         output buffer (see SDP_BUF_SIZE_MIN)
  * addr:        rs485 device address: 1-31 (use anny valid for rs232)
- * returns:     number of writen characters not including trailing '\0',
+ * return:      number of writen characters not including trailing '\0',
  *      -1 on error
  */
 int sdp_sstop(char *buf, int addr)
@@ -951,7 +958,7 @@ int sdp_sstop(char *buf, int addr)
  * used as dot.
  *
  * i:        LCD coded number
- * returns:  BCD coded number
+ * return:   BCD coded number
  */
 static int lcd_bcd(unsigned char lcd_num)
 {

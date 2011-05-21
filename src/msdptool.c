@@ -47,7 +47,7 @@
  * Same as perror, but return -1;
  *
  * fmt:         format message, see man printf for details
- * returns:     -1 always
+ * return:      -1 always
  **/
 static int perror_(const char *fmt)
 {
@@ -117,6 +117,9 @@ static void print_help(void)
         "        See SDP power supply manual for detailed informations about commands\n");
 }
 
+/**
+ * Print short program help to standard output
+ */
 static void print_help_short(void)
 {
         printf("sdptool - commandline utility for remote control of SDP series power supplies\n"
