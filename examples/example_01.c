@@ -39,7 +39,7 @@
 #ifdef __linux__
 const char filename[] = "/dev/ttyS0";
 #elif _WIN32 == 1
-const char filename[] = "COM1";
+const wchar_t filename[] = TEXT("COM1");
 #endif
 
 int main()
