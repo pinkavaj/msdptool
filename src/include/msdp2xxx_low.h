@@ -83,7 +83,7 @@ int sdp_sset_volt_limit(char *buf, int addr, double volt);
 int sdp_sstop(char *buf, int addr);
 
 void sdp_lcd_to_data(sdp_lcd_info_t *lcd_info,
-                sdp_lcd_info_raw_t *lcd_info_raw);
+                const sdp_lcd_info_raw_t *lcd_info_raw);
 
 #ifdef __cplusplus
 } // extern "C"

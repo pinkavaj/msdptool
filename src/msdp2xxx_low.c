@@ -970,14 +970,17 @@ static int lcd_bcd(unsigned char lcd_num)
                         return idx;
         }
 
-        return 0xff;
+        return -1;
 }
 
 /**
-FIXME
+ * Convert raw data from LCD registry dump into its numerical representation
+ *
+ * lcd_info:    pointer to sdp_lcd_info_t, used to store conversion result
+ * lcd_info_raw:pointer to sdp_lcd_info_raw_t, LCD registry dump
  */
 void sdp_lcd_to_data(sdp_lcd_info_t *lcd_info,
-                sdp_lcd_info_raw_t *lcd_info_raw)
+                const sdp_lcd_info_raw_t *lcd_info_raw)
 {
 	// FIXME: check for decimal point
 		lcd_info->read_V = (lcd_bcd(lcd_info_raw->read_V[0]) * 1000 +
