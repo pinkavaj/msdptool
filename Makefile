@@ -6,6 +6,7 @@ src: force_look
 
 doc: force_look
 	make -C doc doc
+	doxygen
 
 clean:
 	make -C src clean

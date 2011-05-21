@@ -3,10 +3,10 @@ all: doc
 	
 
 doc:
-	echo FIXME
+	
 
 clean:
-	echo FIXME
+	rm -r html latex
 
 install:
 	echo FIXME
