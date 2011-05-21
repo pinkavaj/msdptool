@@ -34,6 +34,12 @@
 extern "C" {
 #endif
 
+/**
+ * SDP device structure
+ * @addr:       address of device (1-31)
+ * @f_in:       SDP device input file handler
+ * @f_out:      SDP device output file handler, normaly f_in == f_out
+ */
 typedef struct {
         unsigned char addr;
         SDP_F f_in;

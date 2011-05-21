@@ -37,11 +37,54 @@ extern "C" {
 // lenght of shortest valid response ("OK\r")
 #define SDP_RESP_LEN_OK 3
 
+/**
+ * @sdp_resp_incomplete: response is not complete
+ * @sdp_resp_data:       response is valid and contains data
+ * @sdp_resp_nodata:     response is valid and does not contain anny data
+ */
 typedef enum {
         sdp_resp_incomplete = 0,
         sdp_resp_data,
         sdp_resp_nodata,
 } sdp_resp_t;
+
+/**
+ * This structure stores data returned from GPAL call.
+ * GPAL command returns "ASCII encoded" raw dump of registers
+ * used to drive LCD panel. Use sdp_lcd_to_data to convert this data into
+ * more usefull form shown in structure sdp_lcd_info_t
+ */
+typedef struct {
+        unsigned char read_V[4];
+        unsigned char read_V_ind;
+        unsigned char read_A[4];
+        unsigned char read_A_ind;
+        unsigned char read_W[4];
+        unsigned char read_W_ind;
+        unsigned char time[4];
+        unsigned char timer_ind;
+        unsigned char colon_ind;
+        unsigned char m_ind;
+        unsigned char s_ind;
+        unsigned char set_V[3];
+        unsigned char set_V_const;
+        unsigned char set_V_bar;
+        unsigned char set_V_ind;
+        unsigned char set_A[3];
+        unsigned char set_A_const;
+        unsigned char set_A_bar;
+        unsigned char set_A_ind;
+        unsigned char prog;
+        unsigned char prog_on;
+        unsigned char prog_bar;
+        unsigned char setting_ind;
+        unsigned char key_lock;
+        unsigned char key_open;
+        unsigned char fault_ind;
+        unsigned char output_on;
+        unsigned char output_off;
+        unsigned char remote_ind;
+} sdp_lcd_info_raw_t;
 
 /* Low level operation functions */
 sdp_resp_t sdp_resp(const char *buf, int len);

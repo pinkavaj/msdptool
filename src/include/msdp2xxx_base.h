@@ -29,21 +29,7 @@
 #define __MSDP2XXX_BASE_H___
 
 #ifdef _WIN32
-
-#ifndef WINVER                  // Minimum required platform is Win XP
-#define WINVER 0x0501
-#endif
-
-#ifndef _WIN32_WINNT            // Minimum required platform is Win XP
-#define _WIN32_WINNT 0x0501
-#endif
-
-#ifndef _WIN32_WINDOWS          // Minimum required platform is Win XP
-#define _WIN32_WINDOWS 0x0501
-#endif
-
 #include <windows.h>
-
 #endif
 
 #ifdef __cplusplus
@@ -59,11 +45,11 @@ extern "C" {
 
 #define SDP_PRESET_MIN (1)
 #define SDP_PRESET_MAX (9)
-#define SDP_PRESET_ALL ((SDP_PRESET_MAX) + 1)
+#define SDP_PRESET_ALL (SDP_PRESET_MAX + 1)
 
 #define SDP_PROGRAM_MIN (0)
 #define SDP_PROGRAM_MAX (19)
-#define SDP_PROGRAM_ALL ((SDP_PROGRAM_MAX) + 1)
+#define SDP_PROGRAM_ALL (SDP_PROGRAM_MAX + 1)
 
 #define SDP_RUN_PROG_INF (0)
 
@@ -76,21 +62,38 @@ extern "C" {
 #define SDP_F_ERR INVALID_HANDLE_VALUE
 #endif
 
+/**
+ * @sdp_ifce_rs232:     use RS232 interface
+ * sdp_ifce_rs485:      use RS485 interface
+ */
 typedef enum {
         sdp_ifce_rs232,
         sdp_ifce_rs485,
 } sdp_ifce_t;
 
+/**
+ * @sdp_mode_cv:        PS operate in constant voltage mode
+ * @sdp_mode_cc:        PS operate in constant current mode
+ */
 typedef enum {
         sdp_mode_cv = 0,
         sdp_mode_cc = 1,
 } sdp_mode_t;
 
+/**
+ * @curr:       current [A]
+ * @volt:       voltage [V]
+ */
 typedef struct {
         double curr;
         double volt;
 } sdp_va_t;
 
+/**
+ * @curr:       current [A]
+ * @volt:       voltage [V]
+ * @mode:       power supply mode (CC/CV)
+ */
 typedef struct {
         double curr;
         double volt;
@@ -98,9 +101,9 @@ typedef struct {
 } sdp_va_data_t;
 
 /**
- * curr:        current: [A]
- * volt:        voltage: [V]
- * time:        lenght of program item duration [sec]
+ * @curr:       current: [A]
+ * @volt:       voltage: [V]
+ * @time:       duration of program item [sec]
  */
 typedef struct {
         double curr;
@@ -108,45 +111,36 @@ typedef struct {
         int time;
 } sdp_program_t;
 
-
 /**
- * This structure stores data returned from GPAL call.
- * GPAL command returns "ASCII encoded" raw dump of registers
- * used to drive LCD panel. Use sdp_xxx to convert this data into
- * more usefull form shown in structure sdp_lcd_info_t
+ * Container for processed data from GPAL call
+ * @read_V:      voltage measured at output [V]
+ * @read_V_ind:  V behing reading value, if 1 read_V data are valid
+ * @read_A:      current measured at output [A]
+ * @read_A_ind:  A behind reading value, if 1 read_A data are valid
+ * @read_W:      power to output, P = U * I [W]
+ * @read_W_ind:  W behind reading value, if 1 read_W data are valid
+ * @time:        time remaining to end of current proceeding timed programitem
+ * @timer_ind:   ???
+ * @colon_ind:   ???
+ * @m_ind:       m letter in time, used only when setting time
+ * @s_ind:       s letter in time, used only when setting time 
+ * @set_V:       voltage set point [V]
+ * @set_V_const: 1 when PS operate in constant voltage mode, 0 otherwise
+ * @set_V_bar:   ???
+ * @set_V_ind:   ???
+ * @set_A:       current set point [A]
+ * @set_A_const: 1 when PS operate in constant current mode, 0 otherwise
+ * @set_A_bar:   ???
+ * @set_A_ind:   ???
+ * @prog:        program/perset number, used only when setting program
+ * @prog_on:     program sign, used only when setting program
+ * @prog_bar:    1 when program is running, 0 otherwise
+ * @setting_ind: 1 when uset do some setting at front pannel, 0 otherwise
+ * @key:         0 when PS keypad is locked, 1 when unlocked
+ * @fault_ind:   normaly 0, set to 1 when fault at PS indicated
+ * @output:      when 0 output is off, when 1 output is on
+ * @remote_ind:  when 0 PS use local control, when 1 remote is enabled
  */
-typedef struct {
-        unsigned char read_V[4];
-        unsigned char read_V_ind;
-        unsigned char read_A[4];
-        unsigned char read_A_ind;
-        unsigned char read_W[4];
-        unsigned char read_W_ind;
-        unsigned char time[4];
-        unsigned char timer_ind;
-        unsigned char colon_ind;
-        unsigned char m_ind;
-        unsigned char s_ind;
-        unsigned char set_V[3];
-        unsigned char set_V_const;
-        unsigned char set_V_bar;
-        unsigned char set_V_ind;
-        unsigned char set_A[3];
-        unsigned char set_A_const;
-        unsigned char set_A_bar;
-        unsigned char set_A_ind;
-        unsigned char prog;
-        unsigned char prog_on;
-        unsigned char prog_bar;
-        unsigned char setting_ind;
-        unsigned char key_lock;
-        unsigned char key_open;
-        unsigned char fault_ind;
-        unsigned char output_on;
-        unsigned char output_off;
-        unsigned char remote_ind;
-} sdp_lcd_info_raw_t;
-
 typedef struct {
 	double read_V;
 	unsigned char read_V_ind;
