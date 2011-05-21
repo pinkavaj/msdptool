@@ -5,6 +5,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "msdp2xxx", "msdp2xxx.vcproj
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "msdptool", "msdptool.vcproj", "{263FCD1A-4ADD-4A5D-B67F-75998E95EF8D}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "example_01", "example_01.vcproj", "{AB58EA76-7B54-4DBF-86EE-933EAA983FB0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -19,6 +21,10 @@ Global
 		{263FCD1A-4ADD-4A5D-B67F-75998E95EF8D}.Debug|Win32.Build.0 = Debug|Win32
 		{263FCD1A-4ADD-4A5D-B67F-75998E95EF8D}.Release|Win32.ActiveCfg = Release|Win32
 		{263FCD1A-4ADD-4A5D-B67F-75998E95EF8D}.Release|Win32.Build.0 = Release|Win32
+		{AB58EA76-7B54-4DBF-86EE-933EAA983FB0}.Debug|Win32.ActiveCfg = Debug|Win32
+		{AB58EA76-7B54-4DBF-86EE-933EAA983FB0}.Debug|Win32.Build.0 = Debug|Win32
+		{AB58EA76-7B54-4DBF-86EE-933EAA983FB0}.Release|Win32.ActiveCfg = Release|Win32
+		{AB58EA76-7B54-4DBF-86EE-933EAA983FB0}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
