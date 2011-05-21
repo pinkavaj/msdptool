@@ -44,10 +44,9 @@
 #endif
 
 /**
- * Same as perror, but return -1;
- *
- * @fmt:        format message, see man printf for details
- * @return:     -1 always
+ * Same as perror, but return -1.
+ * @param fmt   format message, see man printf for details
+ * @return      -1
  **/
 static int perror_(const char *fmt)
 {
@@ -67,10 +66,9 @@ static int perror_(const char *fmt)
 }
 
 /**
- * Print string to standard error output and return -1
- *
- * @str:        string to print
- * @return:     -1 always
+ * Print string to standard error output and return -1.
+ * @param str   string to print
+ * @return      -1 always
  */
 static int printe(const char *str)
 {
@@ -80,7 +78,7 @@ static int printe(const char *str)
 }
 
 /**
- * Print program help to standard output
+ * Print program help to standard output.
  */
 static void print_help(void)
 {
@@ -118,7 +116,7 @@ static void print_help(void)
 }
 
 /**
- * Print short program help to standard output
+ * Print short program help to standard output.
  */
 static void print_help_short(void)
 {
@@ -140,7 +138,7 @@ int main(int argc, char **argv_)
 		wchar_t **argv;
 
         argv = CommandLineToArgvW(GetCommandLineW(), &argc);
-		// TODO call LocalFree(argv);
+	// TODO call LocalFree(argv);
 #else
         char **argv = argv_;
 #endif
@@ -402,9 +400,13 @@ int main(int argc, char **argv_)
                 else
                         fprintf(f_stdout, "running program: no\n");
 
-                // lcd.key,
+                if (lcd.key)
+                        fprintf(f_stdout, "keypad locked: yes\n");
+                else
+                        fprintf(f_stdout, "keypad locked: no\n");
+
                 if (lcd.fault_ind)
-                        fprintf(f_stdout, "fault: YES\n");
+                        fprintf(f_stdout, "fault: >> YES <<\n");
                 else
                         fprintf(f_stdout, "fault: no\n");
 
