@@ -31,10 +31,9 @@
 #include <unistd.h>
 
 /**
- * Open serial port and set parameters as defined for SDP power source
- *
- * @fname:      file name of serial port
- * @return:     file descriptor on success, -1 on error
+ * Open serial port and set parameters as defined for SDP power source.
+ * @param fname file name of serial port.
+ * @return      file descriptor on success, -1 on error.
  */
 static int open_serial(const char* fname)
 {
@@ -64,9 +63,8 @@ static int open_serial(const char* fname)
 }
 
 /**
- * Close opened serial port, if f == -1 do nothigh
- *
- * @f:          file descriptor
+ * Close opened serial port, if f == -1 do nothigh.
+ * @param f     file descriptor.
  */
 static void close_serial(int f)
 {
@@ -75,11 +73,10 @@ static void close_serial(int f)
 }
 
 /**
- * Reads data from serial port
- *
- * @fd:         file descriptor
- * @buf:        buffer to store readed data
- * @count:      number of bytes to read
+ * Reads data from serial port.
+ * @param fd    file descriptor.
+ * @param buf   buffer to store readed data.
+ * @param count number of bytes to read.
  */
 static ssize_t sdp_read_resp(int fd, char *buf, ssize_t count)
 {
@@ -120,11 +117,10 @@ static ssize_t sdp_read_resp(int fd, char *buf, ssize_t count)
 }
 
 /**
- * Write data into serial port
- *
- * @fd:         file descriptor
- * @buf:        buffer with data to write
- * @count:      number of bytes to write
+ * Write data into serial port.
+ * @param fd    file descriptor.
+ * @param buf   buffer with data to write.
+ * @param count number of bytes to write.
  */
 static ssize_t sdp_write(int fd, char *buf, ssize_t count)
 {
@@ -139,10 +135,9 @@ typedef int ssize_t;
 #endif
 
 /**
- * Open serial port and set parameters as defined for SDP power source
- *
- * @fname:      file name of serial port
- * @return:     file descriptor on success, -1 on error
+ * Open serial port and set parameters as defined for SDP power source.
+ * @param fname file name of serial port.
+ * @return      file descriptor on success, -1 on error.
  */
 #ifdef _WIN32
 static HANDLE open_serial(const wchar_t *fname)
@@ -207,9 +202,8 @@ static HANDLE open_serial(const char *fname)
 }
 
 /**
- * Close opened serial port, if f == INVALID_HANDLE_VALUE do nothigh
- *
- * @f:          file handle
+ * Close opened serial port, if f == INVALID_HANDLE_VALUE do nothigh.
+ * @param f     file handle.
  */
 static void close_serial(HANDLE f)
 {
@@ -218,12 +212,11 @@ static void close_serial(HANDLE f)
 }
 
 /**
- * Read data from serial port
- *
- * @h:          file handle
- * @buf:        buffer to store readed data
- * @count:      number of bytes to read
- * @return:     number of bytes read
+ * Read data from serial port.
+ * @param h     file handle.
+ * @param buf   buffer to store readed data.
+ * @param count number of bytes to read.
+ * @return      number of bytes read.
  */
 static ssize_t sdp_read_resp(HANDLE h, char *buf, ssize_t count)
 {
@@ -242,12 +235,11 @@ static ssize_t sdp_read_resp(HANDLE h, char *buf, ssize_t count)
 }
 
 /**
- * Write data into serial port
- *
- * @h:          file handle
- * @buf:        buffer with data to send
- * @count:      number of bytes to send
- * @return:     number of bytes succesfully writen
+ * Write data into serial port.
+ * @param h     file handle.
+ * @param buf   buffer with data to send.
+ * @param count number of bytes to send.
+ * @return      number of bytes succesfully writen.
  */
 static ssize_t sdp_write(HANDLE h, char *buf, ssize_t count)
 {
@@ -261,11 +253,11 @@ static ssize_t sdp_write(HANDLE h, char *buf, ssize_t count)
 #endif
 
 /**
- * Open serial port to comunicate with SDP power supply
- *
- * @sdp:        pointer to uninitialized sdp_t structure
- * @fname:      name of serial port to open
- * @addr:       rs485 address of device, for rs232 is ignored - use anny valid
+ * Open serial port to comunicate with SDP power supply.
+ * @param sdp   pointer to uninitialized sdp_t structure.
+ * @param fname name of serial port to open.
+ * @param addr  RS485 address of device, for RS232 is ignored - use anny valid.
+ * @return 0 on success, -1 on error;
  */
 #ifdef _WIN32
 int sdp_open(sdp_t *sdp, const wchar_t *fname, int addr)
@@ -291,11 +283,10 @@ int sdp_open(sdp_t *sdp, const char *fname, int addr)
 }
 
 /**
- * Initialize sdp usign existing opened file
- *
- * @sdp:        pointer to uninitialized sdp_t structure
- * @f:          file descriptor or handle, depend on OS
- * @addr:       rs485 address of device, for rs232 is ignored - use anny valid
+ * Initialize sdp usign existing opened file.
+ * @param sdp   pointer to uninitialized sdp_t structure.
+ * @param f     file descriptor or handle, depend on OS.
+ * @param addr  RS485 address of device, for RS232 is ignored - use anny valid.
  */
 int sdp_openf(sdp_t *sdp, SDP_F f, int addr)
 {
@@ -311,9 +302,8 @@ int sdp_openf(sdp_t *sdp, SDP_F f, int addr)
 }
 
 /**
- * Close SDP and all asociated ports
- *
- * @sdp:        pointer to sdp_t structure, initialized by sdp_open
+ * Close SDP and all asociated ports.
+ * @param sdp   pointer to sdp_t structure, initialized by sdp_open.
  */
 void sdp_close(sdp_t *sdp)
 {
@@ -324,12 +314,11 @@ void sdp_close(sdp_t *sdp)
 
 
 /**
- * Get SDP device address. For devices connected on rs485 this returns
+ * Get SDP device address. For devices connected on RS485 this returns
  *      same value as specified on sdp_open addr field or -1 when device is
- *      not connected. For rs232 returns last set rs485 device address.
- *
- * @sdp:        pointer to sdp_t structure, initialized by sdp_open
- * @return:     SDP device address, -1 if device not found or error
+ *      not connected. For RS232 returns last set RS485 device address.
+ * @param sdp   Pointer to sdp_t structure, initialized by sdp_open.
+ * @return      SDP device address, -1 if device not found or error.
  */
 int sdp_get_dev_addr(const sdp_t *sdp)
 {
@@ -354,11 +343,10 @@ int sdp_get_dev_addr(const sdp_t *sdp)
 }
 
 /**
- * Get maximal values of current and voltage for this PS
- *
- * @va_maximums: pointer to sdp_va_t, used to store recieved values
- * @sdp:         pointer to sdp_t structure, initialized by sdp_open
- * @return:      0 on success, -1 on error
+ * Get maximal values of current and voltage for this PS.
+ * @param va_maximums   Pointer to sdp_va_t, used to store recieved values.
+ * @param sdp   Pointer to sdp_t structure, initialized by sdp_open.
+ * @return       0 on success, -1 on error.
  */
 int sdp_get_va_maximums(const sdp_t *sdp, sdp_va_t *va_maximums)
 {
@@ -383,11 +371,10 @@ int sdp_get_va_maximums(const sdp_t *sdp, sdp_va_t *va_maximums)
 }
 
 /**
- * Get upper voltage limit
- *
- * @sdp:        pointer to sdp_t structure, initialized by sdp_open
- * @volt:       pointer to double, uset to store retrieved value
- * @return:     0 on success, -1 on error
+ * Get upper voltage limit.
+ * @param sdp   pointer to sdp_t structure, initialized by sdp_open.
+ * @param volt  pointer to double, uset to store retrieved value.
+ * @return      0 on success, -1 on error.
  */
 int sdp_get_volt_limit(const sdp_t *sdp, double *volt)
 {
@@ -412,11 +399,10 @@ int sdp_get_volt_limit(const sdp_t *sdp, double *volt)
 }
 
 /**
- * Get actual value of current, voltage and mode of PS output
- *
- * @va_data:    pointer to sdp_va_data_t, used to store returned values
- * @sdp:        pointer to sdp_t structure, initialized by sdp_open
- * @return:     0 on success, -1 on error
+ * Get actual value of current, voltage and mode of PS output.
+ * @param va_data       pointer to sdp_va_data_t, used to store returned values.
+ * @param sdp   pointer to sdp_t structure, initialized by sdp_open.
+ * @return      0 on success, -1 on error.
  */
 int sdp_get_va_data(const sdp_t *sdp, sdp_va_data_t *va_data)
 {
@@ -441,11 +427,10 @@ int sdp_get_va_data(const sdp_t *sdp, sdp_va_data_t *va_data)
 }
 
 /**
- * Get actual setpoint - desired current / voltage value
- *
- * @va_setpoints: pointer to sdp_va_t, used to store retrieved values
- * @sdp:          pointer to sdp_t structure, initialized by sdp_open
- * @return:       0 on success, -1 on error
+ * Get actual setpoint - desired current / voltage value.
+ * @param va_setpoints  pointer to sdp_va_t, used to store retrieved values.
+ * @param sdp   pointer to sdp_t structure, initialized by sdp_open.
+ * @return      0 on success, -1 on error.
  */
 int sdp_get_va_setpoint(const sdp_t *sdp, sdp_va_t *va_setpoints)
 {
@@ -470,14 +455,13 @@ int sdp_get_va_setpoint(const sdp_t *sdp, sdp_va_t *va_setpoints)
 }
 
 /**
- * Get value of one or all presets stored in PS
- *
- * @presn:      number of preset in range 1 - 9 to get from PS or
+ * Get value of one or all presets stored in PS.
+ * @param presn       number of preset in range 1 - 9 to get from PS or
  *      SDP_PRESET_ALL to get all 9 preset values at once.
- * @va_preset:  pointer to sdp_va_t, used to store retrieved velue
- *      or pointer to first item of array of 9 sdp_va_t, to store all presets
- * @sdp:        pointer to sdp_t structure, initialized by sdp_open
- * @return:     0 on success, -1 on error
+ * @param va_preset   pointer to sdp_va_t, used to store retrieved velue
+ *      or pointer to first item of array of 9 sdp_va_t, to store all presets.
+ * @param sdp   pointer to sdp_t structure, initialized by sdp_open.
+ * @return      0 on success, -1 on error.
  */
 int sdp_get_preset(const sdp_t *sdp, int presn, sdp_va_t *va_preset)
 {
@@ -502,15 +486,14 @@ int sdp_get_preset(const sdp_t *sdp, int presn, sdp_va_t *va_preset)
 }
 
 /**
- * Get one or all program items from PS
- *
- * @progn:      program item number to get (0-19) or SDP_PROGRAM_ALL to get
- *      all program items at once
- * @program:    pointer to sdp_program_t to store one program item or
+ * Get one or all program items from PS.
+ * @param progn       program item number to get (0-19) or SDP_PROGRAM_ALL to get
+ *      all program items at once.
+ * @param program     pointer to sdp_program_t to store one program item or
  *      pointer to firt item of array of 20 items of type sdp_program_t to
- *      store all program items
- * @sdp:        pointer to sdp_t structure, initialized by sdp_open
- * @return:     0 on success, -1 on error
+ *      store all program items.
+ * @param sdp   pointer to sdp_t structure, initialized by sdp_open.
+ * @return      0 on success, -1 on error.
  */
 int sdp_get_program(const sdp_t *sdp, int progn, sdp_program_t *program)
 {
@@ -535,11 +518,11 @@ int sdp_get_program(const sdp_t *sdp, int progn, sdp_program_t *program)
 }
 
 /**
- * Get LCD info, return data about all informations currently shown on LCD
- *
- * lcd_info:    pointer to sdp_lcd_info_raw_t where informations should be stored
- * @sdp:        pointer to sdp_t structure, initialized by sdp_open
- * @return:     0 on success, -1 on error
+ * Get LCD info, return data about all informations currently shown on LCD.
+ * @param lcd_info      pointer to sdp_lcd_info_raw_t where informations
+ *      should be stored.
+ * @param sdp   Pointer to sdp_t structure, initialized by sdp_open.
+ * @return      0 on success, -1 on error.
  */
 int sdp_get_lcd_info(const sdp_t *sdp, sdp_lcd_info_t *lcd_info)
 {
@@ -567,11 +550,10 @@ int sdp_get_lcd_info(const sdp_t *sdp, sdp_lcd_info_t *lcd_info)
 }
 
 /**
- * Enable/disable remote operation, disable/enable keyboard (manula) operation
- *
- * @enable:     when 0 disable remote operation, otherwise enable
- * @sdp:        pointer to sdp_t structure, initialized by sdp_open
- * @return:     0 on success, -1 on error
+ * Enable/disable remote operation operation mode.
+ * @param enable        when 0 disable remote operation, otherwise enable.
+ * @param sdp   pointer to sdp_t structure, initialized by sdp_open.
+ * @return      0 on success, -1 on error.
  */
 int sdp_remote(const sdp_t *sdp, int enable)
 {
@@ -593,11 +575,10 @@ int sdp_remote(const sdp_t *sdp, int enable)
 }
 
 /**
- * Load preset and set it as current wanted value
- *
- * @preset:     number of preset to load
- * @sdp:        pointer to sdp_t structure, initialized by sdp_open
- * @return:     0 on success, -1 on error
+ * Load preset and set it as current wanted value.
+ * @param preset        number of preset to load.
+ * @param sdp   pointer to sdp_t structure, initialized by sdp_open.
+ * @return      0 on success, -1 on error.
  */
 int sdp_run_preset(const sdp_t *sdp, int preset)
 {
@@ -619,11 +600,11 @@ int sdp_run_preset(const sdp_t *sdp, int preset)
 }
 
 /**
- * Run timed program, once or repeatly
- *
- * @count:      count of program repeats or SDP_RUN_PROG_INF to repeat forever
- * @sdp:        pointer to sdp_t structure, initialized by sdp_open
- * @return:     0 on success, -1 on error
+ * Run timed program, once or repeatly.
+ * @param count Count of program repeats or SDP_RUN_PROG_INF to
+ *      repeat forever.
+ * @param sdp   Pointer to sdp_t structure, initialized by sdp_open.
+ * @return      0 on success, -1 on error.
  */
 int sdp_run_program(const sdp_t *sdp, int count)
 {
@@ -645,11 +626,10 @@ int sdp_run_program(const sdp_t *sdp, int count)
 }
 
 /**
- * Select comunication interface (rs232/rs485)
- *
- * @ifce:       one of sdp_ifce_rs232 or sdp_ifce_rs485
- * @sdp:        pointer to sdp_t structure, initialized by sdp_open
- * @return:     0 on success, -1 on error
+ * Select comunication interface (RS232/RS485).
+ * @param ifce  One of sdp_ifce_rs232 or sdp_ifce_rs485.
+ * @param sdp   Pointer to sdp_t structure, initialized by sdp_open.
+ * @return      0 on success, -1 on error.
  */
 int sdp_select_ifce(const sdp_t *sdp, sdp_ifce_t ifce)
 {
@@ -670,11 +650,10 @@ int sdp_select_ifce(const sdp_t *sdp, sdp_ifce_t ifce)
 }
 
 /**
- * Set setpont for current
- *
- * @curr:       wanted output current of PS: [A]
- * @sdp:        pointer to sdp_t structure, initialized by sdp_open
- * @return:     0 on success, -1 on error
+ * Set setpont for current.
+ * @param curr  Wanted output current of PS: [A].
+ * @param sdp   Pointer to sdp_t structure, initialized by sdp_open.
+ * @return      0 on success, -1 on error.
  */
 int sdp_set_curr(const sdp_t *sdp, double curr)
 {
@@ -695,11 +674,10 @@ int sdp_set_curr(const sdp_t *sdp, double curr)
 }
 
 /**
- * Set setpoint for voltage
- *
- * @volt:       wanted output voltage of PS: [V]
- * @sdp:        pointer to sdp_t structure, initialized by sdp_open
- * @return:     0 on success, -1 on error
+ * Set setpoint for voltage.
+ * @param volt  Wanted output voltage of PS: [V].
+ * @param sdp   Pointer to sdp_t structure, initialized by sdp_open.
+ * @return      0 on success, -1 on error.
  */
 int sdp_set_volt(const sdp_t *sdp, double volt)
 {
@@ -720,11 +698,10 @@ int sdp_set_volt(const sdp_t *sdp, double volt)
 }
 
 /**
- * Set upper voltage limit
- *
- * @volt:       wanted upper voltage limit: [V]
- * @sdp:        pointer to sdp_t structure, initialized by sdp_open
- * @return:     0 on success, -1 on error
+ * Set upper voltage limit.
+ * @param volt  Wanted upper voltage limit: [V].
+ * @param sdp   Pointer to sdp_t structure, initialized by sdp_open.
+ * @return      0 on success, -1 on error.
  */
 int sdp_set_volt_limit(const sdp_t *sdp, double volt)
 {
@@ -745,11 +722,10 @@ int sdp_set_volt_limit(const sdp_t *sdp, double volt)
 }
 
 /**
- * Set PS output to on or off
- *
- * @enable:     when 0 turn output off, otherwise turn on
- * @sdp:        pointer to sdp_t structure, initialized by sdp_open
- * @return:     0 on success, -1 on error
+ * Set PS output to on or off.
+ * @param enable        When 0 turn output off, otherwise turn on.
+ * @param sdp   Pointer to sdp_t structure, initialized by sdp_open.
+ * @return      0 on success, -1 on error.
  */
 int sdp_set_output(const sdp_t *sdp, int enable)
 {
@@ -770,12 +746,11 @@ int sdp_set_output(const sdp_t *sdp, int enable)
 }
 
 /**
- * Set power on status of output for specific preset item
- *
- * @presn:      number of preset to set output state
- * @enable:     when 0 output is disablen on power, otherwise enabled
- * @sdp:        pointer to sdp_t structure, initialized by sdp_open
- * @return:     0 on success, -1 on error
+ * Set power on status of output for specific preset item.
+ * @param presn Number of preset to set output state.
+ * @param enable        When 0 output is disablen on power, otherwise enabled.
+ * @param sdp   Pointer to sdp_t structure, initialized by sdp_open.
+ * @return      0 on success, -1 on error.
  */
 int sdp_set_poweron_output(const sdp_t *sdp, int presn, int enable)
 {
@@ -796,12 +771,11 @@ int sdp_set_poweron_output(const sdp_t *sdp, int presn, int enable)
 }
 
 /**
- * Set value of preset item
- *
- * @presn:      number of preset to set
- * @va_preset:  new value of preset
- * @sdp:        pointer to sdp_t structure, initialized by sdp_open
- * @return:     0 on success, -1 on error
+ * Set value of preset item.
+ * @param presn number of preset to set.
+ * @param va_preset     new value of preset.
+ * @param sdp   pointer to sdp_t structure, initialized by sdp_open.
+ * @return      0 on success, -1 on error.
  */
 int sdp_set_preset(const sdp_t *sdp, int presn, const sdp_va_t *va_preset)
 {
@@ -822,12 +796,11 @@ int sdp_set_preset(const sdp_t *sdp, int presn, const sdp_va_t *va_preset)
 }
 
 /**
- * Set value of program item
- *
- * @progn:      number of program item to set
- * @program:    new value of program item
- * @sdp:        pointer to sdp_t structure, initialized by sdp_open
- * @return:     0 on success, -1 on error
+ * Set value of program item.
+ * @param progn Number of program item to set.
+ * @param program       New value of program item.
+ * @param sdp   Pointer to sdp_t structure, initialized by sdp_open.
+ * @return      0 on success, -1 on error.
  */
 int sdp_set_program(const sdp_t *sdp, int progn, const sdp_program_t *program)
 {
@@ -848,10 +821,9 @@ int sdp_set_program(const sdp_t *sdp, int progn, const sdp_program_t *program)
 }
 
 /**
- * Stop running program
- *
- * @sdp:        pointer to sdp_t structure, initialized by sdp_open
- * @return:     0 on success, -1 on error
+ * Stop running program.
+ * @param sdp   Pointer to sdp_t structure, initialized by sdp_open.
+ * @return      0 on success, -1 on error.
  */
 int sdp_stop(const sdp_t *sdp)
 {
