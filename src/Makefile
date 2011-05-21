@@ -50,3 +50,6 @@ clean:
 Makefile:
 	
 
+install:
+	echo FIXME
+
