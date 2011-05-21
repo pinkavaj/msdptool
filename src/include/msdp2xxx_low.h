@@ -34,17 +34,15 @@
 extern "C" {
 #endif
 
-// lenght of shortest valid response ("OK\r")
+/** lenght of shortest valid response ("OK\r") */
 #define SDP_RESP_LEN_OK 3
 
-/**
- * @sdp_resp_incomplete: response is not complete
- * @sdp_resp_data:       response is valid and contains data
- * @sdp_resp_nodata:     response is valid and does not contain anny data
- */
 typedef enum {
+        /** response is not complete */
         sdp_resp_incomplete = 0,
+        /** response is valid and contains data */
         sdp_resp_data,
+        /** response is valid and does not contain anny data */
         sdp_resp_nodata,
 } sdp_resp_t;
 
