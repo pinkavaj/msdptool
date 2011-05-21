@@ -6,11 +6,16 @@ PROG=msdptool
 
 AR=ar
 CC=gcc
+INSTALL=install
 CFLAGS=-Wall -std=gnu99 -I./include
 LDFLAGS=
 
 SRC_PROG=msdptool.c
 SRC_LIB=msdp2xxx.c msdp2xxx_low.c
+
+prefix=/usr/local
+BIN_DIR=$(prefix)/bin
+LIB_DIR=$(prefix)/lib
 
 CCOS=$(shell ${CC} -dumpmachine)
 OBJS_PROG=$(SRC_PROG:%.c=%.o)
@@ -50,6 +55,7 @@ clean:
 Makefile:
 	
 
-install:
-	echo FIXME
+install: all
+	$(INSTALL) -m +x $(PROG) $(BIN_DIR)
+	$(INSTALL) -m +x $(LIB_SO_VER) $(LIB_DIR)
 
