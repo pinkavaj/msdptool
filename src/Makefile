@@ -6,6 +6,7 @@ PROG=msdptool
 
 AR=ar
 CC=gcc
+#CC=i486-mingw32-gcc
 INSTALL=install
 CFLAGS=-Wall -std=gnu99 -I./include
 LDFLAGS=
