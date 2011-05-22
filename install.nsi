@@ -64,6 +64,9 @@ Section "mscptool (required)"
   SetOutPath "$INSTDIR\examples"
   File "examples\example_01.c"
 
+  SetOutPath "$INSTDIR\doc"
+  File /r "doc\html"
+
   ; Write the installation path into the registry
   WriteRegStr HKLM SOFTWARE\mscptool "Install_Dir" "$INSTDIR"
   
