@@ -24,11 +24,13 @@ OBJS_LIB=$(SRC_LIB:%.c=%.o)
 ifeq ($(findstring mingw32, $(CCOS)), mingw32)
 LIB_SO:=$(LIB:%=%.dll)
 LIB_SO_VER:=$(LIB_SO:%=%.$(VER_MAJ).$(VER_MIN))
+LIB_STATIC=${LIB_SO:%.dll=%.lib}
 PROG:=$(PROG).exe
 endif
 ifeq ($(findstring linux, $(CCOS)), linux)
 LIB_SO:=$(LIB:%=lib%.so)
 LIB_SO_VER:=$(LIB_SO:%=%.$(VER_MAJ).$(VER_MIN))
+LIB_STATIC=${LIB_SO:%.so=%.a}
 endif
 
 all:	${PROG}
@@ -42,7 +44,9 @@ ${LIB}:	${LIB_SO_VER}
 
 ${LIB_SO_VER}: ${OBJS_LIB}
 	$(CC) ${CFLAGS} ${LDFLAGS} -shared -Wl,-soname,$(LIB_SO_VER) -o $@ $^
-	$(AR) rcs ${LIB_SO:%.so=%.a} $^
+
+${LIB_STATIC}: ${OBJS_LIB}
+	$(AR) rcs $(LIB_STATIC) $^
 
 %.o:	%.c
 	${CC} ${CFLAGS} -c -o $@ $<
@@ -51,7 +55,16 @@ ${LIB_SO_VER}: ${OBJS_LIB}
 	
 
 clean:
-	rm *.a *.o ${LIB_SO} ${LIB_SO_VER} ${PROG}
+	for f in "*.a" \
+		"*.dll" \
+		"*.exe" \
+		"*.lib" \
+		"*.o" \
+		"*.o" \
+		"*.so" \
+		"*.so.*" \
+		${PROG}; \
+		do find . -name "$${f}" -exec rm \{\} \; ; done
 
 Makefile:
 	
