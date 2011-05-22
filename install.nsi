@@ -1,8 +1,25 @@
 ; The name of the installer
 Name "mscptool"
 
+;--------------------------------
+;Version Information
+
+!define /date TIMESTAMP "%Y.%M.%d"
+!define VERSION 0.${TIMESTAMP}
+
+LoadLanguageFile "${NSISDIR}\Contrib\Language files\English.nlf"
+
+VIProductVersion ${VERSION}
+VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductName" "MSDPtool"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "Comments" "Manson SDP power supply tools"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "CompanyName" "Jiri Pinkava"
+;VIAddVersionKey /LANG=${LANG_ENGLISH} "LegalTrademarks" "Test Application is a trademark of Fake company"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "LegalCopyright" "Jiri Pinkava"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "FileDescription" "MSDPtool installer"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "FileVersion" "{__TIMESTAMP__}"
+
 ; The file to write
-OutFile "mscptool_inst.exe"
+OutFile "mscptool-${VERSION}.exe"
 
 ; The default installation directory
 InstallDir $PROGRAMFILES\mscptool
@@ -11,7 +28,7 @@ InstallDir $PROGRAMFILES\mscptool
 ; overwrite the old one automatically)
 InstallDirRegKey HKLM "Software\mscptool" "Install_Dir"
 
-LicenseText "This program is a free, Open Source software."
+LicenseText "This program is a free and Open Source software."
 LicenseData "LGPL.txt"
 
 ; Request application privileges for Windows Vista
