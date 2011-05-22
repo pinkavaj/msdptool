@@ -19,3 +19,6 @@ install:
 force_look:
 	true
 
+wininst:
+	wine "C:\\Program Files\\NSIS\\MakeNSIS.exe" install.nsi
+
