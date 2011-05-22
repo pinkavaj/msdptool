@@ -1,7 +1,6 @@
 ; The name of the installer
 Name "mscptool"
 
-
 ; The file to write
 OutFile "mscptool_inst.exe"
 
@@ -11,6 +10,9 @@ InstallDir $PROGRAMFILES\mscptool
 ; Registry key to check for directory (so if you install again, it will 
 ; overwrite the old one automatically)
 InstallDirRegKey HKLM "Software\mscptool" "Install_Dir"
+
+LicenseText "This program is a free, Open Source software."
+LicenseData "LGPL.txt"
 
 ; Request application privileges for Windows Vista
 RequestExecutionLevel admin
