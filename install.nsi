@@ -4,7 +4,7 @@ Name "mscptool"
 ;--------------------------------
 ;Version Information
 
-!define /date TIMESTAMP "%Y.%M.%d"
+!define /date TIMESTAMP "%Y.%m.%d"
 !define VERSION 0.${TIMESTAMP}
 
 LoadLanguageFile "${NSISDIR}\Contrib\Language files\English.nlf"
