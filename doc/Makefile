@@ -6,7 +6,8 @@ doc:
 	
 
 clean:
-	rm -r html latex
+	[ -d latex ] && rm -r latex || true
+	[ -d html ] && rm -r html || true
 
 install:
 	echo FIXME
