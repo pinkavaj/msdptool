@@ -4,7 +4,7 @@ VER_MIN=0
 LIB=msdp2xxx
 PROG=msdptool
 
-CROSS_COMPILE=i486-mingw32-
+#CROSS_COMPILE=i486-mingw32-
 
 AR=$(CROSS_COMPILE)ar
 CC=$(CROSS_COMPILE)gcc
