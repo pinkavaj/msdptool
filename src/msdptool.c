@@ -46,6 +46,7 @@
 /**
  * Same as perror, but return -1.
  * @param str   Detailed error description.
+ * @param err   Error number returned by sdp_* function.
  * @return      -1
  **/
 static int perror_(const char *str, int err)
