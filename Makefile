@@ -20,5 +20,7 @@ force_look:
 	true
 
 wininst: all
-	wine "C:\\Program Files\\NSIS\\MakeNSIS.exe" install.nsi
+	uname -s | grep "MINGW" && \
+		wine "C:\\Program Files\\NSIS\\MakeNSIS.exe" install.nsi || \
+		"C:\\Program Files\\NSIS\\MakeNSIS.exe" install.nsi
 
