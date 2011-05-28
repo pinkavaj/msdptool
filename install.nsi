@@ -1,5 +1,5 @@
 ; The name of the installer
-Name "mscptool"
+Name "msdptool"
 
 ;--------------------------------
 ;Version Information
@@ -19,14 +19,14 @@ VIAddVersionKey /LANG=${LANG_ENGLISH} "FileDescription" "MSDPtool installer"
 VIAddVersionKey /LANG=${LANG_ENGLISH} "FileVersion" "{__TIMESTAMP__}"
 
 ; The file to write
-OutFile "mscptool-${VERSION}.exe"
+OutFile "msdptool-${VERSION}.exe"
 
 ; The default installation directory
-InstallDir $PROGRAMFILES\mscptool
+InstallDir $PROGRAMFILES\msdptool
 
 ; Registry key to check for directory (so if you install again, it will 
 ; overwrite the old one automatically)
-InstallDirRegKey HKLM "Software\mscptool" "Install_Dir"
+InstallDirRegKey HKLM "Software\msdptool" "Install_Dir"
 
 LicenseText "This program is a free and Open Source software."
 LicenseData "LGPL.txt"
@@ -45,7 +45,7 @@ UninstPage uninstConfirm
 UninstPage instfiles
 
 ; The stuff to install
-Section "mscptool (required)"
+Section "msdptool (required)"
 
   SectionIn RO
   
@@ -68,13 +68,13 @@ Section "mscptool (required)"
   File /r "doc\html"
 
   ; Write the installation path into the registry
-  WriteRegStr HKLM SOFTWARE\mscptool "Install_Dir" "$INSTDIR"
+  WriteRegStr HKLM SOFTWARE\msdptool "Install_Dir" "$INSTDIR"
   
   ; Write the uninstall keys for Windows
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\mscptool" "DisplayName" "MSCPtool"
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\mscptool" "UninstallString" '"$INSTDIR\uninstall.exe"'
-  WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\mscptool" "NoModify" 1
-  WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\mscptool" "NoRepair" 1
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\msdptool" "DisplayName" "MSDPtool"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\msdptool" "UninstallString" '"$INSTDIR\uninstall.exe"'
+  WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\msdptool" "NoModify" 1
+  WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\msdptool" "NoRepair" 1
   WriteUninstaller "uninstall.exe"
   
 SectionEnd
@@ -85,8 +85,8 @@ SectionEnd
 Section "Uninstall"
   
   ; Remove registry keys
-  DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\mscptool"
-  DeleteRegKey HKLM SOFTWARE\mscptool
+  DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\msdptool"
+  DeleteRegKey HKLM SOFTWARE\msdptool
 
   ; Remove files and uninstaller
   Delete "$INSTDIR\examples\example_01.c"
