@@ -121,7 +121,7 @@ static int sdp_scan_num(const char *buf, int len, int *val)
         while (len--) {
                 if (!isdigit(buf[0])) {
                         errno = EINVAL;
-                        return -1;
+                        return SDP_ENONUM;
                 }
                 *val *= 10;
                 *val += buf[0] - '0';
@@ -143,7 +143,7 @@ static int sdp_print_cmd(char *buf, const char *cmd, int addr)
 {
         if (addr < SDP_DEV_ADDR_MIN || addr > SDP_DEV_ADDR_MAX) {
                 errno = ERANGE;
-                return -1;
+                return SDP_ERANGE;
         }
        
         strcpy(buf, cmd);
@@ -237,12 +237,11 @@ int sdp_sget_preset(char *buf, int addr, int presn)
 
         if (presn < SDP_PRESET_MIN || presn > SDP_PRESET_MAX) {
                 errno = ERANGE;
-                return -1;
+                return SDP_ERANGE;
         }
 
-        ret = sdp_print_cmd(buf, sdp_cmd_getm_loc, addr);
-        if (ret == -1)
-                return -1;
+        if ( (ret = sdp_print_cmd(buf, sdp_cmd_getm_loc, addr)) < 0)
+                return ret;
 
         buf[6] = presn + '0';
 
@@ -268,12 +267,11 @@ int sdp_sget_program(char *buf, int addr, int progn)
 
         if (progn < SDP_PROGRAM_MIN || progn > SDP_PROGRAM_MAX) {
                 errno = ERANGE;
-                return -1;
+                return SDP_ERANGE;
         }
 
-        ret = sdp_print_cmd(buf, sdp_cmd_getp_prog, addr);
-        if (ret == -1)
-                return -1;
+        if ( (ret = sdp_print_cmd(buf, sdp_cmd_getp_prog, addr)) < 0)
+                return ret;
 
         sdp_print_num(buf + 6, 2, progn);
 
@@ -331,18 +329,15 @@ int sdp_resp_dev_addr(char *buf, int len, int *addr)
 
         if (len != resp_len) {
                 errno = EINVAL;
-                return -1;
+                return SDP_EINRES;
         }
 
         if (memcmp(resp + 3, buf + 3, resp_len - 3)) {
                 errno = EINVAL;
-                return -1;
+                return SDP_EINRES;
         }
 
-        if (sdp_scan_num(buf + 1, 2, addr) == -1)
-                return -1;
-        
-        return 0;
+        return sdp_scan_num(buf + 1, 2, addr);
 }
 
 /**
@@ -355,19 +350,19 @@ int sdp_resp_dev_addr(char *buf, int len, int *addr)
 int sdp_resp_va_maximums(char *buf, int len, sdp_va_t *va_maximums)
 {
         const char resp[] = "uuuiii\rOK\r";
-        int val;
+        int ret, val;
 
         if (len != (sizeof(resp) - 1)) {
                 errno = EINVAL;
-                return -1;
+                return SDP_EINRES;
         }
 
-        if (sdp_scan_num(buf, 3, &val) == -1)
-                return -1;
+        if ( (ret = sdp_scan_num(buf, 3, &val)) < 0)
+                return ret;
         va_maximums->volt = SDP_INT2VOLT(val);
 
-        if (sdp_scan_num(buf + 3, 3, &val) == -1)
-                return -1;
+        if ( (ret = sdp_scan_num(buf + 3, 3, &val)) < 0)
+                return ret;
         va_maximums->curr = SDP_INT2CURR(val);
         
         return 0;
@@ -383,18 +378,17 @@ int sdp_resp_va_maximums(char *buf, int len, sdp_va_t *va_maximums)
 int sdp_resp_volt_limit(char *buf, int len, double *volt_limit)
 {
         const char resp[] = "uuu\rOK\r";
-        int val;
+        int ret, val;
 
         if (len != (sizeof(resp) - 1)) {
                 errno = EINVAL;
-                return -1;
+                return SDP_EINRES;
         }
 
-        if (sdp_scan_num(buf, 3, &val) == -1)
-                return -1;
-        *volt_limit = SDP_INT2VOLT(val);
+        if ( (ret = sdp_scan_num(buf, 3, &val)) >= 0)
+                *volt_limit = SDP_INT2VOLT(val);
 
-        return 0;
+        return ret;
 }
 
 /**
@@ -407,24 +401,24 @@ int sdp_resp_volt_limit(char *buf, int len, double *volt_limit)
 int sdp_resp_va_data(char *buf, int len, sdp_va_data_t *va_data)
 {
         const char resp[] = "uuuuiiiic\rOK\r";
-        int mode, val;
+        int mode, ret, val;
 
         if (len != (sizeof(resp) - 1)) {
                 errno = EINVAL;
-                return -1;
+                return SDP_EINRES;
         }
 
-        if (sdp_scan_num(buf, 4, &val) == -1)
-                return -1;
+        if ( (ret = sdp_scan_num(buf, 4, &val)) < 0)
+                return ret;
         // Data from measurement have one more decimal point
         va_data->volt = SDP_INT2VOLT(val) / 10;
 
-        if (sdp_scan_num(buf + 4, 4, &val) == -1)
-                return -1;
+        if ( (ret = sdp_scan_num(buf + 4, 4, &val)) < 0)
+                return ret;
         va_data->curr = SDP_INT2CURR(val) / 10;
 
-        if (sdp_scan_num(buf + 8, 1, &mode) == -1)
-                return -1;
+        if ( (ret = sdp_scan_num(buf + 8, 1, &mode)) < 0)
+                return ret;
         va_data->mode = (sdp_mode_t)mode;
 
         return 0;
@@ -440,19 +434,19 @@ int sdp_resp_va_data(char *buf, int len, sdp_va_data_t *va_data)
 int sdp_resp_va_setpoint(char *buf, int len, sdp_va_t *va_setpoints)
 {
         const char resp[] = "uuuiii\rOK\r";
-        int val;
+        int ret, val;
 
         if (len != (sizeof(resp) - 1)) {
                 errno = EINVAL;
-                return -1;
+                return SDP_EINRES;
         }
 
-        if (sdp_scan_num(buf, 3, &val) == -1)
-                return -1;
+        if ( (ret = sdp_scan_num(buf, 3, &val)) < 0)
+                return ret;
         va_setpoints->volt = SDP_INT2VOLT(val);
 
-        if (sdp_scan_num(buf + 3, 3, &val) == -1)
-                return -1;
+        if ( (ret = sdp_scan_num(buf + 3, 3, &val)) < 0)
+                return ret;
         va_setpoints->curr = SDP_INT2CURR(val);
 
         return 0;
@@ -473,26 +467,26 @@ int sdp_resp_preset(char *buf, int len, sdp_va_t *va_preset)
         const char resp[] = "uuuiii\r";
         const int resp_s1 = sizeof(resp) - 1 + sizeof(str_ok) - 1;
         const int resp_s9 = (sizeof(resp) - 1) * 9 + sizeof(str_ok) - 1;
-        int count, val;
+        int count, ret, val;
 
         if (len == resp_s9) {
                 count = 9;
         } else {
                 if (len != resp_s1) {
                         errno = EINVAL;
-                        return -1;
+                        return SDP_EINRES;
                 }
                 count = 1;
         }
 
         while (count--) {
-                if (sdp_scan_num(buf, 3, &val) == -1)
-                        return -1;
+                if ( (ret = sdp_scan_num(buf, 3, &val)) < 0)
+                        return ret;
                 va_preset->volt = SDP_INT2VOLT(val);
                 buf += 3;
 
-                if (sdp_scan_num(buf, 3, &val) == -1)
-                        return -1;
+                if ( (ret = sdp_scan_num(buf, 3, &val)) < 0)
+                        return ret;
                 va_preset->curr = SDP_INT2CURR(val);
                 buf += 3;
 
@@ -518,14 +512,14 @@ int sdp_resp_program(char *buf, int len, sdp_program_t *program)
         const char resp[] = "uuuiiimmss\r";
         const int resp_s1 = sizeof(resp) - 1 + sizeof(str_ok) - 1;
         const int resp_s20 = (sizeof(resp) - 1) * 20 + sizeof(str_ok) - 1;
-        int count, val;
+        int count, ret, val;
 
         if (len == resp_s20) {
                 count = 20;
         } else {
                 if (len != resp_s1) {
                         errno = EINVAL;
-                        return -1;
+                        return SDP_EINRES;
                 }
                 count = 1;
         }
@@ -533,22 +527,22 @@ int sdp_resp_program(char *buf, int len, sdp_program_t *program)
         while (count--) {
                 int min, sec;
 
-                if (sdp_scan_num(buf, 3, &val) == -1)
-                        return -1;
+                if ( (ret = sdp_scan_num(buf, 3, &val)) < 0)
+                        return ret;
                 program->volt = SDP_INT2VOLT(val);
                 buf += 3;
 
-                if (sdp_scan_num(buf, 3, &val) == -1)
-                        return -1;
+                if ( (ret = sdp_scan_num(buf, 3, &val)) < 0)
+                        return ret;
                 program->curr = SDP_INT2CURR(val);
                 buf += 3;
 
-                if (sdp_scan_num(buf, 2, &min) == -1)
-                        return -1;
+                if ( (ret = sdp_scan_num(buf, 2, &min)) < 0)
+                        return ret;
                 buf += 2;
 
-                if (sdp_scan_num(buf, 2, &sec) == -1)
-                        return -1;
+                if ( (ret = sdp_scan_num(buf, 2, &sec)) < 0)
+                        return ret;
                 buf += 2;
                 program->time = min * 60 + sec;
 
@@ -573,7 +567,7 @@ int sdp_resp_lcd_info(char *buf, int len, sdp_lcd_info_raw_t *lcd_info)
 
         if (len != (sizeof(resp) - 1)) {
                 errno = EINVAL;
-                return -1;
+                return SDP_EINRES;
         }
 
         // convert from "ASCII" to binary, (data are in lower nibble)
@@ -660,11 +654,11 @@ int sdp_srun_preset(char *buf, int addr, int presn)
 
         if (presn < SDP_PRESET_MIN || presn > SDP_PRESET_MAX) {
                 errno = ERANGE;
-                return -1;
+                return SDP_EINRES;
         }
 
         ret = sdp_print_cmd(buf, sdp_cmd_runm, addr);
-        if (ret != -1)
+        if (ret >= 0)
                 buf[6] = ((char)presn % 10) + '0';
 
         return ret;
@@ -684,11 +678,11 @@ int sdp_srun_program(char *buf, int addr, int count)
 
         if ((count < 1 || count > 9999) && count != SDP_RUN_PROG_INF) {
                 errno = ERANGE;
-                return -1;
+                return SDP_EINRES;
         }
 
         ret = sdp_print_cmd(buf, sdp_cmd_runp, addr);
-        if (ret != -1)
+        if (ret >= 0)
                 sdp_print_num(buf + 6, 4, count);
  
         return ret;
@@ -710,7 +704,7 @@ int sdp_sselect_ifce(char *buf, int addr, sdp_ifce_t ifce)
                 return sdp_print_cmd(buf, sdp_cmd_ccom_rs485, addr);
 
         errno = ERANGE;
-        return -1;
+        return SDP_ERANGE;
 }
 
 /**
@@ -728,11 +722,11 @@ int sdp_sset_volt(char *buf, int addr, double volt)
         val = SDP_VOLT2INT(volt);
         if (val < 0 || val > 999) {
                 errno = ERANGE;
-                return -1;
+                return SDP_ERANGE;
         }
 
         ret = sdp_print_cmd(buf, sdp_cmd_volt, addr);
-        if (ret != -1)
+        if (ret >= 0)
                 sdp_print_num(buf + 6, 3, val);
         
         return ret;
@@ -753,11 +747,11 @@ int sdp_sset_curr(char *buf, int addr, double curr)
         val = SDP_CURR2INT(curr);
         if (val < 0 || val > 999) {
                 errno = ERANGE;
-                return -1;
+                return SDP_ERANGE;
         }
 
         ret = sdp_print_cmd(buf, sdp_cmd_curr, addr);
-        if (ret != -1)
+        if (ret >= 0)
                 sdp_print_num(buf + 6, 3, val);
 
         return ret;
@@ -778,11 +772,11 @@ int sdp_sset_volt_limit(char *buf, int addr, double volt)
         val = SDP_VOLT2INT(volt);
         if (val < 0 || val > 999) {
                 errno = ERANGE;
-                return -1;
+                return SDP_ERANGE;
         }
 
         ret = sdp_print_cmd(buf, sdp_cmd_sovp, addr);
-        if (ret != -1)
+        if (ret >= 0)
                 sdp_print_num(buf + 6, 3, val);
 
         return ret;
@@ -820,7 +814,7 @@ int sdp_sset_poweron_output(char *buf, int addr, int presn, int enable)
 
         if (presn < SDP_PRESET_MIN || presn > SDP_PRESET_MAX) {
                 errno = ERANGE;
-                return -1;
+                return SDP_ERANGE;
         }
 
         if (enable)
@@ -828,7 +822,7 @@ int sdp_sset_poweron_output(char *buf, int addr, int presn, int enable)
         else
                 ret = sdp_print_cmd(buf, sdp_cmd_poww_dis, addr);
 
-        if (ret != -1)
+        if (ret >= 0)
                 sdp_print_num(buf + 6, 2, presn);
         
         return ret;
@@ -854,11 +848,11 @@ int sdp_sset_preset(char *buf, int addr, int presn, const sdp_va_t *va_preset)
                         volt < 0 || volt > 999 || 
                         curr < 0 || curr > 999) {
                 errno = ERANGE;
-                return -1;
+                return SDP_ERANGE;
         }
 
         ret = sdp_print_cmd(buf, sdp_cmd_prom, addr);
-        if (ret != -1) {
+        if (ret >= 0) {
                 buf[6] = presn + '0';
                 sdp_print_num(buf + 7, 3, volt);
                 sdp_print_num(buf + 10, 3, curr);
@@ -889,11 +883,11 @@ int sdp_sset_program(char *buf, int addr, int progn, const sdp_program_t *progra
                         curr < 0 || curr > 999 ||
                         program->time < 0 || program->time > (99*60+59)) {
                 errno = ERANGE;
-                return -1;
+                return SDP_ERANGE;
         }
 
         ret = sdp_print_cmd(buf, sdp_cmd_prop, addr);
-        if (ret != -1) {
+        if (ret >= 0) {
                 sdp_print_num(buf + 6, 2, progn);
                 sdp_print_num(buf + 8, 3, volt);
                 sdp_print_num(buf + 11, 3, curr);

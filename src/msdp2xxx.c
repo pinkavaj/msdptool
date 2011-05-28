@@ -41,8 +41,8 @@ static int open_serial(const char* fname)
         struct termios tio;
 
         fd = open(fname, O_RDWR | O_NONBLOCK);
-        if (fd == -1)
-                return -1;
+        if (fd < 0)
+                return SDP_EERRNO;
 
         memset(&tio, 0, sizeof(tio));
         tio.c_cflag = CS8 | CREAD | CLOCAL;
@@ -51,12 +51,12 @@ static int open_serial(const char* fname)
         cfsetispeed(&tio, B9600);
         cfsetospeed(&tio, B9600);
 
-        if (tcsetattr(fd, TCSANOW, &tio) == -1) {
+        if (tcsetattr(fd, TCSANOW, &tio) < 0) {
                 int e = errno;
                 close(fd);
                 errno = e;
 
-                return -1;
+                return SDP_EERRNO;
         }
 
         return fd;
@@ -68,7 +68,7 @@ static int open_serial(const char* fname)
  */
 static void close_serial(int f)
 {
-        if (f != -1)
+        if (f >= 0)
                 close(f);
 }
 
@@ -100,11 +100,11 @@ static ssize_t sdp_read_resp(int fd, char *buf, ssize_t count)
                 if (ret <= 0) {
                         if (ret == 0)
                                 errno = ETIMEDOUT;
-                        return -1;
+                        return SDP_ETIMEDOUT;
                 }
                 size_ = read(fd, buf, count);
-                if (size_ == -1)
-                        return -1;
+                if (size_ < 0)
+                        return SDP_EERRNO;
                 size += size_;
                 count -= size_;
                 buf += size_;
@@ -113,7 +113,7 @@ static ssize_t sdp_read_resp(int fd, char *buf, ssize_t count)
         } while (count > 0);
 
         errno = ERANGE;
-        return -1;
+        return SDP_ETOLARGE;
 }
 
 /**
@@ -124,7 +124,13 @@ static ssize_t sdp_read_resp(int fd, char *buf, ssize_t count)
  */
 static ssize_t sdp_write(int fd, char *buf, ssize_t count)
 {
-        return write(fd, buf, count);
+        ssize_t count_;
+
+        count_ = write(fd, buf, count);
+        if (count_ >= 0 && count_ != count)
+                return SDP_EWINCOMPL;
+
+        return count_;
 }
 #endif
 
@@ -224,12 +230,12 @@ static ssize_t sdp_read_resp(HANDLE h, char *buf, ssize_t count)
 
         // TODO
         if (!ReadFile(h, buf, count, &readb, NULL))
-                return -1;
+                return SDP_EERRNO;
 
-		if (readb == 0) {
-			errno = EIO;
-			return -1;
-		}
+	if (readb == 0) {
+		errno = EIO;
+		return SDP_ENODATA;
+	}
 
         return readb;
 }
@@ -246,7 +252,10 @@ static ssize_t sdp_write(HANDLE h, char *buf, ssize_t count)
         DWORD writeb;
 
         if (!WriteFile(h, buf, count, &writeb, NULL))
-            return -1;
+            return SDP_EERRNO;
+
+        if (writeb != count)
+                return SDP_EWINCOMPL;
 
         return writeb;
 }
@@ -269,12 +278,12 @@ int sdp_open(sdp_t *sdp, const char *fname, int addr)
 
         if (addr < SDP_DEV_ADDR_MIN || addr > SDP_DEV_ADDR_MAX) {
                 errno = ERANGE;
-                return -1;
+                return SDP_ERANGE;
         }
 
         f = open_serial(fname);
         if (f == SDP_F_ERR)
-                return -1;
+                return SDP_EERRNO;
 
         sdp->f_in = sdp->f_out = f;
         sdp->addr = addr;
@@ -292,7 +301,7 @@ int sdp_openf(sdp_t *sdp, SDP_F f, int addr)
 {
         if (addr < SDP_DEV_ADDR_MIN || addr > SDP_DEV_ADDR_MAX) {
                 errno = ERANGE;
-                return -1;
+                return SDP_EERRNO;
         }
 
         sdp->f_in = sdp->f_out = f;
@@ -325,19 +334,17 @@ int sdp_get_dev_addr(const sdp_t *sdp)
         int ret, addr;
         char buf[SDP_BUF_SIZE_MIN];
 
-        ret = sdp_sget_dev_addr(buf, sdp->addr);
-        if (ret == -1)
-                return -1;
+        if ( (ret = sdp_sget_dev_addr(buf, sdp->addr)) < 0)
+                return ret;
 
-        if (sdp_write(sdp->f_out, buf, ret) == -1)
-                return -1;
+        if ( (ret = sdp_write(sdp->f_out, buf, ret)) < 0)
+                return ret;
 
-        ret = sdp_read_resp(sdp->f_in, buf, sizeof(buf));
-        if (ret == -1)
-                return -1;
+        if ( (ret = sdp_read_resp(sdp->f_in, buf, sizeof(buf))) < 0)
+                return ret;
 
-        if (sdp_resp_dev_addr(buf, ret, &addr) == -1)
-                return -1;
+        if ( (ret = sdp_resp_dev_addr(buf, ret, &addr)) < 0)
+                return ret;
 
         return addr;
 }
@@ -353,19 +360,17 @@ int sdp_get_va_maximums(const sdp_t *sdp, sdp_va_t *va_maximums)
         int ret;
         char buf[SDP_BUF_SIZE_MIN];
 
-        ret = sdp_sget_va_maximums(buf, sdp->addr);
-        if (ret == -1)
-                return -1;
+        if ( (ret = sdp_sget_va_maximums(buf, sdp->addr)) < 0)
+                return ret;
 
-        if (sdp_write(sdp->f_out, buf, ret) == -1)
-                return -1;
+        if ( (ret = sdp_write(sdp->f_out, buf, ret)) < 0)
+                return ret;
 
-        ret = sdp_read_resp(sdp->f_in, buf, sizeof(buf));
-        if (ret == -1)
-                return -1;
+        if ( (ret = sdp_read_resp(sdp->f_in, buf, sizeof(buf))) < 0)
+                return ret;
 
-        if (sdp_resp_va_maximums(buf, ret, va_maximums) == -1)
-                return -1;
+        if ( (ret = sdp_resp_va_maximums(buf, ret, va_maximums)) < 0)
+                return ret;
 
         return 0;
 }
@@ -381,19 +386,17 @@ int sdp_get_volt_limit(const sdp_t *sdp, double *volt)
         int ret;
         char buf[SDP_BUF_SIZE_MIN];
 
-        ret = sdp_sget_volt_limit(buf, sdp->addr);
-        if (ret == -1)
-                return -1;
+        if ( (ret = sdp_sget_volt_limit(buf, sdp->addr)) < 0)
+                return ret;
 
-        if (sdp_write(sdp->f_out, buf, ret) == -1)
-                return -1;
+        if ( (ret = sdp_write(sdp->f_out, buf, ret)) < 0)
+                return ret;
 
-        ret = sdp_read_resp(sdp->f_in, buf, sizeof(buf));
-        if (ret == -1)
-                return -1;
+        if ( (ret = sdp_read_resp(sdp->f_in, buf, sizeof(buf))) < 0)
+                return ret;
 
-        if (sdp_resp_volt_limit(buf, ret, volt) == -1)
-                return -1;
+        if ( (ret = sdp_resp_volt_limit(buf, ret, volt)) < 0)
+                return ret;
 
         return 0;
 }
@@ -409,19 +412,17 @@ int sdp_get_va_data(const sdp_t *sdp, sdp_va_data_t *va_data)
         int ret;
         char buf[SDP_BUF_SIZE_MIN];
 
-        ret = sdp_sget_va_data(buf, sdp->addr);
-        if (ret == -1)
-                return -1;
+        if ( (ret = sdp_sget_va_data(buf, sdp->addr)) < 0)
+                return ret;
 
-        if (sdp_write(sdp->f_out, buf, ret) == -1)
-                return -1;
+        if ( (ret = sdp_write(sdp->f_out, buf, ret)) < 0)
+                return ret;
 
-        ret = sdp_read_resp(sdp->f_in, buf, sizeof(buf));
-        if (ret == -1)
-                return -1;
+        if ( (ret = sdp_read_resp(sdp->f_in, buf, sizeof(buf))) < 0)
+                return ret;
 
-        if (sdp_resp_va_data(buf, ret, va_data) == -1)
-                return -1;
+        if ( (ret = sdp_resp_va_data(buf, ret, va_data)) < 0)
+                return ret;
 
         return 0;
 }
@@ -437,19 +438,17 @@ int sdp_get_va_setpoint(const sdp_t *sdp, sdp_va_t *va_setpoints)
         int ret;
         char buf[SDP_BUF_SIZE_MIN];
 
-        ret = sdp_sget_va_setpoint(buf, sdp->addr);
-        if (ret == -1)
-                return -1;
+        if ( (ret = sdp_sget_va_setpoint(buf, sdp->addr)) < 0)
+                return ret;
 
-        if (sdp_write(sdp->f_out, buf, ret) == -1)
-                return -1;
+        if ( (ret = sdp_write(sdp->f_out, buf, ret)) < 0)
+                return ret;
 
-        ret = sdp_read_resp(sdp->f_in, buf, sizeof(buf));
-        if (ret == -1)
-                return -1;
+        if ( (ret = sdp_read_resp(sdp->f_in, buf, sizeof(buf))) < 0)
+                return ret;
 
-        if (sdp_resp_va_setpoint(buf, ret, va_setpoints) == -1)
-                return -1;
+        if ( (ret = sdp_resp_va_setpoint(buf, ret, va_setpoints)) < 0)
+                return ret;
 
         return 0;
 }
@@ -468,19 +467,17 @@ int sdp_get_preset(const sdp_t *sdp, int presn, sdp_va_t *va_preset)
         int ret;
         char buf[(7*9+3+1)];
 
-        ret = sdp_sget_preset(buf, sdp->addr, presn);
-        if (ret == -1)
-                return -1;
+        if ( (ret = sdp_sget_preset(buf, sdp->addr, presn)) < 0)
+                return ret;
 
-        if (sdp_write(sdp->f_out, buf, ret) == -1)
-                return -1;
+        if ( (ret = sdp_write(sdp->f_out, buf, ret)) < 0)
+                return ret;
 
-        ret = sdp_read_resp(sdp->f_in, buf, sizeof(buf));
-        if (ret == -1)
-                return -1;
+        if ( (ret = sdp_read_resp(sdp->f_in, buf, sizeof(buf))) < 0)
+                return ret;
 
-        if (sdp_resp_preset(buf, ret, va_preset) == -1)
-                return -1;
+        if ( (ret = sdp_resp_preset(buf, ret, va_preset)) < 0)
+                return ret;
 
         return 0;
 }
@@ -500,19 +497,17 @@ int sdp_get_program(const sdp_t *sdp, int progn, sdp_program_t *program)
         int ret;
         char buf[11*20+3+1];
 
-        ret = sdp_sget_program(buf, sdp->addr, progn);
-        if (ret == -1)
-                return -1;
+        if ( (ret = sdp_sget_program(buf, sdp->addr, progn)) < 0)
+                return ret;
 
-        if (sdp_write(sdp->f_out, buf, ret) == -1)
-                return -1;
+        if ( (ret = sdp_write(sdp->f_out, buf, ret)) < 0)
+                return ret;
 
-        ret = sdp_read_resp(sdp->f_in, buf, sizeof(buf));
-        if (ret == -1)
-                return -1;
+        if ( (ret = sdp_read_resp(sdp->f_in, buf, sizeof(buf))) < 0)
+                return ret;
 
-        if (sdp_resp_program(buf, ret, program) == -1)
-                return -1;
+        if ( (ret = sdp_resp_program(buf, ret, program)) < 0)
+                return ret;
 
         return 0;
 }
@@ -530,21 +525,19 @@ int sdp_get_lcd_info(const sdp_t *sdp, sdp_lcd_info_t *lcd_info)
         char buf[100];
         sdp_lcd_info_raw_t lcd_info_raw;
 
-        ret = sdp_sget_lcd_info(buf, sdp->addr);
-        if (ret == -1)
-                return -1;
+        if ( (ret = sdp_sget_lcd_info(buf, sdp->addr)) < 0)
+                return ret;
 
-        if (sdp_write(sdp->f_out, buf, ret) == -1)
-                return -1;
+        if ( (ret = sdp_write(sdp->f_out, buf, ret)) < 0)
+                return ret;
 
-        ret = sdp_read_resp(sdp->f_in, buf, sizeof(buf));
-        if (ret == -1)
-                return -1;
+        if ( (ret = sdp_read_resp(sdp->f_in, buf, sizeof(buf))) < 0)
+                return ret;
 
-        if (sdp_resp_lcd_info(buf, ret, &lcd_info_raw) == -1)
-                return -1;
+        if ( (ret = sdp_resp_lcd_info(buf, ret, &lcd_info_raw)) < 0)
+                return ret;
 
-		sdp_lcd_to_data(lcd_info, &lcd_info_raw);
+	sdp_lcd_to_data(lcd_info, &lcd_info_raw);
 
         return 0;
 }
@@ -560,16 +553,14 @@ int sdp_remote(const sdp_t *sdp, int enable)
         int ret;
         char buf[SDP_BUF_SIZE_MIN];
 
-        ret = sdp_sremote(buf, sdp->addr, enable);
-        if (ret == -1)
-                return -1;
+        if ( (ret = sdp_sremote(buf, sdp->addr, enable)) < 0)
+                return ret;
 
-        if (sdp_write(sdp->f_out, buf, ret) == -1)
-                return -1;
+        if ( (ret = sdp_write(sdp->f_out, buf, ret)) < 0)
+                return ret;
 
-        ret = sdp_read_resp(sdp->f_in, buf, SDP_RESP_LEN_OK);
-        if (ret == -1)
-                return -1;
+        if ( (ret = sdp_read_resp(sdp->f_in, buf, SDP_RESP_LEN_OK)) < 0)
+                return ret;
 
         return 0;
 }
@@ -585,16 +576,14 @@ int sdp_run_preset(const sdp_t *sdp, int preset)
         int ret;
         char buf[SDP_BUF_SIZE_MIN];
 
-        ret = sdp_srun_preset(buf, sdp->addr, preset);
-        if (ret == -1)
-                return -1;
+        if ( (ret = sdp_srun_preset(buf, sdp->addr, preset)) < 0)
+                return ret;
 
-        if (sdp_write(sdp->f_out, buf, ret) == -1)
-                return -1;
+        if ( (ret = sdp_write(sdp->f_out, buf, ret)) < 0)
+                return ret;
 
-        ret = sdp_read_resp(sdp->f_in, buf, SDP_RESP_LEN_OK);
-        if (ret == -1)
-                return -1;
+        if ( (ret = sdp_read_resp(sdp->f_in, buf, SDP_RESP_LEN_OK)) < 0)
+                return ret;
 
         return 0;
 }
@@ -611,16 +600,14 @@ int sdp_run_program(const sdp_t *sdp, int count)
         int ret;
         char buf[SDP_BUF_SIZE_MIN];
 
-        ret = sdp_srun_program(buf, sdp->addr, count);
-        if (ret == -1)
-                return -1;
+        if ( (ret = sdp_srun_program(buf, sdp->addr, count)) < 0)
+                return ret;
 
-        if (sdp_write(sdp->f_out, buf, ret) == -1)
-                return -1;
+        if ( (ret = sdp_write(sdp->f_out, buf, ret)) < 0)
+                return ret;
 
-        ret = sdp_read_resp(sdp->f_in, buf, SDP_RESP_LEN_OK);
-        if (ret == -1)
-                return -1;
+        if ( (ret = sdp_read_resp(sdp->f_in, buf, SDP_RESP_LEN_OK)) < 0)
+                return ret;
 
         return 0;
 }
@@ -634,17 +621,16 @@ int sdp_run_program(const sdp_t *sdp, int count)
 int sdp_select_ifce(const sdp_t *sdp, sdp_ifce_t ifce)
 {
         char buf[SDP_BUF_SIZE_MIN];
-        ssize_t size;
+        int ret;
 
-        size = sdp_sselect_ifce(buf, sdp->addr, ifce);
-        if (size == -1)
-                return -1;
+        if ( (ret = sdp_sselect_ifce(buf, sdp->addr, ifce)) < 0)
+                return ret;
 
-        if (sdp_write(sdp->f_out, buf, size) != size)
-                return -1;
+        if ( (ret = sdp_write(sdp->f_out, buf, ret)) < 0)
+                return ret;
 
-        if (sdp_read_resp(sdp->f_in, buf, SDP_RESP_LEN_OK) == -1)
-                return -1;
+        if ( (ret = sdp_read_resp(sdp->f_in, buf, SDP_RESP_LEN_OK)) < 0)
+                return ret;
 
         return 0;
 }
@@ -658,17 +644,16 @@ int sdp_select_ifce(const sdp_t *sdp, sdp_ifce_t ifce)
 int sdp_set_curr(const sdp_t *sdp, double curr)
 {
         char buf[SDP_BUF_SIZE_MIN];
-        ssize_t size;
+        int ret;
 
-        size = sdp_sset_curr(buf, sdp->addr, curr);
-        if (size == -1)
-                return -1;
+        if ( (ret = sdp_sset_curr(buf, sdp->addr, curr)) < 0)
+                return ret;
 
-        if (sdp_write(sdp->f_out, buf, size) != size)
-                return -1;
+        if ( (ret = sdp_write(sdp->f_out, buf, ret)) < 0)
+                return ret;
 
-        if (sdp_read_resp(sdp->f_in, buf, SDP_RESP_LEN_OK) == -1)
-                return -1;
+        if ( (ret = sdp_read_resp(sdp->f_in, buf, SDP_RESP_LEN_OK)) < 0)
+                return ret;
 
         return 0;
 }
@@ -682,17 +667,16 @@ int sdp_set_curr(const sdp_t *sdp, double curr)
 int sdp_set_volt(const sdp_t *sdp, double volt)
 {
         char buf[SDP_BUF_SIZE_MIN];
-        ssize_t size;
+        int ret;
 
-        size = sdp_sset_volt(buf, sdp->addr, volt);
-        if (size == -1)
-                return -1;
+        if ( (ret = sdp_sset_volt(buf, sdp->addr, volt)) < 0)
+                return ret;
 
-        if (sdp_write(sdp->f_out, buf, size) != size)
-                return -1;
+        if ( (ret = sdp_write(sdp->f_out, buf, ret)) < 0)
+                return ret;
 
-        if (sdp_read_resp(sdp->f_in, buf, SDP_RESP_LEN_OK) == -1)
-                return -1;
+        if ( (ret = sdp_read_resp(sdp->f_in, buf, SDP_RESP_LEN_OK)) < 0)
+                return ret;
 
         return 0;
 }
@@ -706,17 +690,16 @@ int sdp_set_volt(const sdp_t *sdp, double volt)
 int sdp_set_volt_limit(const sdp_t *sdp, double volt)
 {
         char buf[SDP_BUF_SIZE_MIN];
-        ssize_t size;
+        int ret;
 
-        size = sdp_sset_volt_limit(buf, sdp->addr, volt);
-        if (size == -1)
-                return -1;
+        if ( (ret = sdp_sset_volt_limit(buf, sdp->addr, volt)) < 0)
+                return ret;
 
-        if (sdp_write(sdp->f_out, buf, size) != size)
-                return -1;
+        if ( (ret = sdp_write(sdp->f_out, buf, ret)) < 0)
+                return ret;
 
-        if (sdp_read_resp(sdp->f_in, buf, SDP_RESP_LEN_OK) == -1)
-                return -1;
+        if ( (ret = sdp_read_resp(sdp->f_in, buf, SDP_RESP_LEN_OK)) < 0)
+                return ret;
 
         return 0;
 }
@@ -730,17 +713,16 @@ int sdp_set_volt_limit(const sdp_t *sdp, double volt)
 int sdp_set_output(const sdp_t *sdp, int enable)
 {
         char buf[SDP_BUF_SIZE_MIN];
-        ssize_t size;
+        int ret;
 
-        size = sdp_sset_output(buf, sdp->addr, enable);
-        if (size == -1)
-                return -1;
+        if ( (ret = sdp_sset_output(buf, sdp->addr, enable)) < 0)
+                return ret;
 
-        if (sdp_write(sdp->f_out, buf, size) != size)
-                return -1;
+        if ( (ret = sdp_write(sdp->f_out, buf, ret)) < 0)
+                return ret;
 
-        if (sdp_read_resp(sdp->f_in, buf, SDP_RESP_LEN_OK) == -1)
-                return -1;
+        if ( (ret = sdp_read_resp(sdp->f_in, buf, SDP_RESP_LEN_OK)) < 0)
+                return ret;
 
         return 0;
 }
@@ -755,17 +737,16 @@ int sdp_set_output(const sdp_t *sdp, int enable)
 int sdp_set_poweron_output(const sdp_t *sdp, int presn, int enable)
 {
         char buf[SDP_BUF_SIZE_MIN];
-        ssize_t size;
+        int ret;
 
-        size = sdp_sset_poweron_output(buf, sdp->addr, presn, enable);
-        if (size == -1)
-                return -1;
+        if ( (ret = sdp_sset_poweron_output(buf, sdp->addr, presn, enable)) < 0)
+                return ret;
 
-        if (sdp_write(sdp->f_out, buf, size) != size)
-                return -1;
+        if ( (ret = sdp_write(sdp->f_out, buf, ret)) < 0)
+                return ret;
 
-        if (sdp_read_resp(sdp->f_in, buf, SDP_RESP_LEN_OK) == -1)
-                return -1;
+        if ( (ret = sdp_read_resp(sdp->f_in, buf, SDP_RESP_LEN_OK)) < 0)
+                return ret;
 
         return 0;
 }
@@ -780,17 +761,16 @@ int sdp_set_poweron_output(const sdp_t *sdp, int presn, int enable)
 int sdp_set_preset(const sdp_t *sdp, int presn, const sdp_va_t *va_preset)
 {
         char buf[SDP_BUF_SIZE_MIN];
-        ssize_t size;
+        int ret;
 
-        size = sdp_sset_preset(buf, sdp->addr, presn, va_preset);
-        if (size == -1)
-                return -1;
+        if ( (ret = sdp_sset_preset(buf, sdp->addr, presn, va_preset)) < 0)
+                return ret;
 
-        if (sdp_write(sdp->f_out, buf, size) != size)
-                return -1;
+        if ( (ret = sdp_write(sdp->f_out, buf, ret)) < 0)
+                return ret;
 
-        if (sdp_read_resp(sdp->f_in, buf, SDP_RESP_LEN_OK) == -1)
-                return -1;
+        if ( (ret = sdp_read_resp(sdp->f_in, buf, SDP_RESP_LEN_OK)) < 0)
+                return ret;
 
         return 0;
 }
@@ -805,17 +785,16 @@ int sdp_set_preset(const sdp_t *sdp, int presn, const sdp_va_t *va_preset)
 int sdp_set_program(const sdp_t *sdp, int progn, const sdp_program_t *program)
 {
         char buf[SDP_BUF_SIZE_MIN];
-        ssize_t size;
+        int ret;
 
-        size = sdp_sset_program(buf, sdp->addr, progn, program);
-        if (size == -1)
-                return -1;
+        if ( (ret = sdp_sset_program(buf, sdp->addr, progn, program)) < 0)
+                return ret;
 
-        if (sdp_write(sdp->f_out, buf, size) != size)
-                return -1;
+        if ( (ret = sdp_write(sdp->f_out, buf, ret)) < 0)
+                return ret;
 
-        if (sdp_read_resp(sdp->f_in, buf, SDP_RESP_LEN_OK) == -1)
-                return -1;
+        if ( (ret = sdp_read_resp(sdp->f_in, buf, SDP_RESP_LEN_OK)) < 0)
+                return ret;
 
         return 0;
 }
@@ -830,15 +809,14 @@ int sdp_stop(const sdp_t *sdp)
         char buf[SDP_BUF_SIZE_MIN];
         int ret;
 
-        ret = sdp_sstop(buf, sdp->addr);
-        if (ret == -1)
-                return -1;
+        if ( (ret = sdp_sstop(buf, sdp->addr)) < 0)
+                return ret;
 
-        if (sdp_write(sdp->f_out, buf, ret) != ret)
-                return -1;
+        if ( (ret = sdp_write(sdp->f_out, buf, ret)) < 0)
+                return ret;
 
-        if (sdp_read_resp(sdp->f_in, buf, SDP_RESP_LEN_OK) == -1)
-                return -1;
+        if ( (ret = sdp_read_resp(sdp->f_in, buf, SDP_RESP_LEN_OK)) < 0)
+                return ret;
 
         return 0;
 }

@@ -54,13 +54,32 @@ extern "C" {
 /** Repeat runned program indefinitely */
 #define SDP_RUN_PROG_INF (0)
 
+/** No error. */
+#define SDP_EOK         (0)
+/** System error, error code is in errno */
+#define SDP_EERRNO      (-1)
+/** Response parsing failed, expected number. */
+#define SDP_ENONUM      (-2)
+/** Function parameter is out of range. */
+#define SDP_ERANGE      (-3)
+/** Invalid response. */
+#define SDP_EINRES      (-4)
+/** Response read timeout expired. */
+#define SDP_ETIMEDOUT   (-5)
+/** Output is too large to fit into buffer. */
+#define SDP_ETOLARGE    (-6)
+/** No data recieved. */
+#define SDP_ENODATA     (-7)
+/** Write operation returned with data partialy writen. */
+#define SDP_EWINCOMPL   (-8)
+
 #ifdef __linux__
 #define SDP_F int
-#define SDP_F_ERR -1
+#define SDP_F_ERR       (-1)
 #endif
 #ifdef _WIN32
 #define SDP_F HANDLE
-#define SDP_F_ERR INVALID_HANDLE_VALUE
+#define SDP_F_ERR       (INVALID_HANDLE_VALUE)
 #endif
 
 typedef enum {
