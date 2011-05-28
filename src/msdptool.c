@@ -45,7 +45,7 @@
 
 /**
  * Same as perror, but return -1.
- * @param fmt   format message, see man printf for details
+ * @param fmt   Format message, see man printf for details.
  * @return      -1
  **/
 static int perror_(const char *fmt)
@@ -67,8 +67,8 @@ static int perror_(const char *fmt)
 
 /**
  * Print string to standard error output and return -1.
- * @param str   string to print
- * @return      -1 always
+ * @param str   String to print to standard error.
+ * @return      Always -1.
  */
 static int printe(const char *str)
 {
