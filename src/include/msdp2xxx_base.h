@@ -68,8 +68,6 @@ extern "C" {
 #define SDP_ETIMEDOUT   (-5)
 /** Output is too large to fit into buffer. */
 #define SDP_ETOLARGE    (-6)
-/** No data recieved. */
-#define SDP_ENODATA     (-7)
 /** Write operation returned with data partialy writen. */
 #define SDP_EWINCOMPL   (-8)
 
@@ -180,6 +178,8 @@ typedef struct {
         /** when 0 PS use local control, when 1 remote is enabled */
 	unsigned char remote_ind;
 } sdp_lcd_info_t;
+
+const char *sdp_strerror(int err);
 
 #ifdef __cplusplus
 } // extern "C"

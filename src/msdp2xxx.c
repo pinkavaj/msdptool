@@ -240,7 +240,7 @@ static ssize_t sdp_read_resp(HANDLE h, char *buf, ssize_t count)
 
 	if (readb == 0) {
 		errno = EIO;
-		return SDP_ENODATA;
+		return SDP_ETIMEDOUT;
 	}
 
         return readb;

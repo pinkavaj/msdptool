@@ -292,6 +292,37 @@ int sdp_sget_volt_limit(char *buf, int addr)
 }
 
 /**
+ * Return textual description of SDP error, or value of strerror if
+ *      system level error occured.
+ * @param err   Error number.
+ * @return      Pointer to string describing the error.
+ */
+const char *sdp_strerror(int err)
+{
+        switch(err) {
+                case SDP_EINRES:
+                        return "Recieved invalid response.";
+                case SDP_ERANGE:
+                        return "Function parameter is out of range.";
+                case SDP_ENONUM:
+                        return "Value in response is not number.";
+                case SDP_ETIMEDOUT:
+                        return "Device not responded in specified time.";
+                case SDP_ETOLARGE:
+                        return "Output is too large to fit in buffer.";
+                case SDP_EWINCOMPL:
+                        return "Error occured during sending message to device.";
+                case SDP_EOK:
+                        errno = 0;
+                case SDP_EERRNO:
+                default:
+                        break;
+        }
+
+        return strerror(errno);
+}
+
+/**
  * Check buffer content for completed response on SDP command.
  * @param buf   Buffer containing recieved response.
  * @param len   Lenght of data in buffer.
