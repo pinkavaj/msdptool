@@ -1,6 +1,8 @@
 ; The name of the installer
 Name "msdptool"
 
+!include Library.nsh
+
 ;--------------------------------
 ;Version Information
 
@@ -54,7 +56,8 @@ Section "msdptool (required)"
   
   ; Put file there
   File "src\msdptool.exe"
-  File "src\msdp2xxx.dll"
+  !insertmacro InstallLib REGDLL $ALREADY_INSTALLED NOREBOOT_NOTPROTECTED "src\msdp2xxx.dll" "$INSTDIR\msdp2xxx.dll" $SYSDIR
+  File "src\libmsdp2xxx.a"
 
   SetOutPath "$INSTDIR\include"
   File "src\include\msdp2xxx_base.h"
@@ -93,11 +96,14 @@ Section "Uninstall"
   Delete "$INSTDIR\include\msdp2xxx_base.h"
   Delete "$INSTDIR\include\msdp2xxx.h"
   Delete "$INSTDIR\include\msdp2xxx_low.h"
-  Delete "$INSTDIR\msdp2xxx.dll"
+  !insertmacro UnInstallLib REGDLL SHARED NOREBOOT_NOTPROTECTED $INSTDIR\msdp2xxx.dll
+  Delete "$INSTDIR\libmsdp2xxx.a"
   Delete "$INSTDIR\msdptool.exe"
   Delete "$INSTDIR\uninstall.exe"
 
   ; Remove directories used
+  RMDir "$INSTDIR\doc"
+  RMDir "$INSTDIR\examples"
   RMDir "$INSTDIR\include"
   RMDir "$INSTDIR"
 
