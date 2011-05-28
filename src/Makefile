@@ -24,11 +24,13 @@ OBJS_PROG=$(SRC_PROG:%.c=%.o)
 OBJS_LIB=$(SRC_LIB:%.c=%.o)
 ifeq ($(findstring mingw32, $(CCOS)), mingw32)
 LIB_DINAMIC:=$(LIB:%=%.dll)
-LIB_STATIC=${LIB_DINAMIC:%.dll=%.a}
+LIB_NAME:=${LIB_DINAMIC}
+LIB_STATIC=${LIB_DINAMIC:%.dll=lib%.a}
 PROG:=$(PROG).exe
 endif
 ifeq ($(findstring linux, $(CCOS)), linux)
 LIB_LN:=$(LIB:%=lib%.so)
+LIB_NAME:=${LIB_LN}
 LIB_DINAMIC:=$(LIB_LN).$(VER_MAJ).$(VER_MIN)
 LIB_STATIC=${LIB_LN:%.so=%.a}
 endif
@@ -37,13 +39,13 @@ all:	${PROG}
 	echo done
 
 ${PROG}:	${LIB} ${OBJS_PROG}
-	${CC} ${CFLAGS} ${LDFLAGS} -o $@ -L. -lm -l${LIB} ${OBJS_PROG}
+	${CC} ${CFLAGS} ${LDFLAGS} -o $@ -L. ${OBJS_PROG} -lm -l${LIB}
 
 ${LIB}: $(LIB_DINAMIC)	$(LIB_STATIC)
 	[ "${LIB_LN}_" == "_" ] || ln -sf ${LIB_DINAMIC} $(LIB_LN)
 
 ${LIB_DINAMIC}: ${OBJS_LIB}
-	$(CC) ${CFLAGS} ${LDFLAGS} -shared -Wl,-soname,$(LIB_SO_VER) -o $@ $^
+	$(CC) ${CFLAGS} ${LDFLAGS} -shared -Wl,-soname,$(LIB_NAME) -o $@ $^
 
 ${LIB_STATIC}: ${OBJS_LIB}
 	$(AR) rcs $(LIB_STATIC) $^
