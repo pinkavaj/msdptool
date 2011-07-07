@@ -9,7 +9,7 @@ PROG=msdptool
 AR=$(CROSS_COMPILE)ar
 CC=$(CROSS_COMPILE)gcc
 INSTALL=install
-CFLAGS=-Wall -std=gnu99 -I./include
+CFLAGS=-Wall -std=gnu99 -I./include -fPIC
 LDFLAGS=
 
 SRC_PROG=msdptool.c
