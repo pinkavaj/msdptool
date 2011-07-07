@@ -73,5 +73,6 @@ Makefile:
 
 install: all
 	$(INSTALL) -m +x $(PROG) $(BIN_DIR)
-	$(INSTALL) -m +x $(LIB_SO_VER) $(LIB_DIR)
+	$(INSTALL) -m +x $(LIB_STATIC) $(LIB_DIR)
+	$(INSTALL) -m +x $(LIB_DINAMIC) $(LIB_DIR)
 
