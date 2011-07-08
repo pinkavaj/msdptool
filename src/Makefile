@@ -17,6 +17,7 @@ SRC_LIB=msdp2xxx.c msdp2xxx_low.c
 
 prefix=/usr/local
 BIN_DIR=$(prefix)/bin
+INC_DIR=$(prefix)/include
 LIB_DIR=$(prefix)/lib
 
 CCOS=$(shell ${CC} -dumpmachine)
@@ -76,3 +77,6 @@ install: all
 	$(INSTALL) $(LIB_STATIC) $(LIB_DIR)
 	$(INSTALL) $(LIB_DINAMIC) $(LIB_DIR)
 
+	cp include/msdp2xxx_base.h $(INC_DIR)
+	cp include/msdp2xxx_low.h $(INC_DIR)
+	cp include/msdp2xxx.h $(INC_DIR)
