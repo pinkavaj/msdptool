@@ -93,8 +93,8 @@ static ssize_t sdp_read_resp(int fd, char *buf, ssize_t count)
 
         // TODO: check this value
         timeout.tv_sec = 0;
-        // (bytes + something) * msec / (bitrate / bits per byte)
-        timeout.tv_usec = (count * 2000 + 50000) / (9600 / 10);
+        // (bytes * 10 * usec) / bitrate + delay_to_reaction;
+        timeout.tv_usec = (count * 10l * 1000000l) / 9600l + 70000l;
         do {
                 ssize_t size_;
 
