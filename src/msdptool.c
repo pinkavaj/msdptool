@@ -64,7 +64,7 @@ static int perror_(const char *str, int err)
         const char *errs;
 
         errs = sdp_strerror(err);
-        fprintf(stderr, "%s: %s", str, errs);
+        fprintf(stderr, "%s: %s\n", str, errs);
 
         return -1;
 }
@@ -207,8 +207,8 @@ int main(int argc, char **argv_)
                 f_stdout = stdout;
         }
 #endif
-
-        if (sdp_remote(&sdp, 1) < 0)
+	ret = sdp_remote(&sdp, 1);
+	if (ret < 0)
                 return perror_("Failed to switch to remote mode", ret);
 
         // Drop already processed arguments
