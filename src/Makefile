@@ -67,7 +67,7 @@ clean:
 		"*.so" \
 		"*.so.*" \
 		${PROG}; \
-		do find . -name "$${f}" -exec rm \{\} \; ; done
+		do find . -name "$${f}" -exec rm -f \{\} \; ; done
 
 Makefile:
 	
