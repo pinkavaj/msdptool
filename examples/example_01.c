@@ -67,5 +67,6 @@ int main()
 
         // Set to local controll mode and close comunication
         sdp_close(&sdp);
-}
 
+        return 0;
+}
