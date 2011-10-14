@@ -1,7 +1,7 @@
  * find better names for some functions
- * change buld system from hardcoded Makefiles to some autogen sutff?
+ * change build system from hardcoded Makefiles to some autogen stuff?
  * support for other build systems (cmake, qmake ?)
  * create unit tests for library (usign preferably pytest)
  * create some tools to test and use this library
-   * GUI tool(s) (Qt4? GTK? .Net?)
+   * GUI tool(s) (Qt4/GTK/...)
 
