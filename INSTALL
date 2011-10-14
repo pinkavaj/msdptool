@@ -1,13 +1,13 @@
-Linux:
+== Linux ==
 
 make
 make install
 
-Windows - MinGW:
+== Windows - MinGW ==
 
 make
 make install
 
-Windows - MS Visual Studio:
-open project file in build/MSVC directory
+== Windows - MS Visual Studio ==
 
+open project file in build/MSVC directory and build
