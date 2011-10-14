@@ -594,7 +594,7 @@ int sdp_resp_program(char *buf, int len, sdp_program_t *program)
 int sdp_resp_lcd_info(char *buf, int len, sdp_lcd_info_raw_t *lcd_info)
 {
         const char resp[] = "UUUUUUUUVIIIIIIIIAPPPPPPPPWmmmmssss____uuuuuu___iiiiii___pp_________\rOK\r";
-        int idx;
+        unsigned int idx;
 
         if (len != (sizeof(resp) - 1)) {
                 errno = EINVAL;
