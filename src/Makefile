@@ -40,7 +40,7 @@ all:	${PROG}
 	echo done
 
 ${PROG}:	${LIB} ${OBJS_PROG}
-	${CC} ${CFLAGS} ${LDFLAGS} -o $@ -L. ${OBJS_PROG} -lm -l${LIB}
+	${CC} ${CFLAGS} ${LDFLAGS} -o $@ -L. ${OBJS_PROG} -l${LIB} -lm
 
 ${LIB}: $(LIB_DINAMIC)	$(LIB_STATIC)
 	[ "${LIB_LN}_" == "_" ] || ln -sf ${LIB_DINAMIC} $(LIB_LN)
