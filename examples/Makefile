@@ -1,7 +1,7 @@
 PROG=example_01
 
 CC=gcc
-CFLAGS=-Wall -std=gnu99 -I../src/include -L../src
+CFLAGS=-Wall -I../src/include -L../src
 LDFLAGS=
 
 SRC_PROG=example_01.c
