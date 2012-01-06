@@ -11,6 +11,8 @@ TEMPLATE = lib
 # comment/uncomment to build dinamic/static library
 CONFIG += staticlib
 
+INCLUDEPATH += ../src/include/
+
 VERSION = 0.0
 
 #DEFINES += MSDPTOOL_LIBRARY
